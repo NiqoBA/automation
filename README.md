@@ -1,4 +1,4 @@
-# NorthPeak Digital - Landing Page
+# We Automate - Landing Page
 
 A top 1% landing page for a Digital Transformation & AI Automation agency built with Next.js 14+ (App Router), TypeScript, and TailwindCSS.
 
@@ -96,5 +96,4 @@ npm start
 ## License
 
 MIT
-
 
