@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useLanguage } from '@/contexts/LanguageContext'
 import CaseStudy from './CaseStudy'
 
 type Category = 'Automatización' | 'Marketing/SEO' | 'Datos & Dashboards' | 'IA'
@@ -167,6 +168,7 @@ const cases: Case[] = [
 const categories: Category[] = ['Automatización', 'Marketing/SEO', 'Datos & Dashboards', 'IA']
 
 export default function Work() {
+  const { t } = useLanguage()
   const [activeCategory, setActiveCategory] = useState<Category | 'Todos'>('Todos')
   const [currentIndex, setCurrentIndex] = useState(0)
 
@@ -194,18 +196,19 @@ export default function Work() {
   const currentCase = filteredCases.length > 0 ? filteredCases[currentIndex] : null
 
   return (
-    <section id="work" className="py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F7F6F2' }}>
-      <div className="max-w-7xl mx-auto border border-gray-300 rounded-lg p-8">
+    <section id="work" className="py-16 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#FBFBFB' }}>
+      <div className="max-w-7xl mx-auto p-8">
         {/* Header */}
-        <div className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-px w-12 bg-blue-600" />
-            <span className="text-sm font-medium text-blue-600 uppercase tracking-wider">Experience</span>
+        <div className="mb-10 text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="h-px w-12 bg-teal-700" />
+            <span className="text-sm font-medium text-teal-700 uppercase tracking-wider">{t('work.eyebrow')}</span>
+            <div className="h-px w-12 bg-teal-700" />
           </div>
           <h2 className="text-4xl sm:text-5xl font-bold text-black mb-3 tracking-tight">
-            Proyectos
+            {t('work.title')}
           </h2>
-          <p className="text-lg text-gray-600 font-light">Sistemas reales de automatización, IA e integraciones.</p>
+          <p className="text-lg text-gray-600 font-light">{t('work.subtitle')}</p>
         </div>
 
         {/* Category Filters */}
@@ -214,11 +217,11 @@ export default function Work() {
             onClick={() => handleCategoryChange('Todos')}
             className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
               activeCategory === 'Todos'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                ? 'bg-teal-700 text-white shadow-md shadow-teal-700/20'
                 : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-gray-200/60'
             }`}
           >
-            Todos
+            {t('work.filter.all')}
           </button>
           {categories.map((category) => (
             <button
@@ -226,7 +229,7 @@ export default function Work() {
               onClick={() => handleCategoryChange(category)}
               className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
                 activeCategory === category
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                  ? 'bg-teal-700 text-white shadow-md shadow-teal-700/20'
                   : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-gray-200/60'
               }`}
             >
@@ -269,7 +272,7 @@ export default function Work() {
                         key={idx}
                         onClick={() => setCurrentIndex(idx)}
                         className={`h-2 rounded-full transition-all ${
-                          idx === currentIndex ? 'w-8 bg-blue-600' : 'w-2 bg-gray-300'
+                          idx === currentIndex ? 'w-8 bg-teal-700' : 'w-2 bg-gray-300'
                         }`}
                         aria-label={`Ir a caso ${idx + 1}`}
                       />

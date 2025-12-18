@@ -22,10 +22,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative pt-32 pb-60 px-4 sm:px-6 lg:px-8 overflow-hidden" style={{ background: 'linear-gradient(to right, #1e3a8a, #0f172a)' }}>
-      {/* Gradient accents */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gray-500/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+    <section className="relative pt-32 pb-60 px-4 sm:px-6 lg:px-8 overflow-hidden" style={{ background: 'linear-gradient(to right, #0f766e, #0c4a6e)' }}>
 
       <div className="relative max-w-5xl mx-auto">
         <motion.div
@@ -124,7 +121,7 @@ export default function Hero() {
         >
           <path
             d="M0,0 Q720,180 1440,0 L1440,180 L0,180 Z"
-            fill="#F7F6F2"
+            fill="#FBFBFB"
           />
         </svg>
       </div>

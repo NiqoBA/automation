@@ -23,7 +23,7 @@ export default function CTA() {
   }
 
   return (
-    <section id="cta" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#F7F6F2' }}>
+    <section id="cta" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#FBFBFB' }}>
       {/* Background accents */}
       <div className="absolute inset-0 tech-grid opacity-20" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />

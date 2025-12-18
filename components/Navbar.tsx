@@ -63,28 +63,27 @@ export default function Navbar() {
           ? 'backdrop-blur-md shadow-sm border-gray-400/30' 
           : 'backdrop-blur-sm border-gray-400/20'
       }`}
-      style={{ background: isScrolled ? '#FFFFFF' : 'linear-gradient(to right, rgba(30, 58, 138, 0.90), rgba(15, 23, 42, 0.90))' }}
+      style={{ background: isScrolled ? '#FFFFFF' : 'linear-gradient(to right, rgba(15, 118, 110, 0.90), rgba(12, 74, 110, 0.90))' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24">
+        <div className="flex items-center justify-between h-20">
           <motion.a
             href="/"
             className="flex items-center gap-3 transition-all"
             whileHover={{ scale: 1.05 }}
           >
             <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-              isScrolled ? 'bg-blue-900' : 'bg-white'
+              isScrolled ? 'bg-teal-700' : 'bg-white'
             }`}>
               <span className={`text-2xl font-bold transition-colors ${
-                isScrolled ? 'text-gray-100' : 'text-blue-900'
+                isScrolled ? 'text-white' : 'text-teal-700'
               }`}>W</span>
             </div>
             <span className={`text-lg font-bold ${
               isScrolled 
-                ? 'text-blue-900 hover:text-blue-800' 
-                : 'text-white brightness-150 hover:brightness-125'
+                ? 'text-teal-700 hover:text-teal-800' 
+                : 'text-white'
             }`}
-            style={!isScrolled ? { color: '#ffffff', filter: 'brightness(1.2)' } : {}}
             >
               We Automate
             </span>
@@ -182,8 +181,8 @@ export default function Navbar() {
               onClick={handleBookDemo}
               className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium shadow-sm hover:shadow-md ${
                 isScrolled 
-                  ? 'bg-blue-900 text-white hover:bg-blue-800' 
-                  : 'bg-white text-gray-900 hover:bg-gray-100'
+                  ? 'bg-teal-700 text-white hover:bg-teal-800' 
+                  : 'bg-white text-teal-700 hover:bg-teal-50'
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -213,7 +212,7 @@ export default function Navbar() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="md:hidden border-t border-gray-300/20"
-          style={{ background: 'linear-gradient(to right, #1e3a8a, #0f172a)' }}
+          style={{ background: 'linear-gradient(to right, #0f766e, #0c4a6e)' }}
         >
           <div className="px-4 py-4 space-y-4">
             {[
@@ -283,8 +282,8 @@ export default function Navbar() {
               onClick={handleBookDemo}
               className={`w-full px-4 py-2 rounded-lg transition-colors text-sm font-medium shadow-sm hover:shadow-md ${
                 isScrolled 
-                  ? 'bg-blue-900 text-white hover:bg-blue-800' 
-                  : 'bg-white text-gray-900 hover:bg-gray-100'
+                  ? 'bg-teal-700 text-white hover:bg-teal-800' 
+                  : 'bg-white text-teal-700 hover:bg-teal-50'
               }`}
             >
               {t('nav.bookDemo')}

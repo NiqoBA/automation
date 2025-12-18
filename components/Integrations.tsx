@@ -21,7 +21,7 @@ export default function Integrations() {
   const duplicatedLogos = [...logos, ...logos]
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 overflow-hidden" style={{ backgroundColor: '#F7F6F2' }}>
+    <section className="py-16 px-4 sm:px-6 lg:px-8 overflow-hidden" style={{ backgroundColor: '#FBFBFB' }}>
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
