@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, Brain, Receipt } from 'lucide-react'
-import Image from 'next/image'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function CoreSystems() {
@@ -184,26 +183,22 @@ export default function CoreSystems() {
                   {/* Right: UI Mockup Card */}
                   {system.id === 'voice-whatsapp' ? (
                     <div className="flex items-center justify-center w-full h-full relative">
-                      <div className="relative w-full h-full min-h-[400px] flex items-center justify-center">
-                        <Image 
+                      <div className="w-full h-full min-h-[400px] flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
+                        <img 
                           src="/imgs/sistema 1.png" 
                           alt="Sistema 1" 
-                          fill
-                          className="object-contain"
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                          priority
+                          className="w-full h-full object-contain"
+                          style={{ transform: 'scale(1.8)' }}
                         />
                       </div>
                     </div>
                   ) : system.id === 'rag-brain' ? (
                     <div className="flex items-center justify-center w-full">
-                      <div className="relative w-full max-w-[280px] aspect-square">
-                        <Image 
+                      <div className="w-full max-w-[280px] relative">
+                        <img 
                           src="/imgs/sistema2.jpg" 
                           alt="Sistema 2" 
-                          fill
-                          className="object-contain"
-                          sizes="(max-width: 768px) 100vw, 280px"
+                          className="w-full h-auto object-contain"
                         />
                       </div>
                     </div>
