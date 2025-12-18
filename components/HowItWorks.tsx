@@ -99,9 +99,7 @@ export default function HowItWorks() {
                     }`} style={{
                       WebkitTextStroke: isHighlighted ? 'none' : '1px',
                       WebkitTextStrokeColor: '#e5e7eb',
-                      textStroke: isHighlighted ? 'none' : '1px',
-                      textStrokeColor: '#e5e7eb',
-                    }}>
+                    } as React.CSSProperties}>
                       {step.number}
                     </div>
                   </div>
