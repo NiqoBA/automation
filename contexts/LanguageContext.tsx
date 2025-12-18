@@ -83,12 +83,12 @@ const translations = {
     'howitworks.eyebrow': 'Process',
     'howitworks.title': 'How We Work',
     'howitworks.subtitle': 'A systematic approach to digital transformation that guarantees results.',
-    'howitworks.step1.title': 'Operational Architecture Diagnosis',
-    'howitworks.step1.description': 'Not a sales call. It\'s a strategic session where we analyze how your operation works today: processes, tools, data, and friction points. We identify what can be automated, what\'s generating invisible losses, and where technology can create immediate impact. You leave with a clear map of real opportunities, not generic promises.',
+    'howitworks.step1.title': 'Discovery Call',
+    'howitworks.step1.description': 'We meet to understand your business objectives, your workflows, and the key processes where AI can generate the greatest impact.',
     'howitworks.step2.title': 'Solution Engineering & Stress Testing',
-    'howitworks.step2.description': 'We design the custom solution and integrate it with your current stack. Before putting anything into production, the system is tested in real scenarios: load, errors, edge cases, and intensive use. Nothing is deployed without being validated, ensuring stability, security, and performance from day one.',
+    'howitworks.step2.description': 'We create a functional demo integrated with your stack and test it before releasing anything. We test load, errors, edge cases, and real usage. If it passes all protocols, only then is it deployed: stable, secure, and ready for production.',
     'howitworks.step3.title': 'Precision Deployment',
-    'howitworks.step3.description': 'We implement the system in your real environment without interrupting operations. We actively monitor performance, adjust in real-time, and train your team so adoption is immediate. The result: a solution that\'s working, understood, and generating value from day one.',
+    'howitworks.step3.description': 'We deploy in your real environment without stopping operations. We monitor performance, adjust in real-time, and train your team. The goal: fast production deployment, adopted and generating value from day one.',
     
     // Results
     'results.title': 'Results',
@@ -260,12 +260,12 @@ const translations = {
     'howitworks.eyebrow': 'Proceso',
     'howitworks.title': 'Cómo Trabajamos',
     'howitworks.subtitle': 'Un enfoque sistemático de transformación digital que garantiza resultados.',
-    'howitworks.step1.title': 'Diagnóstico de Arquitectura Operativa',
-    'howitworks.step1.description': 'No es una llamada comercial. Es una sesión estratégica donde analizamos cómo funciona hoy tu operación: procesos, herramientas, datos y puntos de fricción. Identificamos qué se puede automatizar, qué está generando pérdidas invisibles y dónde la tecnología puede generar impacto inmediato. Salís con un mapa claro de oportunidades reales, no con promesas genéricas.',
+    'howitworks.step1.title': 'Discovery Call',
+    'howitworks.step1.description': 'Nos reunimos para entender tus objetivos de negocio, tus flujos de trabajo y los procesos clave donde la IA puede generar el mayor impacto.',
     'howitworks.step2.title': 'Ingeniería de Soluciones & Pruebas de Estrés',
-    'howitworks.step2.description': 'Diseñamos la solución a medida y la integramos con tu stack actual. Antes de poner nada en producción, el sistema se prueba en escenarios reales: carga, errores, casos límite y uso intensivo. Nada se despliega sin estar validado, asegurando estabilidad, seguridad y rendimiento desde el primer día.',
+    'howitworks.step2.description': 'Creamos una demo funcional integrada a tu stack y la ponemos a prueba antes de liberar nada. Testeamos carga, errores, casos límite y uso real. Si pasa todos los protocolos, recién ahí se despliega: estable, seguro y listo para producir.',
     'howitworks.step3.title': 'Despliegue de Precisión',
-    'howitworks.step3.description': 'Implementamos el sistema en tu entorno real sin interrumpir la operación. Monitoreamos activamente el funcionamiento, ajustamos en vivo y capacitamos a tu equipo para que la adopción sea inmediata. El resultado: una solución funcionando, entendida y generando valor desde el día uno.',
+    'howitworks.step3.description': 'Hacemos el deploy en tu entorno real sin frenar la operación. Monitoreamos el rendimiento, ajustamos en vivo y entrenamos a tu equipo. El objetivo: puesta en producción rápida, adoptada y generando valor desde el primer día.',
     
     // Contact
     'contact.title': '¿Listo para escalar?',
