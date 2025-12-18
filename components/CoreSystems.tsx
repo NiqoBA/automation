@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, Brain, Receipt } from 'lucide-react'
+import Image from 'next/image'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function CoreSystems() {
@@ -182,21 +183,29 @@ export default function CoreSystems() {
 
                   {/* Right: UI Mockup Card */}
                   {system.id === 'voice-whatsapp' ? (
-                    <div className="flex items-center justify-center w-full overflow-visible">
-                      <img 
-                        src="/imgs/sistema 1.png" 
-                        alt="Sistema 1" 
-                        className="object-contain"
-                        style={{ width: '120%', height: 'auto', maxWidth: 'none', transform: 'scale(1.5)' }}
-                      />
+                    <div className="flex items-center justify-center w-full h-full relative">
+                      <div className="relative w-full h-full min-h-[400px] flex items-center justify-center">
+                        <Image 
+                          src="/imgs/sistema 1.png" 
+                          alt="Sistema 1" 
+                          fill
+                          className="object-contain"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          priority
+                        />
+                      </div>
                     </div>
                   ) : system.id === 'rag-brain' ? (
                     <div className="flex items-center justify-center w-full">
-                      <img 
-                        src="/imgs/sistema2.jpg" 
-                        alt="Sistema 2" 
-                        className="object-contain w-full h-auto max-w-[280px]"
-                      />
+                      <div className="relative w-full max-w-[280px] aspect-square">
+                        <Image 
+                          src="/imgs/sistema2.jpg" 
+                          alt="Sistema 2" 
+                          fill
+                          className="object-contain"
+                          sizes="(max-width: 768px) 100vw, 280px"
+                        />
+                      </div>
                     </div>
                   ) : (
                     <div className="relative rounded-xl p-6 lg:p-8 flex items-center justify-center overflow-hidden" style={{
