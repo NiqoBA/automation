@@ -60,7 +60,7 @@ export default function ContactModal() {
     >
       <div className="p-6 bg-white rounded-xl">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-black">Book a Call</h2>
+          <h2 className="text-2xl font-semibold text-black">Book a Call</h2>
           <button
             onClick={closeModal}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"

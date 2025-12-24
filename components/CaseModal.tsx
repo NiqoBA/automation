@@ -122,7 +122,7 @@ export default function CaseModal({ isOpen, onClose, caseData }: CaseModalProps)
                       {caseData.duration}
                     </span>
                   </div>
-                  <h2 id="modal-title" className="text-2xl font-bold text-black">
+                  <h2 id="modal-title" className="text-2xl font-semibold text-black">
                     {caseData.name}
                   </h2>
                 </div>
@@ -260,5 +260,7 @@ export default function CaseModal({ isOpen, onClose, caseData }: CaseModalProps)
     </AnimatePresence>
   )
 }
+
+
 
 

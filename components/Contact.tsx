@@ -95,8 +95,15 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="py-24 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#FBFBFB' }}>
+    <section id="contact" className="py-28 px-4 sm:px-6 lg:px-8 bg-black">
       <div className="max-w-7xl mx-auto">
+        {/* Badge centered */}
+        <div className="text-center mb-12">
+          <span className="inline-block px-3.5 py-1.5 bg-black border border-white rounded-lg text-white text-[10px] font-medium uppercase tracking-wide">
+            Contacto
+          </span>
+        </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           {/* Left: Invitational Text & Contact Info */}
           <motion.div
@@ -107,10 +114,10 @@ export default function Contact() {
             className="space-y-8"
           >
             <div>
-              <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4 tracking-tight">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white leading-tight mb-4 tracking-tight">
                 {t('contact.title')}
               </h2>
-              <p className="text-lg text-gray-600 font-light leading-relaxed">
+              <p className="text-lg text-gray-400 font-light leading-relaxed">
                 {t('contact.subtitle')}
               </p>
             </div>
@@ -119,10 +126,10 @@ export default function Contact() {
             <div className="space-y-4 pt-6">
               <a
                 href="mailto:contacto@weautomate.com"
-                className="flex items-center gap-3 text-gray-700 hover:text-teal-700 transition-colors group"
+                className="flex items-center gap-3 text-gray-300 hover:text-purple-400 transition-colors group"
               >
-                <div className="p-2 bg-white rounded-lg border border-gray-200 group-hover:border-teal-300 transition-colors">
-                  <Mail size={18} className="text-gray-600 group-hover:text-teal-700" />
+                <div className="p-2 bg-[#0a0a0a] rounded-lg border border-white/10 group-hover:border-purple-500/50 transition-colors">
+                  <Mail size={18} className="text-gray-400 group-hover:text-purple-400" />
                 </div>
                 <span className="text-sm font-medium">contacto@weautomate.com</span>
               </a>
@@ -130,18 +137,18 @@ export default function Contact() {
                 href="https://linkedin.com/company/weautomate"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 text-gray-700 hover:text-teal-700 transition-colors group"
+                className="flex items-center gap-3 text-gray-300 hover:text-purple-400 transition-colors group"
               >
-                <div className="p-2 bg-white rounded-lg border border-gray-200 group-hover:border-teal-300 transition-colors">
-                  <Linkedin size={18} className="text-gray-600 group-hover:text-teal-700" />
+                <div className="p-2 bg-[#0a0a0a] rounded-lg border border-white/10 group-hover:border-purple-500/50 transition-colors">
+                  <Linkedin size={18} className="text-gray-400 group-hover:text-purple-400" />
                 </div>
                 <span className="text-sm font-medium">LinkedIn</span>
               </a>
             </div>
 
             {/* Trust Statement */}
-            <div className="pt-6 border-t border-gray-200">
-              <p className="text-sm text-gray-500 italic leading-relaxed">
+            <div className="pt-6 border-t border-white/10">
+              <p className="text-sm text-gray-400 italic leading-relaxed">
                 {t('contact.trustStatement')}
               </p>
             </div>
@@ -154,7 +161,7 @@ export default function Contact() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-10 border border-gray-100">
+            <div className="bg-[#0a0a0a] rounded-2xl shadow-xl p-8 sm:p-10 border border-white/10">
               <AnimatePresence mode="wait">
                 {isSuccess ? (
                   <motion.div
@@ -164,13 +171,13 @@ export default function Contact() {
                     exit={{ opacity: 0, scale: 0.9 }}
                     className="text-center py-8"
                   >
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-100 rounded-full mb-4">
-                      <CheckCircle size={32} className="text-teal-700" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-500/20 rounded-full mb-4 border border-purple-500/30">
+                      <CheckCircle size={32} className="text-purple-400" />
                     </div>
-                    <h3 className="text-2xl font-bold text-black mb-2">
+                    <h3 className="text-2xl font-semibold text-white mb-2">
                       {t('contact.success.title')}
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-400">
                       {t('contact.success.message')}
                     </p>
                   </motion.div>
@@ -185,8 +192,8 @@ export default function Contact() {
                   >
                     {/* Name */}
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                        {t('contact.fields.name')} <span className="text-red-500">*</span>
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                        {t('contact.fields.name')} <span className="text-red-400">*</span>
                       </label>
                       <input
                         type="text"
@@ -194,10 +201,10 @@ export default function Contact() {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                        className={`w-full px-4 py-3 rounded-lg border bg-[#0d0d0d] text-white placeholder-gray-500 transition-colors ${
                           errors.name
-                            ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                            : 'border-gray-200 focus:border-teal-500 focus:ring-teal-500'
+                            ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500'
+                            : 'border-white/10 focus:border-purple-500 focus:ring-purple-500'
                         } focus:outline-none focus:ring-2 focus:ring-opacity-20`}
                         placeholder={t('contact.placeholders.name')}
                       />
@@ -208,8 +215,8 @@ export default function Contact() {
 
                     {/* Email */}
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                        {t('contact.fields.email')} <span className="text-red-500">*</span>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                        {t('contact.fields.email')} <span className="text-red-400">*</span>
                       </label>
                       <input
                         type="email"
@@ -217,10 +224,10 @@ export default function Contact() {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                        className={`w-full px-4 py-3 rounded-lg border bg-[#0d0d0d] text-white placeholder-gray-500 transition-colors ${
                           errors.email
-                            ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                            : 'border-gray-200 focus:border-teal-500 focus:ring-teal-500'
+                            ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500'
+                            : 'border-white/10 focus:border-purple-500 focus:ring-purple-500'
                         } focus:outline-none focus:ring-2 focus:ring-opacity-20`}
                         placeholder={t('contact.placeholders.email')}
                       />
@@ -231,8 +238,8 @@ export default function Contact() {
 
                     {/* Company */}
                     <div>
-                      <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
-                        {t('contact.fields.company')} <span className="text-red-500">*</span>
+                      <label htmlFor="company" className="block text-sm font-medium text-gray-300 mb-2">
+                        {t('contact.fields.company')} <span className="text-red-400">*</span>
                       </label>
                       <input
                         type="text"
@@ -240,10 +247,10 @@ export default function Contact() {
                         name="company"
                         value={formData.company}
                         onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-lg border transition-colors ${
+                        className={`w-full px-4 py-3 rounded-lg border bg-[#0d0d0d] text-white placeholder-gray-500 transition-colors ${
                           errors.company
-                            ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                            : 'border-gray-200 focus:border-teal-500 focus:ring-teal-500'
+                            ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500'
+                            : 'border-white/10 focus:border-purple-500 focus:ring-purple-500'
                         } focus:outline-none focus:ring-2 focus:ring-opacity-20`}
                         placeholder={t('contact.placeholders.company')}
                       />
@@ -254,7 +261,7 @@ export default function Contact() {
 
                     {/* Phone */}
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
                         {t('contact.fields.phone')}
                       </label>
                       <input
@@ -263,15 +270,15 @@ export default function Contact() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-teal-500 focus:ring-teal-500 focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-colors"
+                        className="w-full px-4 py-3 rounded-lg border border-white/10 bg-[#0d0d0d] text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-colors"
                         placeholder={t('contact.placeholders.phone')}
                       />
                     </div>
 
                     {/* Service Selection */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        {t('contact.fields.service')} <span className="text-red-500">*</span>
+                      <label className="block text-sm font-medium text-gray-300 mb-3">
+                        {t('contact.fields.service')} <span className="text-red-400">*</span>
                       </label>
                       <div className="grid grid-cols-2 gap-3">
                         <button
@@ -279,8 +286,8 @@ export default function Contact() {
                           onClick={() => handleServiceSelect('automations')}
                           className={`px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium ${
                             formData.service === 'automations'
-                              ? 'border-teal-600 bg-teal-50 text-teal-700'
-                              : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                              ? 'border-purple-500 bg-purple-500/10 text-purple-400'
+                              : 'border-white/10 bg-[#0d0d0d] text-gray-300 hover:border-white/20'
                           }`}
                         >
                           {t('contact.services.automations')}
@@ -290,8 +297,8 @@ export default function Contact() {
                           onClick={() => handleServiceSelect('consulting')}
                           className={`px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium ${
                             formData.service === 'consulting'
-                              ? 'border-teal-600 bg-teal-50 text-teal-700'
-                              : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                              ? 'border-purple-500 bg-purple-500/10 text-purple-400'
+                              : 'border-white/10 bg-[#0d0d0d] text-gray-300 hover:border-white/20'
                           }`}
                         >
                           {t('contact.services.consulting')}
@@ -311,7 +318,7 @@ export default function Contact() {
                           exit={{ opacity: 0, height: 0 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
                             {t('contact.fields.message')}
                           </label>
                           <textarea
@@ -320,7 +327,7 @@ export default function Contact() {
                             value={formData.message}
                             onChange={handleChange}
                             rows={4}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-teal-500 focus:ring-teal-500 focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-colors resize-none"
+                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-[#0d0d0d] text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-colors resize-none"
                             placeholder={t('contact.placeholders.message')}
                           />
                         </motion.div>
@@ -331,10 +338,7 @@ export default function Contact() {
                     <motion.button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full px-6 py-4 rounded-lg text-white font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      style={{
-                        background: 'linear-gradient(to right, #0f766e, #0c4a6e)',
-                      }}
+                      className="w-full px-6 py-4 rounded-lg text-white font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)]"
                       whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                       whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                     >
@@ -360,4 +364,6 @@ export default function Contact() {
     </section>
   )
 }
+
+
 

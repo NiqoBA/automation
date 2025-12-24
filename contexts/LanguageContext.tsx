@@ -15,17 +15,19 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 const translations = {
   en: {
     // Navbar
+    'nav.home': 'Home',
     'nav.work': 'Projects',
     'nav.consulting': 'Consulting',
     'nav.results': 'Results',
     'nav.book1on1': 'Contact',
-    'nav.bookDemo': 'Start Now',
+    'nav.bookDemo': 'Schedule Meeting',
     
     // Hero
     'hero.badge': 'AI + Automation Studio',
-    'hero.title': 'Digital transformation for companies',
-    'hero.subtitle': 'We automate repetitive processes and integrate AI into your current systems.',
-    'hero.cta.demo': 'Start Now',
+    'hero.badgeText': 'Automated Lead Generation',
+    'hero.title': 'Intelligent Automation for Modern Businesses',
+    'hero.subtitle': 'We automate repetitive processes and integrate AI into your current systems through the construction of highly customized software.',
+    'hero.cta.demo': 'Schedule Meeting',
     'hero.cta.work': 'View Work',
     'hero.microline.erp': 'ERP/CRM',
     'hero.microline.sheets': 'Sheets → DB',
@@ -133,6 +135,9 @@ const translations = {
     'cta.book1on1': 'Book 1:1',
     
     // Core Systems
+    'core.servicesBadge': 'Our Services',
+    'core.mainTitle': 'AI Solutions That Take\nYour Business to the Next Level',
+    'core.mainSubtitle': 'We design, develop, and implement automation tools that help you work smarter, not harder',
     'core.eyebrow': 'Core Systems',
     'core.title': 'Enterprise AI Infrastructure',
     'core.voice.tab': 'Omnichannel Agent',
@@ -157,7 +162,7 @@ const translations = {
     
     // Work / Portfolio
     'work.eyebrow': 'Experience',
-    'work.title': 'Custom Projects',
+    'work.title': 'Success Cases',
     'work.subtitle': 'Real automation, AI, and integration systems.',
     'work.filter.all': 'All',
     'work.caseStudy.aiIntegrated': 'AI Integrated',
@@ -174,7 +179,7 @@ const translations = {
     'integrations.title': 'We work with your stack',
     
     // Footer
-    'footer.copyright': '© We Automate',
+    'footer.copyright': '© Autonomo AI',
     
     // Project names and descriptions
     'project.reception.name': 'Reception + Scheduling Automation',
@@ -192,17 +197,19 @@ const translations = {
   },
   es: {
     // Navbar
+    'nav.home': 'Inicio',
     'nav.work': 'Proyectos',
     'nav.consulting': 'Asesorías',
     'nav.results': 'Resultados',
     'nav.book1on1': 'Contacto',
-    'nav.bookDemo': 'Comienza Ya',
+    'nav.bookDemo': 'Agendar reunión',
     
     // Hero
     'hero.badge': 'Estudio de IA + Automatización',
-    'hero.title': 'Transformación digital para empresas',
-    'hero.subtitle': 'Automatizamos procesos repetitivos e integramos IA en tus sistemas actuales.',
-    'hero.cta.demo': 'Comienza Ya',
+    'hero.badgeText': 'Generación Automatizada de Leads',
+    'hero.title': 'Automatización Inteligente para Empresas',
+    'hero.subtitle': 'Automatizamos procesos repetitivos e integramos IA en tus sistemas actuales mediante la construcción de software hiper personalizado.',
+    'hero.cta.demo': 'Agendar reunión',
     'hero.cta.work': 'Ver Trabajo',
     'hero.microline.erp': 'ERP/CRM',
     'hero.microline.sheets': 'Hojas → BD',
@@ -310,6 +317,9 @@ const translations = {
     'cta.book1on1': 'Reservar 1:1',
     
     // Core Systems
+    'core.servicesBadge': 'Nuestros servicios',
+    'core.mainTitle': 'Soluciones con IA que llevan\ntu negocio al siguiente nivel',
+    'core.mainSubtitle': 'Diseñamos, desarrollamos e implementamos herramientas de automatización que te ayudan a trabajar más inteligentemente, no más duro',
     'core.eyebrow': 'Sistemas Core',
     'core.title': 'Infraestructura IA Empresarial',
     'core.voice.tab': 'Agente Omnicanal',
@@ -325,7 +335,7 @@ const translations = {
     'core.rag.description1End': '.',
     'core.rag.description2': 'Indexa documentos, manuales, procesos y conocimiento operativo para generar respuestas precisas, auditables y sin alucinaciones, siempre basadas en datos propios. Se integra como chat interno, web o WhatsApp, permitiendo escalar soporte, ventas u operaciones sin perder control sobre la información.',
     'core.rag.useCases': 'Alto volumen de documentación, equipos de soporte, operaciones complejas o necesidad de IA confiable a nivel corporativo',
-    'core.accounting.tab': 'Auditoría IA',
+    'core.accounting.tab': 'IA Contable',
     'core.accounting.title': 'Sistema Contable Automatizado',
     'core.accounting.description1': 'Un sistema contable automatizado que procesa información financiera de forma inteligente, reduciendo la carga manual y aumentando la visibilidad en tiempo real.',
     'core.accounting.description2': 'Todo integrado con WhatsApp, web y sistemas empresariales, permitiendo operar la contabilidad de forma remota, ordenada y escalable.',
@@ -334,7 +344,7 @@ const translations = {
     
     // Work / Portfolio
     'work.eyebrow': 'Experience',
-    'work.title': 'Proyectos a medida',
+    'work.title': 'Casos de Éxito',
     'work.subtitle': 'Sistemas reales de automatización, IA e integraciones.',
     'work.filter.all': 'Todos',
     'work.caseStudy.aiIntegrated': 'IA integrada',
@@ -351,7 +361,7 @@ const translations = {
     'integrations.title': 'Trabajamos con tu stack',
     
     // Footer
-    'footer.copyright': '© We Automate',
+    'footer.copyright': '© Autonomo AI',
     
     // Project names and descriptions
     'project.reception.name': 'Automatización de Recepción + Programación',

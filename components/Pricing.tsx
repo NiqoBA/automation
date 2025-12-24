@@ -38,7 +38,7 @@ export default function Pricing() {
     <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-black mb-4">Pricing</h2>
+          <h2 className="text-3xl sm:text-4xl font-semibold text-black mb-4">Pricing</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Simple, transparent engagement models
           </p>
@@ -53,7 +53,7 @@ export default function Pricing() {
               }`}
             >
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-black mb-2">{plan.name}</h3>
+                <h3 className="text-2xl font-semibold text-black mb-2">{plan.name}</h3>
                 <p className="text-sm text-gray-500 mb-4">{plan.type}</p>
                 <div className="text-3xl font-bold text-primary mb-2">{plan.startingAt}</div>
                 <p className="text-sm text-gray-600">{plan.description}</p>
@@ -92,5 +92,7 @@ export default function Pricing() {
     </section>
   )
 }
+
+
 
 

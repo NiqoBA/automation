@@ -300,7 +300,7 @@ export default function Portfolio() {
           transition={{ duration: 0.6 }}
           className="mb-16"
         >
-          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-black mb-4 tracking-tight">
+          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-semibold text-black mb-4 tracking-tight">
             <span className="relative inline-block">
               Portfolio
               <span className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600" style={{ height: '4px' }} />
@@ -347,7 +347,7 @@ export default function Portfolio() {
               onClick={() => handleOpenModal(project)}
             >
               {/* Project Name */}
-              <h3 className="text-2xl font-bold text-black mb-3 group-hover:text-blue-600 transition-colors duration-300 leading-tight">
+              <h3 className="text-2xl font-semibold text-black mb-3 group-hover:text-blue-600 transition-colors duration-300 leading-tight">
                 {project.name}
               </h3>
 

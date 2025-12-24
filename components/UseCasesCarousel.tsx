@@ -102,7 +102,7 @@ export default function UseCasesCarousel() {
     <section id="use-cases" className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-black mb-4">Use Cases</h2>
+          <h2 className="text-3xl sm:text-4xl font-semibold text-black mb-4">Use Cases</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Real workflows we've automated for operations teams
           </p>
@@ -129,7 +129,7 @@ export default function UseCasesCarousel() {
                 <div className="grid md:grid-cols-2 gap-8 items-center">
                   {/* Content */}
                   <div>
-                    <h3 className="text-2xl md:text-3xl font-bold text-black mb-4">
+                    <h3 className="text-2xl md:text-3xl font-semibold text-black mb-4">
                       {useCases[currentIndex].title}
                     </h3>
                     

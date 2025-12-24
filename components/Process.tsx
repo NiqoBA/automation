@@ -34,7 +34,7 @@ export default function Process() {
     <section id="process" className="py-24 px-4 sm:px-6 lg:px-8 bg-off-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-black mb-4">How It Works</h2>
+          <h2 className="text-3xl sm:text-4xl font-semibold text-black mb-4">How It Works</h2>
           <p className="text-gray-600 max-w-2xl mx-auto mb-2">
             Clear scope. Fast delivery. Measurable impact.
           </p>

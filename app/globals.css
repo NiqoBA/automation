@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-roboto: 'Roboto', system-ui, sans-serif;
 }
 
 @layer base {
@@ -39,6 +39,111 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  @keyframes gradient {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 8s ease infinite;
+  }
+
+  @keyframes dotPulse {
+    0%, 20% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Radar animations */
+  .radar-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .radar-pointer {
+    position: absolute;
+    z-index: 1024;
+    left: 10.5820106%;
+    right: 10.5820106%;
+    top: 10.5820106%;
+    bottom: 50%;
+    will-change: transform;
+    transform-origin: 50% 100%;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    background-image: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.8) 0%, 
+      rgba(236, 72, 153, 0.6) 50%,
+      rgba(0, 0, 0, 0.02) 70%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    clip-path: polygon(100% 0, 
+      100% 10%,
+      50% 100%, 
+      0 100%, 
+      0 0);
+    animation: rotate360 3s infinite linear;
+  }
+
+  .radar-pointer-line {
+    content: "";
+    position: absolute;
+    width: 50%;
+    bottom: -1px;
+    border-top: 2px solid rgba(168, 85, 247, 0.8);
+    box-shadow: 0 0 3px rgba(168, 85, 247, 0.6);
+    border-radius: 9px;
+  }
+
+  .radar-shadow {
+    position: absolute;
+    left: 45%;
+    top: 45%;
+    right: 45%;
+    bottom: 45%;
+    margin: auto;
+    border-radius: 9999px;
+    box-shadow: 0 0 15px 1px rgba(168, 85, 247, 0.3);
+    animation: shadowPulse 1s infinite ease;
+  }
+
+  @keyframes rotate360 {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(-360deg);
+    }
+  }
+
+  @keyframes shadowPulse {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
   }
 }
 
