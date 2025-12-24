@@ -7,7 +7,7 @@ export default function SalesMarketing() {
   return (
     <section id="sales-marketing" className="pt-16 pb-28 bg-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col-reverse lg:grid lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
           {/* Left Panel - Content */}
           <div className="max-w-md mx-auto lg:mx-0">
             <motion.div

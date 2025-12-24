@@ -492,7 +492,7 @@ export default function HowItWorks() {
             Inteligente y Escalable
           </h2>
           <p className="text-base md:text-lg text-white max-w-3xl mx-auto">
-            Diseñamos, desarrollamos e implementamos herramientas de automatización que te ayudan a trabajar más inteligentemente, no más duro
+            Desarrollo end-to-end de automatizaciones inteligentes. Desde la llamada inicial hasta producción y soporte 24/7. Tu equipo se enfoca en crecer, nosotros en que todo funcione.
           </p>
         </motion.div>
 
