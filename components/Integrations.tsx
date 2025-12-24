@@ -85,18 +85,25 @@ export default function Integrations() {
                       initial={{ opacity: 0, scale: 0 }}
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true }}
-                      transition={{ 
-                        duration: 0.5, 
-                        delay: index * 0.1,
-                        type: 'spring',
-                        stiffness: 200,
-                        damping: 20
-                      }}
                       animate={{
                         y: [0, -10, 0],
                         rotate: [rotation - 2, rotation + 2, rotation - 2],
                       }}
                       transition={{
+                        opacity: {
+                          duration: 0.5,
+                          delay: index * 0.1,
+                          type: 'spring',
+                          stiffness: 200,
+                          damping: 20
+                        },
+                        scale: {
+                          duration: 0.5,
+                          delay: index * 0.1,
+                          type: 'spring',
+                          stiffness: 200,
+                          damping: 20
+                        },
                         y: {
                           duration: 3 + (index % 3),
                           repeat: Infinity,
