@@ -11,7 +11,7 @@ interface LogoProps {
 }
 
 export default function Logo({ size = 40, className = '', animated = true, blur = 1 }: LogoProps) {
-  const logoStyle: CSSProperties = {
+  const logoStyle: MotionStyle = {
     aspectRatio: '1 / 1',
     background: 'linear-gradient(229deg, #df7afe 13%, rgba(201, 110, 240, 0) 35.0235827429153%, rgba(164, 92, 219, 0) 64.17244225559735%, rgb(129, 74, 200) 88%)',
     borderRadius: `${size * 0.894}px`, // 363/406 ratio
@@ -24,7 +24,7 @@ export default function Logo({ size = 40, className = '', animated = true, blur 
     willChange: 'transform',
     opacity: 1,
     filter: `blur(${blur}px)`,
-  } as MotionStyle
+  }
 
   if (animated) {
     return (
@@ -43,6 +43,6 @@ export default function Logo({ size = 40, className = '', animated = true, blur 
     )
   }
 
-  return <div className={className} style={logoStyle} />
+  return <div className={className} style={logoStyle as CSSProperties} />
 }
 
