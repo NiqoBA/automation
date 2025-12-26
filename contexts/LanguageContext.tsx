@@ -380,7 +380,7 @@ const translations = {
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('en')
+  const [language, setLanguage] = useState<Language>('es')
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') as Language
