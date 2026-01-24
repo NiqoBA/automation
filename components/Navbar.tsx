@@ -86,7 +86,7 @@ export default function Navbar() {
               <Logo size={40} animated={false} blur={1} />
             </div>
             <span className="text-lg font-bold text-white">
-              INFLEXO AI
+              Inflexo AI
             </span>
           </a>
 

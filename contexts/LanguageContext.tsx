@@ -196,7 +196,7 @@ const translations = {
     'integrations.title': 'We work with your stack',
     
     // Footer
-    'footer.copyright': '© INFLEXO AI',
+    'footer.copyright': '© Inflexo AI',
     
     // Project names and descriptions
     'project.reception.name': 'Reception + Scheduling Automation',
@@ -395,7 +395,7 @@ const translations = {
     'integrations.title': 'Trabajamos con tu stack',
     
     // Footer
-    'footer.copyright': '© INFLEXO AI',
+    'footer.copyright': '© Inflexo AI',
     
     // Project names and descriptions
     'project.reception.name': 'Automatización de Recepción + Programación',

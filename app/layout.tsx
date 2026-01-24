@@ -13,24 +13,24 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'INFLEXO AI | AI Automation & Digital Transformation Studio',
+  title: 'Inflexo AI | AI Automation & Digital Transformation Studio',
   description: 'We build automation systems that run your operations. We integrate AI into business processes, automate repetitive workflows, and build functional systems.',
   keywords: ['AI automation', 'digital transformation', 'workflow automation', 'ERP integration', 'CRM integration', 'business automation', 'automation consulting'],
-    authors: [{ name: 'INFLEXO AI' }],
+    authors: [{ name: 'Inflexo AI' }],
   icons: {
     icon: '/icon.svg',
     shortcut: '/icon.svg',
     apple: '/icon.svg',
   },
   openGraph: {
-    title: 'INFLEXO AI | AI Automation & Digital Transformation',
+    title: 'Inflexo AI | AI Automation & Digital Transformation',
     description: 'We build automation systems that run your operations.',
     type: 'website',
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'INFLEXO AI | AI Automation & Digital Transformation',
+    title: 'Inflexo AI | AI Automation & Digital Transformation',
     description: 'We build automation systems that run your operations.',
   },
   robots: {
