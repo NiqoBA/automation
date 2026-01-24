@@ -224,7 +224,7 @@ const translations = {
     // Hero
     'hero.badge': 'Estudio de IA + Automatización',
     'hero.badgeText': 'Generación Automatizada de Leads',
-    'hero.title': 'Automatización Inteligente para Empresas',
+    'hero.title': 'Transformación digital para Empresas',
     'hero.subtitle': 'Automatizamos procesos repetitivos e integramos IA en tus sistemas actuales mediante la construcción de software hiper personalizado.',
     'hero.cta.demo': 'Agendar reunión',
     'hero.cta.work': 'Ver Trabajo',
