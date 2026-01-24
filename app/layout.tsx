@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from '@/contexts/LanguageContext'
+import { AuthProvider } from '@/contexts/AuthContext'
+import ProfileModal from '@/components/ProfileModal'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -11,24 +13,24 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'Autonomo AI | AI Automation & Digital Transformation Studio',
+  title: 'INFLEXO AI | AI Automation & Digital Transformation Studio',
   description: 'We build automation systems that run your operations. We integrate AI into business processes, automate repetitive workflows, and build functional systems.',
   keywords: ['AI automation', 'digital transformation', 'workflow automation', 'ERP integration', 'CRM integration', 'business automation', 'automation consulting'],
-    authors: [{ name: 'Autonomo AI' }],
+    authors: [{ name: 'INFLEXO AI' }],
   icons: {
     icon: '/icon.svg',
     shortcut: '/icon.svg',
     apple: '/icon.svg',
   },
   openGraph: {
-    title: 'Autonomo AI | AI Automation & Digital Transformation',
+    title: 'INFLEXO AI | AI Automation & Digital Transformation',
     description: 'We build automation systems that run your operations.',
     type: 'website',
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Autonomo AI | AI Automation & Digital Transformation',
+    title: 'INFLEXO AI | AI Automation & Digital Transformation',
     description: 'We build automation systems that run your operations.',
   },
   robots: {
@@ -45,7 +47,12 @@ export default function RootLayout({
   return (
     <html lang="es" className={poppins.variable}>
       <body className={poppins.className}>
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            {children}
+            <ProfileModal />
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   )

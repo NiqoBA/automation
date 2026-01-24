@@ -128,6 +128,18 @@ const translations = {
     'contact.errors.company': 'Company is required',
     'contact.errors.service': 'Please select a service',
     
+    // Profile Modal
+    'profile.title': 'Complete Your Profile',
+    'profile.subtitle': 'Please provide your name and age to continue.',
+    'profile.fields.name': 'Full Name',
+    'profile.fields.age': 'Age',
+    'profile.placeholders.name': 'John Doe',
+    'profile.placeholders.age': '25',
+    'profile.submit': 'Save',
+    'profile.errors.nameRequired': 'Name is required',
+    'profile.errors.ageRequired': 'Age is required',
+    'profile.errors.ageInvalid': 'Please enter a valid age (1-150)',
+    
     // CTA
     'cta.title': 'Start today',
     'cta.description': 'Tell us the workflow. We\'ll map it, build it, and integrate it into your stack.',
@@ -159,6 +171,11 @@ const translations = {
     'core.accounting.description2': 'All integrated with WhatsApp, web, and enterprise systems, enabling remote, organized, and scalable accounting operations.',
     'core.accounting.description2Bold': 'Uses document detection and reading (OCR + AI) to interpret invoices and receipts, automatically organizes income and expenses, and generates actionable financial reports.',
     'core.accounting.useCases': 'SMEs and growing companies that need financial control, operational efficiency, and less dependence on manual processes',
+    'core.leads.tab': 'Lead Prospecting',
+    'core.leads.title': 'AI Lead Prospecting',
+    'core.leads.description1': 'Intelligent scraping system that uses AI to identify and qualify potential clients, automatically analyzing company profiles, growth indicators, and business needs.',
+    'core.leads.description2': 'Scans multiple sources (LinkedIn, company websites, public data) to find high-quality leads, scores them based on fit and opportunity, and delivers qualified prospects ready for your sales team. Increases your sales pipeline without manual research.',
+    'core.leads.useCases': 'Sales teams, B2B companies, agencies, and businesses looking to scale lead generation and increase conversion rates',
     
     // Work / Portfolio
     'work.eyebrow': 'Experience',
@@ -179,7 +196,7 @@ const translations = {
     'integrations.title': 'We work with your stack',
     
     // Footer
-    'footer.copyright': '© Autonomo AI',
+    'footer.copyright': '© INFLEXO AI',
     
     // Project names and descriptions
     'project.reception.name': 'Reception + Scheduling Automation',
@@ -301,6 +318,18 @@ const translations = {
     'contact.errors.company': 'La empresa es requerida',
     'contact.errors.service': 'Por favor selecciona un servicio',
     
+    // Profile Modal
+    'profile.title': 'Completa Tu Perfil',
+    'profile.subtitle': 'Por favor proporciona tu nombre y edad para continuar.',
+    'profile.fields.name': 'Nombre Completo',
+    'profile.fields.age': 'Edad',
+    'profile.placeholders.name': 'Juan Pérez',
+    'profile.placeholders.age': '25',
+    'profile.submit': 'Guardar',
+    'profile.errors.nameRequired': 'El nombre es requerido',
+    'profile.errors.ageRequired': 'La edad es requerida',
+    'profile.errors.ageInvalid': 'Por favor ingresa una edad válida (1-150)',
+    
     // Results
     'results.title': 'Resultados',
     'results.hoursSaved': 'Horas ahorradas / mes',
@@ -341,6 +370,11 @@ const translations = {
     'core.accounting.description2': 'Todo integrado con WhatsApp, web y sistemas empresariales, permitiendo operar la contabilidad de forma remota, ordenada y escalable.',
     'core.accounting.description2Bold': 'Utiliza detección y lectura de documentos (OCR + IA) para interpretar facturas y comprobantes, organiza ingresos y egresos automáticamente y genera reportes financieros accionables.',
     'core.accounting.useCases': 'PYMEs y empresas en crecimiento que necesitan control financiero, eficiencia operativa y menos dependencia de procesos manuales',
+    'core.leads.tab': 'Prospección Leads',
+    'core.leads.title': 'Prospección de Leads con IA',
+    'core.leads.description1': 'Sistema de scraping inteligente que utiliza IA para identificar y calificar posibles clientes, analizando automáticamente perfiles de empresas, indicadores de crecimiento y necesidades de negocio.',
+    'core.leads.description2': 'Escanea múltiples fuentes (LinkedIn, sitios web, datos públicos) para encontrar leads de alta calidad, los califica según fit y oportunidad, y entrega prospectos listos para tu equipo de ventas. Aumenta tu pipeline de ventas sin investigación manual.',
+    'core.leads.useCases': 'Equipos de ventas, empresas B2B, agencias y negocios que buscan escalar la generación de leads y aumentar tasas de conversión',
     
     // Work / Portfolio
     'work.eyebrow': 'Experience',
@@ -361,7 +395,7 @@ const translations = {
     'integrations.title': 'Trabajamos con tu stack',
     
     // Footer
-    'footer.copyright': '© Autonomo AI',
+    'footer.copyright': '© INFLEXO AI',
     
     // Project names and descriptions
     'project.reception.name': 'Automatización de Recepción + Programación',

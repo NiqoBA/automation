@@ -13,7 +13,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['hero', 'services', 'how-it-works', 'work', 'consulting', 'faq', 'contact']
+      const sections = ['hero', 'services', 'work', 'consulting', 'faq', 'contact']
       const scrollPosition = window.scrollY + 100
 
       for (let i = sections.length - 1; i >= 0; i--) {
@@ -86,7 +86,7 @@ export default function Navbar() {
               <Logo size={40} animated={false} blur={1} />
             </div>
             <span className="text-lg font-bold text-white">
-              Autonomo AI
+              INFLEXO AI
             </span>
           </a>
 
@@ -95,7 +95,6 @@ export default function Navbar() {
             {[
               { href: '#hero', label: 'Inicio', id: 'hero' },
               { href: '#services', label: 'Servicios', id: 'services' },
-              { href: '#how-it-works', label: 'Cómo funciona', id: 'how-it-works' },
               { href: '#work', label: 'Casos de éxito', id: 'work' },
               { href: '#consulting', label: 'Asesorías', id: 'consulting' },
               { href: '#faq', label: 'FAQs', id: 'faq' },
@@ -190,7 +189,6 @@ export default function Navbar() {
               {[
                 { href: '#hero', label: 'Inicio', id: 'hero' },
                 { href: '#services', label: 'Servicios', id: 'services' },
-                { href: '#how-it-works', label: 'Cómo funciona', id: 'how-it-works' },
                 { href: '#work', label: 'Casos de éxito', id: 'work' },
                 { href: '#consulting', label: 'Asesorías', id: 'consulting' },
                 { href: '#faq', label: 'FAQs', id: 'faq' },

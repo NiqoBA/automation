@@ -19,7 +19,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-white text-lg font-semibold mb-4">Autonomo AI</h3>
+            <h3 className="text-white text-lg font-semibold mb-4">INFLEXO AI</h3>
             <p className="text-gray-400 text-sm leading-relaxed mb-4 max-w-md">
               Automatizamos procesos repetitivos e integramos IA en tus sistemas actuales mediante la construcción de software hiper personalizado.
             </p>
@@ -33,7 +33,7 @@ export default function Footer() {
                 <Linkedin size={20} />
               </a>
               <a
-                href="mailto:contacto@weautomate.com"
+                href="mailto:nicovilaviviano@gmail.com"
                 className="text-gray-400 hover:text-purple-400 transition-colors"
               >
                 <Mail size={20} />
@@ -74,11 +74,11 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <a 
-                  href="mailto:contacto@weautomate.com"
+                  href="mailto:nicovilaviviano@gmail.com"
                   className="text-gray-400 hover:text-white text-sm transition-colors flex items-center gap-2"
                 >
                   <Mail size={14} />
-                  contacto@weautomate.com
+                  nicovilaviviano@gmail.com
                 </a>
               </li>
               <li>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageCircle, Brain, Receipt } from 'lucide-react'
+import { MessageCircle, Brain, Receipt, Search } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function CoreSystems() {
@@ -40,6 +40,15 @@ export default function CoreSystems() {
       description2Key: 'core.accounting.description2',
       description2BoldKey: 'core.accounting.description2Bold',
       useCasesKey: 'core.accounting.useCases',
+    },
+    {
+      id: 'lead-prospecting',
+      icon: Search,
+      tabKey: 'core.leads.tab',
+      titleKey: 'core.leads.title',
+      description1Key: 'core.leads.description1',
+      description2Key: 'core.leads.description2',
+      useCasesKey: 'core.leads.useCases',
     },
   ]
 
@@ -184,20 +193,19 @@ export default function CoreSystems() {
                   {/* Right: UI Mockup Card */}
                   {system.id === 'voice-whatsapp' ? (
                     <div className="flex items-center justify-center w-full h-full relative">
-                      <img 
-                        src="/imgs/sistema 1.png" 
-                        alt="Sistema 1" 
-                        className="w-full h-full object-contain"
-                        style={{ transform: 'scale(1.8)' }}
-                      />
+                      <WhatsAppConversation />
                     </div>
                   ) : system.id === 'rag-brain' ? (
-                    <div className="flex items-center justify-center w-full">
-                      <img 
-                        src="/imgs/sistema2.jpg" 
-                        alt="Sistema 2" 
-                        className="w-full h-auto object-contain max-w-[280px]"
-                      />
+                    <div className="flex items-center justify-center w-full h-full relative">
+                      <RAGConversation />
+                    </div>
+                  ) : system.id === 'accounting-ai' ? (
+                    <div className="flex items-center justify-center w-full h-full relative">
+                      <AccountingConversation />
+                    </div>
+                  ) : system.id === 'lead-prospecting' ? (
+                    <div className="flex items-center justify-center w-full h-full relative">
+                      <LeadProspectingConversation />
                     </div>
                   ) : (
                     <div className="relative flex items-center justify-center">
@@ -225,6 +233,108 @@ function SystemMockup({ systemId }: { systemId: string }) {
     return <AccountingMockup />
   }
   return null
+}
+
+// WhatsApp Conversation Component
+function WhatsAppConversation() {
+  return (
+    <div className="w-full max-w-[320px] h-[400px] bg-[#0a0a0a] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl flex flex-col">
+      {/* WhatsApp Header */}
+      <div className="bg-[#1f2c33] px-4 py-3 flex items-center gap-3 border-b border-gray-700 flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+          <span className="text-white text-sm font-semibold">IA</span>
+        </div>
+        <div className="flex-1">
+          <div className="text-white text-sm font-medium">Recepcionista</div>
+          <div className="text-gray-400 text-[10px] flex items-center gap-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+            En línea
+          </div>
+        </div>
+      </div>
+
+      {/* Chat Messages - Scrollable */}
+      <div className="px-3 py-4 space-y-3 bg-[#0a0a0a] flex-1 overflow-y-auto" style={{ 
+        backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(37, 211, 102, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(37, 211, 102, 0.03) 0%, transparent 50%)',
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent'
+      }}>
+        {/* Customer Message 1 */}
+        <div className="flex justify-start">
+          <div className="max-w-[75%] bg-[#202c33] rounded-lg rounded-tl-none px-3 py-2 shadow-sm">
+            <div className="text-xs text-gray-100 leading-relaxed">Hola, necesito una mesa para 4 personas</div>
+            <div className="text-[9px] text-gray-500 mt-1">14:32</div>
+          </div>
+        </div>
+
+        {/* AI Response 1 - Understanding Intent */}
+        <div className="flex justify-end">
+          <div className="max-w-[75%] bg-[#005c4b] rounded-lg rounded-tr-none px-3 py-2 shadow-sm">
+            <div className="text-xs text-white leading-relaxed">¡Hola! Para cuándo necesitas la reserva? Y ¿prefieres algún horario en particular?</div>
+            <div className="text-[9px] text-[#99beb7] mt-1 flex items-center gap-1 justify-end">
+              14:32
+              <svg width="12" height="12" viewBox="0 0 16 15" className="ml-0.5">
+                <path fill="currentColor" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.175a.366.366 0 0 0-.063-.512z"/>
+                <path fill="currentColor" d="M15.654 1.595a.416.416 0 0 0-.609-.163L8.666 7.879a.32.32 0 0 1-.484.033L5.891 5.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.688-8.22a.415.415 0 0 0-.163-.609z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Customer Message 2 */}
+        <div className="flex justify-start">
+          <div className="max-w-[75%] bg-[#202c33] rounded-lg rounded-tl-none px-3 py-2 shadow-sm">
+            <div className="text-xs text-gray-100 leading-relaxed">Mañana a las 8</div>
+            <div className="text-[9px] text-gray-500 mt-1">14:33</div>
+          </div>
+        </div>
+
+        {/* AI Response 2 - State Management & Real Action */}
+        <div className="flex justify-end">
+          <div className="max-w-[75%] bg-[#005c4b] rounded-lg rounded-tr-none px-3 py-2 shadow-sm">
+            <div className="text-xs text-white leading-relaxed">Perfecto, tengo disponibilidad. ¿Tu nombre para la reserva?</div>
+            <div className="text-[9px] text-[#99beb7] mt-1 flex items-center gap-1 justify-end">
+              14:33
+              <svg width="12" height="12" viewBox="0 0 16 15" className="ml-0.5">
+                <path fill="currentColor" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.175a.366.366 0 0 0-.063-.512z"/>
+                <path fill="currentColor" d="M15.654 1.595a.416.416 0 0 0-.609-.163L8.666 7.879a.32.32 0 0 1-.484.033L5.891 5.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.688-8.22a.415.415 0 0 0-.163-.609z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Customer Message 3 */}
+        <div className="flex justify-start">
+          <div className="max-w-[75%] bg-[#202c33] rounded-lg rounded-tl-none px-3 py-2 shadow-sm">
+            <div className="text-xs text-gray-100 leading-relaxed">Carlos Martínez</div>
+            <div className="text-[9px] text-gray-500 mt-1">14:34</div>
+          </div>
+        </div>
+
+        {/* AI Response 3 - System Sync & Confirmation */}
+        <div className="flex justify-end">
+          <div className="max-w-[75%] bg-[#005c4b] rounded-lg rounded-tr-none px-3 py-2 shadow-sm">
+            <div className="text-xs text-white leading-relaxed">Listo Carlos, reserva confirmada para mañana 8PM, 4 personas. Ya quedó registrado en el sistema. Te envío recordatorio mañana.</div>
+            <div className="text-[9px] text-[#99beb7] mt-1 flex items-center gap-1 justify-end">
+              14:34
+              <svg width="12" height="12" viewBox="0 0 16 15" className="ml-0.5">
+                <path fill="currentColor" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.175a.366.366 0 0 0-.063-.512z"/>
+                <path fill="currentColor" d="M15.654 1.595a.416.416 0 0 0-.609-.163L8.666 7.879a.32.32 0 0 1-.484.033L5.891 5.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.688-8.22a.415.415 0 0 0-.163-.609z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Status Badge - System Sync Indicator */}
+        <div className="flex justify-center pt-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-900/20 border border-green-700/30 rounded-full">
+            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+            <span className="text-[10px] font-medium text-green-300">Sincronizado con sistema</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 // Simplified: Only chat bubbles floating
@@ -260,6 +370,99 @@ function WhatsAppMockup() {
   )
 }
 
+// RAG Conversation Component
+function RAGConversation() {
+  return (
+    <div className="w-full max-w-[320px] h-[400px] bg-[#0a0a0a] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl flex flex-col">
+      {/* RAG Header */}
+      <div className="bg-[#1a1a1a] px-4 py-3 flex items-center gap-3 border-b border-gray-700 flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center">
+          <Brain size={18} className="text-white" />
+        </div>
+        <div className="flex-1">
+          <div className="text-white text-sm font-medium">Cerebro Empresarial</div>
+          <div className="text-gray-400 text-[10px] flex items-center gap-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+            Indexando documentos...
+          </div>
+        </div>
+      </div>
+
+      {/* Chat Messages - Scrollable */}
+      <div className="px-3 py-4 space-y-3 bg-[#0a0a0a] flex-1 overflow-y-auto" style={{ 
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent'
+      }}>
+        {/* User Question - Left side, gray */}
+        <div className="flex justify-start items-start gap-2">
+          <div className="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+            <span className="text-[10px] text-white font-medium">U</span>
+          </div>
+          <div className="max-w-[75%] bg-[#2a2a2a] rounded-lg rounded-tl-none px-3 py-2 shadow-sm border border-gray-700">
+            <div className="text-xs text-gray-100 leading-relaxed">¿Cómo está el rendimiento de la sucursal Centro comparado con el mes pasado?</div>
+            <div className="text-[9px] text-gray-500 mt-1">10:15</div>
+          </div>
+        </div>
+
+        {/* RAG Searching Indicator */}
+        <div className="flex justify-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-900/20 border border-purple-700/30 rounded-full">
+            <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
+            <span className="text-[10px] font-medium text-purple-300">Consultando base de datos...</span>
+          </div>
+        </div>
+
+        {/* RAG Response - Right side, purple/blue */}
+        <div className="flex justify-end items-start gap-2">
+          <div className="max-w-[80%] bg-gradient-to-br from-[#1e3a5f] to-[#2d1b4e] rounded-lg rounded-tr-none px-3 py-2.5 shadow-sm border border-purple-700/40">
+            <div className="text-xs text-white leading-relaxed mb-2">
+              <div className="mb-2">
+                <span className="font-semibold">Sucursal Centro - Comparativo:</span>
+              </div>
+              <div className="space-y-1 text-[11px]">
+                <div>• <span className="font-medium">Ventas:</span> $245K (este mes) vs $198K (mes pasado) - <span className="text-green-300">+23.7%</span></div>
+                <div>• <span className="font-medium">Clientes:</span> 1,247 vs 1,089 - <span className="text-green-300">+14.5%</span></div>
+                <div>• <span className="font-medium">Ticket promedio:</span> $196 vs $182 - <span className="text-green-300">+7.7%</span></div>
+              </div>
+            </div>
+            
+            {/* Source Citations */}
+            <div className="pt-2 border-t border-purple-600/30 space-y-1.5">
+              <div className="flex items-start gap-2">
+                <div className="w-0.5 h-4 bg-purple-400 rounded-full mt-0.5 flex-shrink-0"></div>
+                <div className="text-[9px] text-purple-200">
+                  <span className="font-medium">Reporte Mensual Diciembre 2024</span>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-0.5 h-4 bg-purple-400 rounded-full mt-0.5 flex-shrink-0"></div>
+                <div className="text-[9px] text-purple-200">
+                  <span className="font-medium">BD Ventas - Sucursal Centro</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-[9px] text-purple-300 mt-2 flex items-center gap-1 justify-end">
+              10:15
+            </div>
+          </div>
+          <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
+            <Brain size={12} className="text-white" />
+          </div>
+        </div>
+
+        {/* Trust Badge */}
+        <div className="flex justify-center pt-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-900/20 border border-purple-700/30 rounded-full">
+            <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+            <span className="text-[10px] font-medium text-purple-300">Datos en tiempo real</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Simplified: Only chat response with source
 function RAGMockup() {
   return (
@@ -284,6 +487,277 @@ function RAGMockup() {
             <div className="text-[10px] text-gray-400">
               Fuente: Página 12, Protocolo
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Accounting Conversation Component
+function AccountingConversation() {
+  return (
+    <div className="w-full max-w-[320px] h-[400px] bg-[#0a0a0a] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl flex flex-col">
+      {/* Accounting Header */}
+      <div className="bg-[#1a1a1a] px-4 py-3 flex items-center gap-3 border-b border-gray-700 flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center">
+          <Receipt size={18} className="text-white" />
+        </div>
+        <div className="flex-1">
+          <div className="text-white text-sm font-medium">Sistema Contable</div>
+          <div className="text-gray-400 text-[10px] flex items-center gap-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+            Procesando documentos...
+          </div>
+        </div>
+      </div>
+
+      {/* Chat Messages - Scrollable */}
+      <div className="px-3 py-4 space-y-3 bg-[#0a0a0a] flex-1 overflow-y-auto" style={{ 
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent'
+      }}>
+        {/* User sends invoice image */}
+        <div className="flex justify-start items-start gap-2">
+          <div className="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+            <span className="text-[10px] text-white font-medium">U</span>
+          </div>
+          <div className="max-w-[75%] bg-[#2a2a2a] rounded-lg rounded-tl-none px-3 py-2 shadow-sm border border-gray-700">
+            <div className="flex items-center gap-2 mb-1">
+              <Receipt size={14} className="text-gray-400" />
+              <span className="text-[10px] text-gray-400">factura_enero_2024.pdf</span>
+            </div>
+            <div className="text-xs text-gray-100 leading-relaxed">📎 Factura de proveedor</div>
+            <div className="text-[9px] text-gray-500 mt-1">09:42</div>
+          </div>
+        </div>
+
+        {/* System Processing Indicator */}
+        <div className="flex justify-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-900/20 border border-green-700/30 rounded-full">
+            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+            <span className="text-[10px] font-medium text-green-300">Procesando con OCR + IA...</span>
+          </div>
+        </div>
+
+        {/* System Response - Extracted Data */}
+        <div className="flex justify-end items-start gap-2">
+          <div className="max-w-[80%] bg-gradient-to-br from-[#0f4c3a] to-[#1a5c47] rounded-lg rounded-tr-none px-3 py-2.5 shadow-sm border border-green-700/40">
+            <div className="text-xs text-white leading-relaxed mb-2">
+              <div className="mb-2">
+                <span className="font-semibold">✅ Factura procesada automáticamente</span>
+              </div>
+              <div className="space-y-1.5 text-[11px] bg-green-900/20 rounded p-2 border border-green-700/30">
+                <div className="flex justify-between">
+                  <span className="text-green-200">Proveedor:</span>
+                  <span className="text-white font-medium">Servicios Tech S.A.</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-green-200">Monto:</span>
+                  <span className="text-white font-medium">$12,450.00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-green-200">Fecha:</span>
+                  <span className="text-white font-medium">15/01/2024</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-green-200">Categoría:</span>
+                  <span className="text-white font-medium">Servicios</span>
+                </div>
+              </div>
+              <div className="mt-2 text-[10px] text-green-200">
+                Registrado en contabilidad • Reporte actualizado
+              </div>
+            </div>
+            
+            <div className="text-[9px] text-green-300 mt-2 flex items-center gap-1 justify-end">
+              09:42
+            </div>
+          </div>
+          <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+            <Receipt size={12} className="text-white" />
+          </div>
+        </div>
+
+        {/* User Question */}
+        <div className="flex justify-start items-start gap-2">
+          <div className="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+            <span className="text-[10px] text-white font-medium">U</span>
+          </div>
+          <div className="max-w-[75%] bg-[#2a2a2a] rounded-lg rounded-tl-none px-3 py-2 shadow-sm border border-gray-700">
+            <div className="text-xs text-gray-100 leading-relaxed">¿Cuál es el total de gastos este mes?</div>
+            <div className="text-[9px] text-gray-500 mt-1">09:43</div>
+          </div>
+        </div>
+
+        {/* System Response - Report */}
+        <div className="flex justify-end items-start gap-2">
+          <div className="max-w-[80%] bg-gradient-to-br from-[#0f4c3a] to-[#1a5c47] rounded-lg rounded-tr-none px-3 py-2.5 shadow-sm border border-green-700/40">
+            <div className="text-xs text-white leading-relaxed mb-2">
+              <div className="mb-2">
+                <span className="font-semibold">📊 Resumen Enero 2024:</span>
+              </div>
+              <div className="space-y-1 text-[11px]">
+                <div>• <span className="font-medium">Total Egresos:</span> <span className="text-green-300">$89,230</span></div>
+                <div>• <span className="font-medium">Total Ingresos:</span> <span className="text-green-300">$156,400</span></div>
+                <div>• <span className="font-medium">Balance:</span> <span className="text-green-300 font-semibold">+$67,170</span></div>
+              </div>
+            </div>
+            
+            <div className="text-[9px] text-green-300 mt-2 flex items-center gap-1 justify-end">
+              09:43
+            </div>
+          </div>
+          <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+            <Receipt size={12} className="text-white" />
+          </div>
+        </div>
+
+        {/* Success Badge */}
+        <div className="flex justify-center pt-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-900/20 border border-green-700/30 rounded-full">
+            <div className="w-2 h-2 rounded-full bg-green-400"></div>
+            <span className="text-[10px] font-medium text-green-300">Procesamiento automático</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Lead Prospecting Conversation Component
+function LeadProspectingConversation() {
+  return (
+    <div className="w-full max-w-[320px] h-[400px] bg-[#0a0a0a] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl flex flex-col">
+      {/* Lead Prospecting Header */}
+      <div className="bg-[#1a1a1a] px-4 py-3 flex items-center gap-3 border-b border-gray-700 flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center">
+          <Search size={18} className="text-white" />
+        </div>
+        <div className="flex-1">
+          <div className="text-white text-sm font-medium">Prospección IA</div>
+          <div className="text-gray-400 text-[10px] flex items-center gap-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></div>
+            Escaneando oportunidades...
+          </div>
+        </div>
+      </div>
+
+      {/* Chat Messages - Scrollable */}
+      <div className="px-3 py-4 space-y-3 bg-[#0a0a0a] flex-1 overflow-y-auto" style={{ 
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent'
+      }}>
+        {/* System Auto-detection */}
+        <div className="flex justify-end items-start gap-2">
+          <div className="max-w-[80%] bg-gradient-to-br from-[#5c2e0f] to-[#7a3d1a] rounded-lg rounded-tr-none px-3 py-2.5 shadow-sm border border-orange-700/40">
+            <div className="text-xs text-white leading-relaxed mb-2">
+              <div className="mb-2">
+                <span className="font-semibold">🎯 Nuevos leads detectados</span>
+              </div>
+              <div className="space-y-1.5 text-[11px] bg-orange-900/20 rounded p-2 border border-orange-700/30">
+                <div className="flex justify-between items-center">
+                  <span className="text-orange-200">Empresa:</span>
+                  <span className="text-white font-medium">TechSolutions Inc.</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-orange-200">Sector:</span>
+                  <span className="text-white font-medium">Software B2B</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-orange-200">Score:</span>
+                  <span className="text-orange-300 font-semibold">87/100</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-orange-200">Contacto:</span>
+                  <span className="text-white font-medium">CEO - LinkedIn</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-[9px] text-orange-300 mt-2 flex items-center gap-1 justify-end">
+              11:30
+            </div>
+          </div>
+          <div className="w-6 h-6 rounded-full bg-orange-600 flex items-center justify-center flex-shrink-0">
+            <Search size={12} className="text-white" />
+          </div>
+        </div>
+
+        {/* Scanning Indicator */}
+        <div className="flex justify-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-orange-900/20 border border-orange-700/30 rounded-full">
+            <div className="w-2 h-2 rounded-full bg-orange-400 animate-pulse"></div>
+            <span className="text-[10px] font-medium text-orange-300">Analizando perfil y actividad...</span>
+          </div>
+        </div>
+
+        {/* System Response - Lead Details */}
+        <div className="flex justify-end items-start gap-2">
+          <div className="max-w-[80%] bg-gradient-to-br from-[#5c2e0f] to-[#7a3d1a] rounded-lg rounded-tr-none px-3 py-2.5 shadow-sm border border-orange-700/40">
+            <div className="text-xs text-white leading-relaxed mb-2">
+              <div className="mb-2">
+                <span className="font-semibold">📊 Análisis completado:</span>
+              </div>
+              <div className="space-y-1 text-[11px]">
+                <div>• <span className="font-medium">Crecimiento:</span> <span className="text-orange-300">+45% empleados (último año)</span></div>
+                <div>• <span className="font-medium">Presupuesto estimado:</span> <span className="text-orange-300">$50K - $100K</span></div>
+                <div>• <span className="font-medium">Necesidad detectada:</span> <span className="text-orange-300">Automatización de procesos</span></div>
+                <div>• <span className="font-medium">Momento ideal:</span> <span className="text-orange-300">Expansión activa</span></div>
+              </div>
+              <div className="mt-2 text-[10px] text-orange-200">
+                Lead calificado • Listo para contacto
+              </div>
+            </div>
+            
+            <div className="text-[9px] text-orange-300 mt-2 flex items-center gap-1 justify-end">
+              11:31
+            </div>
+          </div>
+          <div className="w-6 h-6 rounded-full bg-orange-600 flex items-center justify-center flex-shrink-0">
+            <Search size={12} className="text-white" />
+          </div>
+        </div>
+
+        {/* User Question */}
+        <div className="flex justify-start items-start gap-2">
+          <div className="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+            <span className="text-[10px] text-white font-medium">U</span>
+          </div>
+          <div className="max-w-[75%] bg-[#2a2a2a] rounded-lg rounded-tl-none px-3 py-2 shadow-sm border border-gray-700">
+            <div className="text-xs text-gray-100 leading-relaxed">¿Cuántos leads encontró hoy?</div>
+            <div className="text-[9px] text-gray-500 mt-1">11:35</div>
+          </div>
+        </div>
+
+        {/* System Response - Summary */}
+        <div className="flex justify-end items-start gap-2">
+          <div className="max-w-[80%] bg-gradient-to-br from-[#5c2e0f] to-[#7a3d1a] rounded-lg rounded-tr-none px-3 py-2.5 shadow-sm border border-orange-700/40">
+            <div className="text-xs text-white leading-relaxed mb-2">
+              <div className="mb-2">
+                <span className="font-semibold">📈 Resumen del día:</span>
+              </div>
+              <div className="space-y-1 text-[11px]">
+                <div>• <span className="font-medium">Leads encontrados:</span> <span className="text-orange-300">23</span></div>
+                <div>• <span className="font-medium">Calificados (70+):</span> <span className="text-orange-300">15</span></div>
+                <div>• <span className="font-medium">Oportunidades:</span> <span className="text-orange-300 font-semibold">$1.2M potencial</span></div>
+              </div>
+            </div>
+            
+            <div className="text-[9px] text-orange-300 mt-2 flex items-center gap-1 justify-end">
+              11:35
+            </div>
+          </div>
+          <div className="w-6 h-6 rounded-full bg-orange-600 flex items-center justify-center flex-shrink-0">
+            <Search size={12} className="text-white" />
+          </div>
+        </div>
+
+        {/* Success Badge */}
+        <div className="flex justify-center pt-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-900/20 border border-orange-700/30 rounded-full">
+            <div className="w-2 h-2 rounded-full bg-orange-400"></div>
+            <span className="text-[10px] font-medium text-orange-300">Scraping inteligente activo</span>
           </div>
         </div>
       </div>

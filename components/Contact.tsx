@@ -125,13 +125,13 @@ export default function Contact() {
             {/* Contact Information */}
             <div className="space-y-4 pt-6">
               <a
-                href="mailto:contacto@weautomate.com"
+                href="mailto:nicovilaviviano@gmail.com"
                 className="flex items-center gap-3 text-gray-300 hover:text-purple-400 transition-colors group"
               >
                 <div className="p-2 bg-[#0a0a0a] rounded-lg border border-white/10 group-hover:border-purple-500/50 transition-colors">
                   <Mail size={18} className="text-gray-400 group-hover:text-purple-400" />
                 </div>
-                <span className="text-sm font-medium">contacto@weautomate.com</span>
+                <span className="text-sm font-medium">nicovilaviviano@gmail.com</span>
               </a>
               <a
                 href="https://linkedin.com/company/weautomate"
