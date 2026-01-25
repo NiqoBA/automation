@@ -5,9 +5,8 @@ import CoreSystems from '@/components/CoreSystems'
 import Services from '@/components/Services'
 import SalesMarketing from '@/components/SalesMarketing'
 import Integrations from '@/components/Integrations'
-import Work from '@/components/Work'
+import CaseStudiesSection from '@/components/case-studies/CaseStudiesSection'
 import HowItWorks from '@/components/HowItWorks'
-import Consulting from '@/components/Consulting'
 import FAQ from '@/components/FAQ'
 import Contact from '@/components/Contact'
 import Footer from '@/components/Footer'
@@ -24,8 +23,7 @@ export default function Home() {
       <Integrations />
       <CoreSystems />
       <HowItWorks />
-      <Work />
-      <Consulting />
+      <CaseStudiesSection />
       <FAQ />
       <Contact />
       <Footer />

@@ -59,8 +59,11 @@ export default function Consulting() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white leading-tight mb-4">
             Asesoramos devs
           </h2>
-          <p className="text-base md:text-lg text-gray-400 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-base md:text-lg text-gray-400 leading-relaxed max-w-3xl mx-auto mb-6">
             De Scripts a Sistemas de Producción. Sesiones prácticas para aprender integración de APIs, automatización con n8n y construcción de agentes de IA listos para producción.
+          </p>
+          <p className="inline-block px-5 py-2.5 bg-white/5 border border-white/20 rounded-xl text-white font-semibold">
+            20 USD — curso completo de 6 semanas
           </p>
         </motion.div>
 

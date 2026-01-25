@@ -348,7 +348,7 @@ const translations = {
     // Core Systems
     'core.servicesBadge': 'Nuestros servicios',
     'core.mainTitle': 'Soluciones con IA que llevan\ntu negocio al siguiente nivel',
-    'core.mainSubtitle': 'Diseñamos, desarrollamos e implementamos herramientas de automatización que te ayudan a trabajar más inteligentemente, no más duro',
+    'core.mainSubtitle': 'Diseñamos, desarrollamos e implementamos herramientas de automatización que se convierten en tu punto de inflexión.',
     'core.eyebrow': 'Sistemas Core',
     'core.title': 'Infraestructura IA Empresarial',
     'core.voice.tab': 'Agente Omnicanal',

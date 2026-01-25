@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { Menu, X, Globe } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import Logo from './Logo'
@@ -9,11 +10,13 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('')
+  const pathname = usePathname()
   const { language, setLanguage, t } = useLanguage()
 
   useEffect(() => {
+    if (pathname !== '/') return
     const handleScroll = () => {
-      const sections = ['hero', 'services', 'work', 'consulting', 'faq', 'contact']
+      const sections = ['hero', 'services', 'work', 'faq', 'contact']
       const scrollPosition = window.scrollY + 100
 
       for (let i = sections.length - 1; i >= 0; i--) {
@@ -29,9 +32,9 @@ export default function Navbar() {
     }
 
     window.addEventListener('scroll', handleScroll)
-    handleScroll() // Check on mount
+    handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [pathname])
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -93,27 +96,45 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             {[
-              { href: '#hero', label: 'Inicio', id: 'hero' },
-              { href: '#services', label: 'Servicios', id: 'services' },
-              { href: '#work', label: 'Casos de éxito', id: 'work' },
-              { href: '#consulting', label: 'Asesorías', id: 'consulting' },
-              { href: '#faq', label: 'FAQs', id: 'faq' },
-              { href: '#contact', label: 'Contacto', id: 'contact' },
-            ].map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className={`text-xs xl:text-sm text-white hover:text-gray-300 font-medium transition-colors relative ${
-                  activeSection === link.id ? 'text-purple-400' : ''
-                }`}
-              >
-                {link.label}
-                {activeSection === link.id && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-400" />
-                )}
-              </a>
-            ))}
+              { href: '#hero', label: 'Inicio', id: 'hero', isPage: false },
+              { href: '#services', label: 'Servicios', id: 'services', isPage: false },
+              { href: '#work', label: 'Casos de éxito', id: 'work', isPage: false },
+              { href: '/asesorias', label: 'Asesorías', id: 'consulting', isPage: true },
+              { href: '/pricing', label: 'Pricing', id: 'pricing', isPage: true },
+              { href: '#faq', label: 'FAQs', id: 'faq', isPage: false },
+              { href: '#contact', label: 'Contacto', id: 'contact', isPage: false },
+            ].map((link) => {
+              const isSubPage = ['/asesorias', '/pricing'].includes(pathname) || pathname.startsWith('/casos')
+              const isActive = link.isPage
+                ? pathname === link.href
+                : activeSection === link.id
+              const href = link.isPage ? link.href : isSubPage ? `/${link.href}` : link.href
+              return (
+                <a
+                  key={link.href}
+                  href={href}
+                  onClick={(e) => {
+                    if (link.isPage) {
+                      setIsMobileMenuOpen(false)
+                      return
+                    }
+                    if (isSubPage) {
+                      setIsMobileMenuOpen(false)
+                      return
+                    }
+                    handleNavClick(e, link.href)
+                  }}
+                  className={`text-xs xl:text-sm text-white hover:text-gray-300 font-medium transition-colors relative ${
+                    isActive ? 'text-purple-400' : ''
+                  }`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-400" />
+                  )}
+                </a>
+              )
+            })}
             
             {/* Language Selector */}
             <div className="relative language-selector">
@@ -162,6 +183,14 @@ export default function Navbar() {
               )}
             </div>
             
+            {/* Login Button */}
+            <a
+              href="/auth/login"
+              className="px-4 py-2 rounded-lg text-white text-sm font-semibold hover:text-gray-300 transition-colors"
+            >
+              Iniciar Sesión
+            </a>
+            
             {/* CTA Button */}
             <button
               onClick={handleBookDemo}
@@ -187,26 +216,42 @@ export default function Navbar() {
         <div className="md:hidden border-t border-gray-800 bg-black">
             <div className="px-4 py-4 space-y-4">
               {[
-                { href: '#hero', label: 'Inicio', id: 'hero' },
-                { href: '#services', label: 'Servicios', id: 'services' },
-                { href: '#work', label: 'Casos de éxito', id: 'work' },
-                { href: '#consulting', label: 'Asesorías', id: 'consulting' },
-                { href: '#faq', label: 'FAQs', id: 'faq' },
-                { href: '#contact', label: 'Contacto', id: 'contact' },
-              ].map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className={`block py-2 font-medium transition-colors rounded-lg px-3 ${
-                    activeSection === link.id 
-                      ? 'text-purple-400' 
-                      : 'text-white hover:text-gray-300'
-                  }`}
-                >
-                  {link.label}
-                </a>
-              ))}
+                { href: '#hero', label: 'Inicio', id: 'hero', isPage: false },
+                { href: '#services', label: 'Servicios', id: 'services', isPage: false },
+                { href: '#work', label: 'Casos de éxito', id: 'work', isPage: false },
+                { href: '/asesorias', label: 'Asesorías', id: 'consulting', isPage: true },
+                { href: '/pricing', label: 'Pricing', id: 'pricing', isPage: true },
+                { href: '#faq', label: 'FAQs', id: 'faq', isPage: false },
+                { href: '#contact', label: 'Contacto', id: 'contact', isPage: false },
+              ].map((link) => {
+                const isSubPage = ['/asesorias', '/pricing'].includes(pathname) || pathname.startsWith('/casos')
+                const isActive = link.isPage
+                  ? pathname === link.href
+                  : activeSection === link.id
+                const href = link.isPage ? link.href : isSubPage ? `/${link.href}` : link.href
+                return (
+                  <a
+                    key={link.href}
+                    href={href}
+                    onClick={(e) => {
+                      if (link.isPage) {
+                        setIsMobileMenuOpen(false)
+                        return
+                      }
+                      if (isSubPage) {
+                        setIsMobileMenuOpen(false)
+                        return
+                      }
+                      handleNavClick(e, link.href)
+                    }}
+                    className={`block py-2 font-medium transition-colors rounded-lg px-3 ${
+                      isActive ? 'text-purple-400' : 'text-white hover:text-gray-300'
+                    }`}
+                  >
+                    {link.label}
+                  </a>
+                )
+              })}
               
               {/* Language Selector Mobile */}
               <div className="flex items-center gap-2 py-2 px-3">
@@ -238,6 +283,15 @@ export default function Navbar() {
                   </button>
                 </div>
               </div>
+              
+              {/* Login Button Mobile */}
+              <a
+                href="/auth/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block w-full px-4 py-3 rounded-lg text-white text-sm font-semibold hover:bg-gray-800 transition-colors text-center border border-gray-700"
+              >
+                Iniciar Sesión
+              </a>
               
               <button
                 onClick={handleBookDemo}

@@ -1,16 +1,32 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { Mail, Linkedin, ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function Footer() {
   const { t } = useLanguage()
-  
+  const pathname = usePathname()
+  const isSubPage = ['/asesorias', '/pricing'].includes(pathname) || pathname.startsWith('/casos')
+
   const handleContact = () => {
+    if (isSubPage) {
+      window.location.href = '/#contact'
+      return
+    }
     const element = document.querySelector('#contact')
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
     }
+  }
+
+  const link = (hash: string, label: string) => {
+    const href = isSubPage ? `/${hash}` : hash
+    return (
+      <a href={href} className="text-gray-400 hover:text-white text-sm transition-colors">
+        {label}
+      </a>
+    )
   }
 
   return (
@@ -45,26 +61,19 @@ export default function Footer() {
           <div>
             <h4 className="text-white text-sm font-semibold mb-4 uppercase tracking-wider">Servicios</h4>
             <ul className="space-y-2">
+              <li>{link('#services', 'Automatización')}</li>
               <li>
-                <a href="#services" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  Automatización
-                </a>
-              </li>
-              <li>
-                <a href="#consulting" className="text-gray-400 hover:text-white text-sm transition-colors">
+                <a href="/asesorias" className="text-gray-400 hover:text-white text-sm transition-colors">
                   Asesorías
                 </a>
               </li>
               <li>
-                <a href="#work" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  Casos de Éxito
+                <a href="/pricing" className="text-gray-400 hover:text-white text-sm transition-colors">
+                  Pricing
                 </a>
               </li>
-              <li>
-                <a href="#how-it-works" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  Nuestro Proceso
-                </a>
-              </li>
+              <li>{link('#work', 'Casos de Éxito')}</li>
+              <li>{link('#how-it-works', 'Nuestro Proceso')}</li>
             </ul>
           </div>
 
@@ -98,12 +107,7 @@ export default function Footer() {
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-400">{t('footer.copyright')}</p>
           <div className="flex items-center gap-6 text-sm text-gray-400">
-            <a
-              href="#faq"
-              className="hover:text-white transition-colors"
-            >
-              FAQ
-            </a>
+            {link('#faq', 'FAQ')}
             <a
               href="https://linkedin.com/company/we-automate"
               target="_blank"

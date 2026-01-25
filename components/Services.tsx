@@ -465,7 +465,7 @@ export default function Services() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-base md:text-lg text-white leading-relaxed mb-12"
           >
-            Diseñamos, desarrollamos e implementamos herramientas de automatización que te ayudan a trabajar más inteligentemente, no más duro
+            Diseñamos, desarrollamos e implementamos herramientas de automatización que se convierten en tu punto de inflexión.
           </motion.p>
         </div>
 
