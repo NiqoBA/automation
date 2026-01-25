@@ -15,7 +15,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'Inflexo AI | AI Automation & Digital Transformation Studio',
   description: 'We build automation systems that run your operations. We integrate AI into business processes, automate repetitive workflows, and build functional systems.',
-  keywords: ['AI automation', 'digital transformation', 'workflow automation', 'ERP integration', 'CRM integration', 'business automation', 'automation consulting'],
+  keywords: ['AI automation', 'digital transformation', 'workflow automation', 'ERP integration', 'CRM integration', 'business automation'],
     authors: [{ name: 'Inflexo AI' }],
   icons: {
     icon: '/icon.svg',

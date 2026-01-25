@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 export default function Footer() {
   const { t } = useLanguage()
   const pathname = usePathname()
-  const isSubPage = ['/asesorias', '/pricing'].includes(pathname) || pathname.startsWith('/casos')
+  const isSubPage = pathname === '/pricing' || pathname.startsWith('/casos')
 
   const handleContact = () => {
     if (isSubPage) {
@@ -62,11 +62,6 @@ export default function Footer() {
             <h4 className="text-white text-sm font-semibold mb-4 uppercase tracking-wider">Servicios</h4>
             <ul className="space-y-2">
               <li>{link('#services', 'Automatización')}</li>
-              <li>
-                <a href="/asesorias" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  Asesorías
-                </a>
-              </li>
               <li>
                 <a href="/pricing" className="text-gray-400 hover:text-white text-sm transition-colors">
                   Pricing

@@ -31,6 +31,8 @@ export interface CaseStudyDetail extends CaseStudyCard {
   testimonial?: { quote: string; name: string; role: string; company: string; image?: string }
   gallery?: string[]
   architecture?: string
+  /** Explicación opcional "Por qué RAG" u otra tecnología fue clave */
+  ragExplanation?: string[]
 }
 
 export const CASE_FILTERS: CaseCategory[] = [
@@ -44,50 +46,68 @@ export const CASE_FILTERS: CaseCategory[] = [
 
 export const CASE_STUDIES: CaseStudyDetail[] = [
   {
-    slug: 'sara-whatsapp-ventas',
-    title: 'Sara: Asistente de Ventas por WhatsApp',
+    slug: 'sara-sistema-carga-ventas',
+    title: 'Sara: Sistema Interno de Carga de Ventas',
     client: { name: 'SouthGenetics', logo: '/imgs/logo-web-southgenetics.svg' },
     description:
-      'Agente de IA que toma pedidos por WhatsApp y los ejecuta automáticamente en Odoo, desde el primer contacto hasta la factura.',
-    metricHighlight: '847 pedidos procesados en 3 meses',
+      'Agente RAG que recibe reportes de vendedores por WhatsApp y carga automáticamente en Odoo, eliminando 3 pasos manuales.',
+    metricHighlight: '15 hrs/semana ahorradas',
     category: 'Automatización',
-    tags: ['WhatsApp', 'Odoo', 'Claude AI', 'Python'],
+    tags: ['WhatsApp', 'Odoo', 'RAG', 'Claude AI', 'n8n'],
     image: '/imgs/sara.jpg',
     featured: true,
     challenge: [
-      'SouthGenetics recibía cientos de consultas por WhatsApp sobre tests de paternidad prenatal, un producto complejo que requiere explicación detallada. El equipo de ventas pasaba horas respondiendo las mismas preguntas, creando cotizaciones manualmente y cargando pedidos en Odoo.',
-      'El proceso manual generaba: tiempo de respuesta lento (hasta 24hrs en horario no laboral), pérdida de ventas por consultas no atendidas, errores en la carga de pedidos, falta de trazabilidad de conversaciones, e imposibilidad de escalar sin contratar más personal.',
-      'Necesitaban un sistema que atendiera 24/7, explicara el producto correctamente, tomara pedidos y los ejecutara automáticamente en Odoo sin intervención humana.',
+      'SouthGenetics tenía un proceso de carga de ventas completamente manual y propenso a errores que involucraba a múltiples personas.',
+      'Proceso anterior: 1) Vendedor cierra venta → Notifica por email al equipo administrativo. 2) Empleado A recibe el email → Carga datos en Google Sheets. 3) Empleado B revisa el Sheet → Carga manualmente en Odoo (ERP).',
+      'Este flujo generaba: retrasos de 4-12 horas entre venta cerrada y registro en sistema; errores de transcripción en cada paso manual; doble trabajo innecesario (Sheet + Odoo); pérdida de información en la cadena de comunicación; imposibilidad de tener datos en tiempo real; 2 personas dedicando 15+ horas/semana solo a carga de datos.',
+      'El equipo necesitaba eliminar los pasos manuales y que los vendedores pudieran reportar ventas directamente al sistema, sin intermediarios.',
     ],
     solution: [
-      'Desarrollamos Sara, un agente conversacional impulsado por Claude AI que vive en WhatsApp y se integra directamente con Odoo.',
-      'Sara puede: responder consultas sobre el test de paternidad prenatal; explicar el proceso, requisitos y tiempos de entrega; tomar pedidos completos con datos del cliente; crear automáticamente contactos en Odoo; generar oportunidades de venta; crear órdenes de venta; emitir facturas; enviar la factura al cliente por WhatsApp.',
-      'Todo esto sin intervención humana, con trazabilidad completa de cada interacción guardada en base de datos. El sistema usa n8n para orquestar el flujo completo, Claude AI (API) para procesamiento de lenguaje natural, WhatsApp Business API para la interfaz, Odoo API para crear y actualizar registros, y Supabase para almacenar historial de conversaciones.',
+      'Desarrollamos Sara, un agente RAG (Retrieval-Augmented Generation) especializado que vive en WhatsApp y entiende el proceso completo de ventas de SouthGenetics.',
+      'Cómo funciona Sara: los vendedores reportan la venta por WhatsApp a Sara (como lo harían con un colega). Sara procesa el mensaje usando Claude AI con RAG sobre documentación de productos, procesos y políticas de la empresa. Extrae información clave: cliente, producto, cantidad, precio, método de pago, etc. Valida que los datos sean correctos (precios, productos existentes, etc.). Carga automáticamente la venta en Odoo con todos los campos necesarios. Confirma al vendedor que la venta fue registrada. Genera registro de auditoría en base de datos. El vendedor solo escribe un mensaje natural; Sara hace todo el resto.',
+      'Ejemplo de interacción: Vendedor: "Hola Sara, vendí 2 kits de paternidad prenatal a Juan Pérez, DNI 12345678, total $450 USD, pago con transferencia". Sara: "Perfecto! Registré la venta #VT-2847 en Odoo. Cliente: Juan Pérez. 2x Kit Paternidad Prenatal. Total: $450 USD. ✅"',
+      'Sara entiende variaciones de lenguaje natural, maneja información incompleta preguntando lo faltante, y tiene contexto sobre productos, precios y políticas gracias a RAG.',
     ],
     solutionFeatures: [
-      'Respuesta a consultas sobre paternidad prenatal',
-      'Toma de pedidos completos por chat',
-      'Creación automática de contactos y oportunidades en Odoo',
-      'Generación y envío de facturas por WhatsApp',
-      'Trazabilidad completa en base de datos',
-      'Disponibilidad 24/7',
+      'Vendedores reportan por WhatsApp en lenguaje natural',
+      'Procesamiento con Claude AI + RAG sobre documentación interna',
+      'Extracción y validación automática de datos (cliente, producto, precio, etc.)',
+      'Carga automática en Odoo con todos los campos',
+      'Confirmación inmediata al vendedor',
+      'Registro de auditoría en base de datos',
+      'Disponible 24/7',
     ],
     techStack: [
-      { name: 'n8n', description: 'Workflow automation' },
-      { name: 'Claude AI API', description: 'NLP y decisiones' },
-      { name: 'WhatsApp Business API' },
-      { name: 'Odoo 16', description: 'ERP' },
-      { name: 'Supabase', description: 'Database' },
-      { name: 'Python', description: 'Scripts custom' },
+      { name: 'n8n', description: 'Orquestación de workflow' },
+      { name: 'Claude AI API', description: 'NLP + RAG' },
+      { name: 'WhatsApp Business API', description: 'Interfaz' },
+      { name: 'Odoo 16 API', description: 'Destino de datos' },
+      { name: 'Supabase', description: 'Base vectorial para RAG + logs' },
+      { name: 'Python', description: 'Scripts de validación' },
     ],
     results: [
-      { label: 'Pedidos procesados', value: '847 en 3 meses' },
-      { label: 'Horas ahorradas/semana', value: '15 hrs' },
-      { label: 'Errores en facturación', value: '0 (vs 8-10/mes previo)' },
-      { label: 'Consultas sin intervención', value: '94%' },
-      { label: 'Tiempo de respuesta', value: '<2 min promedio' },
+      { label: 'Pasos manuales', value: 'De 3 → 0' },
+      { label: 'Delay venta → registro', value: 'De 4-12h → <2 min' },
+      { label: 'Horas ahorradas/semana', value: '15 hrs equipo administrativo' },
+      { label: 'Empleados liberados', value: '2 para tareas de mayor valor' },
+      { label: 'Errores de carga', value: 'De 8-12/mes → 0' },
+      { label: 'Ventas procesadas (3 meses)', value: '847' },
+      { label: 'Reportes correctos 1er intento', value: '94%' },
+      { label: 'Downtime desde implementación', value: '0' },
     ],
-    gallery: ['/imgs/sara.jpg', '/imgs/Sistema 1.png', '/imgs/sistema2.jpg'],
+    ragExplanation: [
+      'A diferencia de un simple chatbot con reglas, Sara necesitaba: entender lenguaje natural variable de vendedores; conocer el catálogo completo y precios actualizados; validar que productos y precios sean correctos; manejar casos especiales según políticas de empresa; aprender de nuevas situaciones sin reprogramación.',
+      'RAG (Retrieval-Augmented Generation) permite que Sara: 1) Busque en la base de conocimiento cuando es necesario. 2) Tome decisiones informadas basadas en documentación real. 3) Valide contra el catálogo actual sin hardcodear precios. 4) Se mantenga actualizada cuando cambian productos o políticas. 5) Dé respuestas precisas sin alucinar información.',
+      'Esto hace que Sara sea más inteligente que un bot de reglas y más confiable que un LLM genérico.',
+    ],
+    testimonial: {
+      quote:
+        'Sara eliminó completamente el trabajo manual de carga de ventas. Antes teníamos 2 personas dedicadas casi exclusivamente a esto, con errores constantes y demoras. Ahora los vendedores reportan en 30 segundos y el sistema se actualiza solo. Fue un gran cambio.',
+      name: '',
+      role: '',
+      company: '',
+    },
+    gallery: ['/imgs/sara.jpg'],
   },
   {
     slug: 'web-paternidad-prenatal',

@@ -30,24 +30,30 @@ export default function TestimonialSection({ caseStudy }: TestimonialSectionProp
           <p className="relative text-lg leading-relaxed text-gray-300">
             &ldquo;{t.quote}&rdquo;
           </p>
-          <footer className="mt-6 flex items-center gap-4">
-            {t.image && (
-              <div className="relative h-12 w-12 overflow-hidden rounded-full">
-                <Image
-                  src={t.image}
-                  alt={t.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            )}
-            <div>
-              <p className="font-semibold text-white">{t.name}</p>
-              <p className="text-sm text-gray-500">
-                {t.role} · {t.company}
-              </p>
-            </div>
-          </footer>
+          {(t.name || t.image) && (
+            <footer className="mt-6 flex items-center gap-4">
+              {t.image && (
+                <div className="relative h-12 w-12 overflow-hidden rounded-full">
+                  <Image
+                    src={t.image}
+                    alt={t.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              {t.name && (
+                <div>
+                  <p className="font-semibold text-white">{t.name}</p>
+                  {(t.role || t.company) && (
+                    <p className="text-sm text-gray-500">
+                      {[t.role, t.company].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                </div>
+              )}
+            </footer>
+          )}
         </motion.blockquote>
       </div>
     </section>

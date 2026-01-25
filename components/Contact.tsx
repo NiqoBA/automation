@@ -12,7 +12,7 @@ export default function Contact() {
     email: '',
     company: '',
     phone: '',
-    service: '' as 'automations' | 'consulting' | '',
+    service: 'automations' as 'automations' | '',
     message: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -33,7 +33,7 @@ export default function Contact() {
     }
   }
 
-  const handleServiceSelect = (service: 'automations' | 'consulting') => {
+  const handleServiceSelect = (service: 'automations') => {
     setFormData(prev => ({ ...prev, service, message: '' }))
     if (errors.service) {
       setErrors(prev => ({ ...prev, service: '' }))
@@ -88,7 +88,7 @@ export default function Contact() {
         email: '',
         company: '',
         phone: '',
-        service: '',
+        service: 'automations',
         message: '',
       })
     }, 3000)
@@ -291,17 +291,6 @@ export default function Contact() {
                           }`}
                         >
                           {t('contact.services.automations')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleServiceSelect('consulting')}
-                          className={`px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium ${
-                            formData.service === 'consulting'
-                              ? 'border-purple-500 bg-purple-500/10 text-purple-400'
-                              : 'border-white/10 bg-[#0d0d0d] text-gray-300 hover:border-white/20'
-                          }`}
-                        >
-                          {t('contact.services.consulting')}
                         </button>
                       </div>
                       {errors.service && (

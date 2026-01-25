@@ -11,6 +11,7 @@ import ChallengeSection from '@/components/case-studies/detail/ChallengeSection'
 import SolutionSection from '@/components/case-studies/detail/SolutionSection'
 import TechStackSection from '@/components/case-studies/detail/TechStackSection'
 import ResultsSection from '@/components/case-studies/detail/ResultsSection'
+import RagSection from '@/components/case-studies/detail/RagSection'
 import TestimonialSection from '@/components/case-studies/detail/TestimonialSection'
 import GallerySection from '@/components/case-studies/detail/GallerySection'
 import CaseCTA from '@/components/case-studies/detail/CaseCTA'
@@ -51,6 +52,7 @@ export default async function CaseDetailPage({ params }: PageProps) {
       <SolutionSection caseStudy={caseStudy} />
       <TechStackSection caseStudy={caseStudy} />
       <ResultsSection caseStudy={caseStudy} />
+      <RagSection caseStudy={caseStudy} />
       <TestimonialSection caseStudy={caseStudy} />
       <GallerySection caseStudy={caseStudy} />
       <CaseCTA />

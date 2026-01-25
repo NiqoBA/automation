@@ -45,7 +45,7 @@ export default function CaseStudy({
 }: CaseStudyProps) {
   const { t } = useLanguage()
   const handleSimilar = () => {
-    const element = document.querySelector('#consulting') || document.querySelector('#cta')
+    const element = document.querySelector('#cta')
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
     }

@@ -148,7 +148,7 @@ export default function Work() {
   const hasMore = filteredCases.length > 3
 
   const handleSimilar = () => {
-    const element = document.querySelector('#consulting') || document.querySelector('#cta')
+    const element = document.querySelector('#cta')
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
     }

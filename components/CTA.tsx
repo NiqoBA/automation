@@ -14,14 +14,6 @@ export default function CTA() {
     }
   }
 
-  const handleBookOneOnOne = () => {
-    const modal = document.getElementById('booking-modal') as HTMLDialogElement
-    if (modal) {
-      modal.setAttribute('data-type', 'developer')
-      modal.showModal()
-    }
-  }
-
   return (
     <section id="cta" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#FBFBFB' }}>
       {/* Background accents */}
@@ -56,15 +48,6 @@ export default function CTA() {
                 animate={{ x: ['-100%', '100%'] }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 1, ease: 'linear' }}
               />
-            </motion.button>
-            
-            <motion.button
-              onClick={handleBookOneOnOne}
-              className="px-8 py-4 bg-white/80 backdrop-blur-sm text-[#1e40af] border-2 border-[#1e40af]/20 rounded-xl hover:bg-white hover:border-[#1e40af] transition-all duration-300 font-medium shadow-sm hover:shadow-md"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {t('cta.book1on1')}
             </motion.button>
           </div>
         </motion.div>

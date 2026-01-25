@@ -63,16 +63,7 @@ export default function BookingModal() {
     }
   }
 
-  const getTitle = () => {
-    switch (formData.type) {
-      case 'developer':
-        return 'Book a 1:1 Developer Session'
-      case 'team':
-        return 'Book a Team Consulting Call'
-      default:
-        return 'Book a Demo'
-    }
-  }
+  const getTitle = () => 'Book a Demo'
 
   return (
     <dialog
@@ -92,26 +83,6 @@ export default function BookingModal() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Type selector for demo */}
-          {formData.type === 'demo' && (
-            <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-                Booking Type
-              </label>
-              <select
-                id="type"
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
-              >
-                <option value="demo">Demo</option>
-                <option value="developer">1:1 Developer Session</option>
-                <option value="team">Team Consulting Call</option>
-              </select>
-            </div>
-          )}
-
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
               Name *
@@ -155,23 +126,6 @@ export default function BookingModal() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e40af] focus:border-transparent"
             />
           </div>
-
-          {(formData.type === 'developer' || formData.type === 'team') && (
-            <div>
-              <label htmlFor="stack" className="block text-sm font-medium text-gray-700 mb-1">
-                Current stack + goal
-              </label>
-              <textarea
-                id="stack"
-                name="stack"
-                rows={3}
-                value={formData.stack}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e40af] focus:border-transparent resize-none"
-                placeholder="e.g., React app, PostgreSQL, want to add AI features..."
-              />
-            </div>
-          )}
 
           {formData.type === 'demo' && (
             <div>
