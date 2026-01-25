@@ -4,6 +4,7 @@ import { Mail, Linkedin, ArrowRight, CheckCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { submitContactForm } from '@/app/actions/contact'
 
 export default function Contact() {
   const { t } = useLanguage()
@@ -73,14 +74,25 @@ export default function Contact() {
     }
 
     setIsSubmitting(true)
+    setErrors({})
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    const { error } = await submitContactForm({
+      name: formData.name,
+      email: formData.email,
+      company: formData.company,
+      phone: formData.phone || undefined,
+      service: formData.service || 'automations',
+      message: formData.message || undefined,
+    })
 
     setIsSubmitting(false)
-    setIsSuccess(true)
 
-    // Reset form after 3 seconds
+    if (error) {
+      setErrors({ submit: error })
+      return
+    }
+
+    setIsSuccess(true)
     setTimeout(() => {
       setIsSuccess(false)
       setFormData({
@@ -322,6 +334,10 @@ export default function Contact() {
                         </motion.div>
                       )}
                     </AnimatePresence>
+
+                    {errors.submit && (
+                      <p className="text-sm text-red-500">{errors.submit}</p>
+                    )}
 
                     {/* Submit Button */}
                     <motion.button

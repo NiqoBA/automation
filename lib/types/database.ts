@@ -77,3 +77,14 @@ export interface Invoice {
   created_at: string
   updated_at: string
 }
+
+export interface ContactSubmission {
+  id: string
+  name: string
+  email: string
+  company: string
+  phone: string | null
+  service: string
+  message: string | null
+  created_at: string
+}

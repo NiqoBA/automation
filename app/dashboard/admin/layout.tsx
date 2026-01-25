@@ -2,6 +2,7 @@ import { requireMasterAdmin } from '@/lib/auth/guards'
 import { createClient } from '@/lib/supabase/server'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { getMasterAdminStats, getInvitations } from '@/app/actions/master-admin'
+import { getContactSubmissionsCount } from '@/app/actions/contact'
 
 export default async function AdminLayout({
   children,
@@ -25,6 +26,7 @@ export default async function AdminLayout({
   const pendingInvitations = invitations.filter(
     (inv) => inv.status === 'pending' && new Date(inv.expires_at) > new Date()
   ).length
+  const contactCount = await getContactSubmissionsCount()
 
   const navItems = [
     {
@@ -48,6 +50,12 @@ export default async function AdminLayout({
       label: 'Facturación',
       href: '/dashboard/admin/billing',
       icon: 'CreditCard',
+    },
+    {
+      label: 'Contacto',
+      href: '/dashboard/admin/contact',
+      icon: 'MessageSquare',
+      badge: contactCount,
     },
   ]
 
