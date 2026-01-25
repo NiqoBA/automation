@@ -4,20 +4,9 @@ import { useState, useEffect } from 'react'
 import { registerWithInvitation } from '@/app/actions/register'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { registerSchema } from '@/lib/validations/auth'
+import { registerSchema, type RegisterFormData } from '@/lib/validations/auth'
 import { Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
-
-interface RegisterFormData {
-  email: string
-  password: string
-  full_name: string
-  phone?: string
-  company_name: string
-  employee_count: '1-10' | '11-50' | '51-200' | '201-1000' | '1000+'
-  rut: string
-  country: string
-}
 
 const employeeCountOptions = [
   { value: '1-10', label: '1-10 empleados' },

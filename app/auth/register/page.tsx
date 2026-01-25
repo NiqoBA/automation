@@ -23,17 +23,19 @@ export default async function RegisterPage({
       .select('id, organization_id, role')
       .eq('id', user.id)
       .maybeSingle()
-    
-    if (profile?.role === 'master_admin') {
-      redirect('/dashboard/admin')
-    } else {
+
+    if (profile) {
+      if (profile.role === 'master_admin') {
+        redirect('/dashboard/admin')
+      }
       redirect('/dashboard/org')
     }
+    // Usuario invitado sin perfil: no redirigir, prellenar desde user
   }
 
   // Verificar si hay errores en la URL (link expirado, etc.)
   const hasError = searchParams?.error || searchParams?.error_code
-  const errorMessage = searchParams?.error_description 
+  const errorMessage = searchParams?.error_description
     ? decodeURIComponent(searchParams.error_description.replace(/\+/g, ' '))
     : null
 
@@ -41,10 +43,9 @@ export default async function RegisterPage({
   let email = searchParams?.email || ''
   let companyName = searchParams?.company_name || ''
 
-  // Si hay un usuario invitado (aún sin contraseña), obtener su metadata
-  if (user && !user.email_confirmed_at) {
-    email = user.email || email
-    companyName = user.user_metadata?.company_name || companyName
+  if (user) {
+    email = user.email ?? email
+    companyName = (user.user_metadata?.company_name as string | undefined) ?? companyName
   }
 
   return (

@@ -2,14 +2,28 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageCircle, Brain, Search } from 'lucide-react'
+import { MessageCircle, Brain, Search, type LucideIcon } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
+
+interface SystemConfig {
+  id: string
+  icon: LucideIcon
+  tabKey: string
+  titleKey: string
+  description1Key: string
+  description2Key?: string
+  description3Key?: string
+  useCasesKey: string
+  description1BoldKey?: string
+  description1EndKey?: string
+  description2BoldKey?: string
+}
 
 export default function CoreSystems() {
   const { t } = useLanguage()
   const [activeTab, setActiveTab] = useState(0)
 
-  const systems = [
+  const systems: SystemConfig[] = [
     {
       id: 'voice-whatsapp',
       icon: MessageCircle,
