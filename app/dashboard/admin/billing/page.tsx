@@ -28,7 +28,7 @@ export default async function BillingPage() {
   const collectionRate = totalCount > 0 ? Math.round((paidCount / totalCount) * 100) : 0
 
   return (
-    <div className="space-y-8">
+    <div className="min-w-0 max-w-full space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-zinc-100">Facturación</h1>
         <p className="text-zinc-400 mt-1">Gestiona las facturas y pagos</p>

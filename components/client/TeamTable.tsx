@@ -27,7 +27,7 @@ export default function TeamTable({ members, currentUserId }: TeamTableProps) {
   }
 
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+    <div className="w-full min-w-0 bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
       <div className="p-6 border-b border-zinc-800">
         <h2 className="text-xl font-bold text-zinc-100">Miembros del Equipo</h2>
         <p className="text-sm text-zinc-400 mt-1">

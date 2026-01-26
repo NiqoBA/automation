@@ -9,13 +9,15 @@ export default async function InvitationsPage() {
   const invitations = await getInvitations()
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+    <div className="min-w-0 max-w-full space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="min-w-0">
           <h1 className="text-3xl font-bold text-zinc-100">Invitaciones</h1>
           <p className="text-zinc-400 mt-1">Gestiona las invitaciones enviadas</p>
         </div>
-        <InviteClientButton />
+        <div className="flex-shrink-0">
+          <InviteClientButton />
+        </div>
       </div>
 
       <InvitationsTable invitations={invitations} />

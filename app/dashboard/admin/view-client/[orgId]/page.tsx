@@ -19,17 +19,17 @@ export default async function ViewClientPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full space-y-6">
       {/* Banner */}
-      <div className="bg-violet-500/10 border border-violet-500/20 rounded-lg p-4">
-        <div className="flex items-center gap-4">
+      <div className="w-full min-w-0 bg-violet-500/10 border border-violet-500/20 rounded-lg p-4">
+        <div className="flex flex-wrap items-center gap-4">
           <Link
             href="/dashboard/admin"
-            className="p-2 rounded-lg hover:bg-violet-500/20 text-violet-400 hover:text-violet-300 transition-colors"
+            className="p-2 flex-shrink-0 rounded-lg hover:bg-violet-500/20 text-violet-400 hover:text-violet-300 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <div>
+          <div className="min-w-0">
             <p className="text-violet-400 font-medium">
               Viendo como: <span className="text-violet-300">{result.data.organization.name}</span>
             </p>

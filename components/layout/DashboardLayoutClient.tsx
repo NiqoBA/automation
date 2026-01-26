@@ -33,7 +33,7 @@ export default function DashboardLayoutClient({
   const pathname = usePathname()
 
   return (
-    <div className="min-h-screen bg-black text-white flex">
+    <div className="min-h-screen bg-black text-white flex overflow-x-hidden">
       {/* Sidebar Desktop */}
       <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
         <div className="flex flex-col flex-grow bg-zinc-900 border-r border-zinc-800">
@@ -179,22 +179,24 @@ export default function DashboardLayoutClient({
       )}
 
       {/* Main content */}
-      <div className="flex-1 md:pl-64">
+      <div className="flex-1 md:pl-64 min-w-0">
         {/* Mobile header */}
-        <div className="md:hidden flex items-center justify-between px-4 py-4 border-b border-zinc-800 bg-zinc-900">
-          <h1 className="text-lg font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+        <div className="md:hidden flex items-center justify-between gap-4 px-4 py-4 border-b border-zinc-800 bg-zinc-900">
+          <h1 className="text-lg font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent min-w-0 truncate">
             Inflexo AI
           </h1>
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400"
+            className="p-2 flex-shrink-0 rounded-lg hover:bg-zinc-800 text-zinc-400"
           >
             <Menu className="w-5 h-5" />
           </button>
         </div>
 
         {/* Page content */}
-        <main className="p-6 md:p-8">{children}</main>
+        <main className="p-6 md:p-8 overflow-x-auto min-w-0">
+          {children}
+        </main>
       </div>
     </div>
   )

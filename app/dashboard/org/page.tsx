@@ -14,13 +14,15 @@ export default async function ClientDashboard() {
   ])
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
+    <div className="min-w-0 max-w-full space-y-8">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="min-w-0">
           <h1 className="text-3xl font-bold text-zinc-100">Dashboard</h1>
           <p className="text-zinc-400 mt-1">Panel de control de tu organización</p>
         </div>
-        <CreateProjectButton />
+        <div className="flex-shrink-0">
+          <CreateProjectButton />
+        </div>
       </div>
 
       {/* Stats Cards */}

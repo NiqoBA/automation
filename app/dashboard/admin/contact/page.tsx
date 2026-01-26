@@ -8,7 +8,7 @@ export default async function ContactPage() {
   const submissions = await getContactSubmissions()
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-zinc-100">Contacto</h1>
         <p className="text-zinc-400 mt-1">

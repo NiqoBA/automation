@@ -9,14 +9,16 @@ export default async function TeamPage() {
   const members = await getTeamMembers()
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+    <div className="min-w-0 max-w-full space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="min-w-0">
           <h1 className="text-3xl font-bold text-zinc-100">Equipo</h1>
           <p className="text-zinc-400 mt-1">Gestiona los miembros de tu organización</p>
         </div>
         {['org_admin', 'master_admin'].includes(profile.role) && (
-          <InviteTeamButton />
+          <div className="flex-shrink-0">
+            <InviteTeamButton />
+          </div>
         )}
       </div>
 

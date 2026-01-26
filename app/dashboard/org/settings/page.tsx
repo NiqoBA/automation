@@ -14,7 +14,7 @@ export default async function SettingsPage() {
     .single()
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-zinc-100">Configuración</h1>
         <p className="text-zinc-400 mt-1">Gestiona la información de tu organización y perfil</p>

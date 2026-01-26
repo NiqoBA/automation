@@ -33,7 +33,7 @@ export default function ClientsTable({ clients }: ClientsTableProps) {
   }
 
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+    <div className="w-full min-w-0 bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
       <div className="p-6 border-b border-zinc-800">
         <h2 className="text-xl font-bold text-zinc-100">Clientes</h2>
         <p className="text-sm text-zinc-400 mt-1">
@@ -77,7 +77,7 @@ export default function ClientsTable({ clients }: ClientsTableProps) {
           <tbody className="divide-y divide-zinc-800">
             {clients.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-12 text-center">
+                <td colSpan={9} className="px-6 py-12 text-center">
                   <p className="text-zinc-400">No hay clientes registrados</p>
                 </td>
               </tr>

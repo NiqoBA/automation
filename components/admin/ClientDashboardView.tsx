@@ -22,9 +22,9 @@ export default function ClientDashboardView({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full space-y-6">
       {/* Organization Info */}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+      <div className="w-full min-w-0 bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
         <div className="flex items-start justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-zinc-100 mb-2">
@@ -75,7 +75,7 @@ export default function ClientDashboardView({
       </div>
 
       {/* Projects */}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+      <div className="w-full min-w-0 bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
         <div className="p-6 border-b border-zinc-800">
           <h3 className="text-lg font-bold text-zinc-100">Proyectos</h3>
           <p className="text-sm text-zinc-400 mt-1">
@@ -123,7 +123,7 @@ export default function ClientDashboardView({
       </div>
 
       {/* Users */}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+      <div className="w-full min-w-0 bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
         <div className="p-6 border-b border-zinc-800">
           <h3 className="text-lg font-bold text-zinc-100">Usuarios</h3>
           <p className="text-sm text-zinc-400 mt-1">
