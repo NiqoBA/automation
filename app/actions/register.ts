@@ -44,7 +44,7 @@ export async function registerWithInvitation(
     .maybeSingle()
 
   if (existingProfile) {
-    // Si ya tiene perfil, redirigir al dashboard de su organización
+    // Si ya tiene perfil, redirigir al dashboard según su rol
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, organization_id')
@@ -52,8 +52,10 @@ export async function registerWithInvitation(
       .single()
     
     revalidatePath('/', 'layout')
-    if (profile?.organization_id) {
-      redirect(`/dashboard/${profile.organization_id}`)
+    if (profile?.role === 'master_admin') {
+      redirect('/dashboard/admin')
+    } else if (profile?.organization_id) {
+      redirect('/dashboard/org')
     } else {
       redirect('/auth/login')
     }
@@ -175,9 +177,11 @@ export async function registerWithInvitation(
 
   revalidatePath('/', 'layout')
   
-  // Redirigir al dashboard de la organización
-  if (createdProfile?.organization_id) {
-    redirect(`/dashboard/${createdProfile.organization_id}`)
+  // Redirigir al dashboard según el rol
+  if (createdProfile?.role === 'master_admin') {
+    redirect('/dashboard/admin')
+  } else if (createdProfile?.organization_id) {
+    redirect('/dashboard/org')
   } else {
     redirect('/auth/login')
   }
