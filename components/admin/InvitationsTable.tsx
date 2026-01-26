@@ -33,7 +33,7 @@ export default function InvitationsTable({ invitations }: InvitationsTableProps)
   }
 
   const copyLink = (token: string) => {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://somosinflexo.com'
     const link = `${siteUrl}/auth/register?token=${token}`
     navigator.clipboard.writeText(link)
     setCopiedId(token)

@@ -303,7 +303,7 @@ export async function inviteTeamMember(data: {
     .single()
 
   // Crear invitación usando Supabase Auth
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://somosinflexo.com'
   const { data: inviteData, error: inviteError } = await adminSupabase.auth.admin.inviteUserByEmail(
     data.email,
     {
