@@ -46,7 +46,7 @@ const plans: Plan[] = [
       'Sistema de tickets (respuesta en 24hrs hábiles)',
       '5 horas/mes de ajustes y mejoras',
       'Monitoreo diario + optimización proactiva',
-      'Reunión mensual de revisión',
+      'Reuniones semanales',
       'Soporte por WhatsApp',
     ],
     idealFor: 'Automatizaciones en producción con volumen medio',

@@ -5,6 +5,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { requireMasterAdmin } from '@/lib/auth/guards'
 import type { ContactSubmission } from '@/lib/types/database'
 
+const CONTACT_WEBHOOK_URL =
+  process.env.CONTACT_WEBHOOK_URL ||
+  'https://n8n.srv908725.hstgr.cloud/webhook/notificaciones_inflexo'
+
 export type ContactFormData = {
   name: string
   email: string
@@ -15,8 +19,27 @@ export type ContactFormData = {
 }
 
 /**
+ * Enviar payload al webhook de n8n (no bloquea ni falla el flujo).
+ */
+async function notifyWebhook(payload: Record<string, string | null>) {
+  try {
+    const res = await fetch(CONTACT_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    if (!res.ok) {
+      console.warn('[contact] Webhook responded', res.status, await res.text())
+    }
+  } catch (e) {
+    console.warn('[contact] Webhook request failed:', e)
+  }
+}
+
+/**
  * Guardar envío del formulario de contacto (público, sin auth).
  * Usa admin client para insertar sin sesión.
+ * Además envía un webhook a n8n con los datos del formulario.
  */
 export async function submitContactForm(data: ContactFormData): Promise<{ error?: string }> {
   const name = String(data.name ?? '').trim()
@@ -49,6 +72,15 @@ export async function submitContactForm(data: ContactFormData): Promise<{ error?
     console.error('Error al guardar contacto:', error)
     return { error: 'No se pudo enviar el formulario. Intenta de nuevo.' }
   }
+
+  await notifyWebhook({
+    name,
+    email,
+    company,
+    phone,
+    service,
+    message,
+  })
 
   return {}
 }
