@@ -1,0 +1,34 @@
+name: Daily Scraper
+
+on:
+  schedule:
+    # 7:30 AM UTC-3 is 10:30 UTC
+    - cron: '30 10 * * *'
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: ./unified-scraper
+        run: npm ci
+
+      - name: Run Scraper
+        working-directory: ./unified-scraper
+        run: node index.js
+        env:
+          # N8N Webhook URL is hardcoded in the script as fallback, 
+          # but good practice to set it here if we wanted to use secrets.
+          # For now, relying on the script's default or we can set it.
+          N8N_WEBHOOK_URL: "https://n8n.srv908725.hstgr.cloud/webhook/scraper"

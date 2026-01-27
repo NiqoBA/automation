@@ -187,6 +187,15 @@ export async function inviteClient(data: z.infer<typeof inviteClientSchema>) {
 
   if (inviteError || !inviteData.user) {
     console.error('Error al invitar usuario:', inviteError)
+    
+    // Manejar específicamente el error de rate limit
+    if (inviteError?.message?.toLowerCase().includes('rate limit') || 
+        inviteError?.message?.toLowerCase().includes('too many requests')) {
+      return { 
+        error: 'Se alcanzó el límite de envío de emails. Por favor, espera unos minutos antes de intentar nuevamente. Si el problema persiste, contacta al soporte.' 
+      }
+    }
+    
     return { error: inviteError?.message || 'Error al crear la invitación' }
   }
 
