@@ -3,8 +3,8 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 
 // --- CONFIGURACIÓN ---
-// Reemplaza esto con tu URL de Webhook de n8n
 const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK || 'https://n8n.srv908725.hstgr.cloud/webhook/scraper';
+const MIN_PRICE_FOR_DETAIL = 100000;
 // ---------------------
 
 async function scrapeInfoCasas(browser) {
@@ -53,8 +53,9 @@ async function scrapeInfoCasas(browser) {
             } else {
                 let newItemsFound = 0;
                 pageListings.forEach(item => {
+                    if (item.price?.amount < MIN_PRICE_FOR_DETAIL && item.price?.currency?.name === 'U$S') return;
+
                     const link = `https://www.infocasas.com.uy${item.link}`;
-                    // Evitar duplicados internos por ID o Link
                     if (!allListings.some(x => x.id === item.id || x.link === link)) {
                         allListings.push({
                             portal: 'InfoCasas',
@@ -73,7 +74,6 @@ async function scrapeInfoCasas(browser) {
                     }
                 });
 
-                // Si no hay ítems nuevos en esta página, detenemos la paginación
                 if (newItemsFound === 0) {
                     hasNextPage = false;
                 } else {
@@ -88,6 +88,42 @@ async function scrapeInfoCasas(browser) {
         await page.close();
     }
     return allListings;
+}
+
+async function getCasasYMasDetail(browser, url) {
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    try {
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        const content = await page.content();
+        const $ = cheerio.load(content);
+        const ldJsonText = $('script[type="application/ld+json"]').html();
+        if (ldJsonText) {
+            try {
+                const data = JSON.parse(ldJsonText);
+                const listing = Array.isArray(data) ? data.find(i => i['@type'] === 'RealEstateListing') : (data['@type'] === 'RealEstateListing' ? data : null);
+                if (listing) {
+                    return {
+                        price: listing.offers?.price || 0,
+                        currency: listing.offers?.priceCurrency === 'USD' ? 'U$S' : (listing.offers?.priceCurrency || 'U$S'),
+                        agency: listing.offers?.seller?.name || 'Particular',
+                        phone: listing.offers?.seller?.telephone || 'Consultar',
+                        description: listing.description || '',
+                        m2: listing.mainEntity?.floorSize?.value || 0,
+                        rooms: listing.mainEntity?.numberOfBedrooms || 0,
+                        neighborhood: listing.mainEntity?.address?.addressLocality || ''
+                    };
+                }
+            } catch (e) {
+                console.error(`[Casasymas] Error parsing JSON-LD for ${url}`);
+            }
+        }
+    } catch (e) {
+        console.error(`[Casasymas] Error loading detail for ${url}: ${e.message}`);
+    } finally {
+        await page.close();
+    }
+    return null;
 }
 
 async function scrapeCasasYMas(browser) {
@@ -106,80 +142,64 @@ async function scrapeCasasYMas(browser) {
                 : `https://www.casasymas.com.uy/propiedades/venta/publicadas=hoy/pagina-${currentPage}`;
 
             console.log(`[Casasymas] Navegando a página ${currentPage}...`);
-            const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-
-            if (response.url() !== url && currentPage > 1) break;
+            await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
             const content = await page.content();
             const $ = cheerio.load(content);
-            const pageResults = [];
             const cards = $('.prop-entrada');
 
             if (cards.length === 0) break;
 
             let newItemsFound = 0;
-            cards.each((i, el) => {
-                const card = $(el);
+            const pendingDetails = [];
+
+            for (let i = 0; i < cards.length; i++) {
+                const card = $(cards[i]);
                 const link = 'https://www.casasymas.com.uy' + card.attr('href');
                 const id = card.attr('data-id') || (currentPage * 1000 + i);
 
-                if (allListings.some(x => x.link === link || x.id === id)) return;
-
-                const title = card.find('.titulo-prop').text().trim();
                 const priceText = card.find('.precio').text().trim();
                 const priceVal = parseInt(priceText.replace(/[^0-9]/g, '')) || 0;
-                const currency = priceText.includes('$') && !priceText.includes('U') ? '$' : 'U$S';
-                const neighborhood = card.find('.localidad_p').text().trim().split(' ')[0] || '';
 
-                let rooms = 0;
-                let m2 = 0;
-                card.find('ul li').each((j, li) => {
-                    const text = $(li).text().trim();
-                    const img = $(li).find('img').attr('title');
-                    if (img === 'Dormitorios') rooms = parseInt(text) || 0;
-                    if (img && img.includes('Superficie')) m2 = parseInt(text) || 0;
-                });
+                if (priceVal < MIN_PRICE_FOR_DETAIL) continue;
+                if (allListings.some(x => x.link === link || x.id === id)) continue;
 
-                let phone = 'Consultar';
-                const whatsappBtn = card.find('.action-link.whatsapp').attr('onclick');
-                if (whatsappBtn) {
-                    const match = whatsappBtn.match(/wa\.me\/([0-9]+)/);
-                    if (match) phone = '+' + match[1];
-                }
-
-                let agency = 'Particular';
-                const agencyInput = card.find('input[name="inmobiliaria"]');
-                if (agencyInput.length > 0) {
-                    agency = agencyInput.val().trim();
-                } else {
-                    // Fallback: extraer del título si tiene el formato "iMas.uy - AGENCIA"
-                    const titleParts = title.split('iMas.uy');
-                    if (titleParts.length > 1) {
-                        agency = titleParts[1].replace(/^-/, '').trim() || 'Particular';
-                    }
-                }
-
-                allListings.push({
-                    portal: 'CasasYMas',
-                    id,
-                    title,
-                    price: priceVal,
-                    currency,
-                    neighborhood,
-                    m2,
-                    rooms,
-                    agency,
-                    phone,
-                    link
-                });
+                pendingDetails.push({ id, link, initialPrice: priceVal });
                 newItemsFound++;
-            });
+            }
+
+            console.log(`[Casasymas] Obteniendo detalles para ${pendingDetails.length} propiedades...`);
+            // Procesamos detalles de 3 en 3 para no saturar
+            for (let i = 0; i < pendingDetails.length; i += 3) {
+                const chunk = pendingDetails.slice(i, i + 3);
+                const results = await Promise.all(chunk.map(item => getCasasYMasDetail(browser, item.link)));
+
+                results.forEach((detail, idx) => {
+                    const original = chunk[idx];
+                    if (detail) {
+                        allListings.push({
+                            portal: 'CasasYMas',
+                            id: original.id,
+                            title: detail.description ? detail.description.substring(0, 100) + '...' : 'Propiedad en CasasYMas',
+                            price: detail.price || original.initialPrice,
+                            currency: detail.currency,
+                            neighborhood: detail.neighborhood,
+                            m2: detail.m2,
+                            rooms: detail.rooms,
+                            agency: detail.agency,
+                            phone: detail.phone,
+                            link: original.link
+                        });
+                    }
+                });
+                await new Promise(r => setTimeout(r, 1000)); // Anti-ban delay
+            }
 
             if (newItemsFound === 0) {
                 hasNextPage = false;
             } else {
                 const nextButton = $('.pagination .page-item a[aria-label="Next"]');
-                if (nextButton.length === 0 || currentPage >= 15) {
+                if (nextButton.length === 0 || currentPage >= 10) { // Reducido para evitar tiempos excesivos
                     hasNextPage = false;
                 } else {
                     currentPage++;
@@ -195,6 +215,7 @@ async function scrapeCasasYMas(browser) {
 }
 
 function normalizeString(str) {
+    if (!str) return '';
     return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
 }
 
@@ -210,7 +231,6 @@ function detectDuplicates(list1, list2) {
             const item1 = combined[i];
             const normNeighborhood1 = normalizeString(item1.neighborhood);
 
-            // Criterios de duplicidad: mismo barrio, mismo precio y (mismos cuartos o m2 similares)
             const sameNeighborhood = (normNeighborhood1 === normNeighborhood2 && normNeighborhood1 !== '');
             const samePrice = (item1.price === item2.price && item1.price > 0);
             const similarM2 = Math.abs(item1.m2 - item2.m2) <= 3 && item1.m2 > 0;
@@ -227,14 +247,10 @@ function detectDuplicates(list1, list2) {
             item1.isDuplicate = true;
             item1.portal = "InfoCasas + CasasYMas";
             item1.link = `${item1.link} + ${item2.link}`;
-
-            // Preferir el portal que tenga teléfono real si uno dice 'Consultar'
             if (item1.phone === 'Consultar' && item2.phone !== 'Consultar') {
                 item1.phone = item2.phone;
             }
-
             duplicates.push({ a: item1, b: item2 });
-            // No lo agregamos a combined para evitar que el usuario reciba la misma propiedad dos veces
         } else {
             combined.push(item2);
         }
@@ -247,7 +263,6 @@ async function sendToN8N(data, summary) {
         console.log('[Webhook] URL no configurada. Omitiendo envío.');
         return;
     }
-
     console.log('[Webhook] Enviando datos a n8n...');
     try {
         const payload = {
@@ -255,13 +270,11 @@ async function sendToN8N(data, summary) {
             summary: summary,
             properties: data
         };
-
         const response = await fetch(N8N_WEBHOOK_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-
         if (response.ok) {
             console.log('[Webhook] Datos enviados exitosamente!');
         } else {
@@ -283,27 +296,25 @@ async function sendToN8N(data, summary) {
 
         const { combined, duplicates } = detectDuplicates(infoCasasResults, casasYMasResults);
 
-        // Reporte de Texto Local
-        let output = '';
-        output += `REPORTE UNIFICADO - ${new Date().toLocaleDateString()}\n`;
-        output += `Total: ${combined.length} (Duplicados: ${duplicates.length})\n\n`;
-        combined.forEach((item, index) => {
-            const dupInfo = item.isDuplicate ? ' [⚠️ DUPLICADO]' : '';
-            output += `#${index + 1}${dupInfo} - ${item.portal}\n`;
-            output += `${item.title}\n`;
-            output += `${item.currency} ${item.price} | ${item.neighborhood} | ${item.m2}m²\n`;
-            output += `Inmobiliaria: ${item.agency}\n`;
-            output += `Tel: ${item.phone}\n`;
+        // Filtrar opcionalmente solo >= 100k (aunque ya se filtró en scrapers)
+        const finalResults = combined.filter(item => item.price >= MIN_PRICE_FOR_DETAIL);
+
+        let output = `REPORTE UNIFICADO EXTRA (>= 100k) - ${new Date().toLocaleString()}\n`;
+        output += `Total final: ${finalResults.length} (Duplicados entre portales: ${duplicates.length})\n\n`;
+        finalResults.forEach((item, index) => {
+            output += `#${index + 1} - ${item.portal}\n`;
+            output += `Precio: ${item.currency} ${item.price} | Barrio: ${item.neighborhood} | M2: ${item.m2}\n`;
+            output += `Inmobiliaria: ${item.agency} | Tel: ${item.phone}\n`;
             output += `Link: ${item.link}\n`;
-            if (item.duplicateRef) output += `Ref: ${item.duplicateRef}\n`;
             output += '--------------------------------------------------\n';
         });
-        fs.writeFileSync('reporte_final.txt', output);
-        console.log('Archivo local guardado: reporte_final.txt');
 
-        // Enviar a N8N
-        await sendToN8N(combined, {
-            total: combined.length,
+        fs.writeFileSync('Salida2.0.txt', output);
+        fs.writeFileSync('reporte_final.txt', output);
+        console.log('Archivos guardados: Salida2.0.txt y reporte_final.txt');
+
+        await sendToN8N(finalResults, {
+            total: finalResults.length,
             duplicates: duplicates.length,
             source_infocasas: infoCasasResults.length,
             source_casasymas: casasYMasResults.length
