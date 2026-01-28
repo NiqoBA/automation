@@ -245,11 +245,22 @@ function detectDuplicates(list1, list2) {
         if (foundDuplicateIdx !== -1) {
             const item1 = combined[foundDuplicateIdx];
             item1.isDuplicate = true;
-            item1.portal = "InfoCasas + CasasYMas";
-            item1.link = `${item1.link} + ${item2.link}`;
+
+            // Solo combinamos si son portales distintos y aún no ha sido combinado
+            if (item1.portal !== item2.portal && !item1.portal.includes(' + ')) {
+                // Identificamos cual es cual antes de sobreescribir el portal
+                const infoLink = item1.portal === "InfoCasas" ? item1.link : item2.link;
+                const casasLink = item1.portal === "CasasYMas" ? item1.link : item2.link;
+
+                item1.portal = "InfoCasas + CasasYMas";
+                item1.link = `${infoLink} + ${casasLink}`;
+            }
+
+            // Preferir el portal que tenga teléfono real si uno dice 'Consultar'
             if (item1.phone === 'Consultar' && item2.phone !== 'Consultar') {
                 item1.phone = item2.phone;
             }
+
             duplicates.push({ a: item1, b: item2 });
         } else {
             combined.push(item2);
