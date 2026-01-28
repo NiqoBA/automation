@@ -51,22 +51,35 @@ async function scrapeInfoCasas(browser) {
             if (pageListings.length === 0) {
                 hasNextPage = false;
             } else {
-                const mapped = pageListings.map(item => ({
-                    portal: 'InfoCasas',
-                    id: item.id,
-                    title: item.title,
-                    price: item.price?.amount || 0,
-                    currency: item.price?.currency?.name || 'U$S',
-                    neighborhood: item.locations?.neighbourhood?.[0]?.name || '',
-                    m2: item.m2 || item.m2Built || 0,
-                    rooms: item.bedrooms || 0,
-                    agency: item.owner?.name || 'Particular',
-                    phone: item.owner?.whatsapp_phone || item.owner?.masked_phone || 'Consultar',
-                    link: `https://www.infocasas.com.uy${item.link}`
-                }));
-                allListings = allListings.concat(mapped);
-                currentPage++;
-                if (currentPage > 15) hasNextPage = false; // Safety limit
+                let newItemsFound = 0;
+                pageListings.forEach(item => {
+                    const link = `https://www.infocasas.com.uy${item.link}`;
+                    // Evitar duplicados internos por ID o Link
+                    if (!allListings.some(x => x.id === item.id || x.link === link)) {
+                        allListings.push({
+                            portal: 'InfoCasas',
+                            id: item.id,
+                            title: item.title,
+                            price: item.price?.amount || 0,
+                            currency: item.price?.currency?.name || 'U$S',
+                            neighborhood: item.locations?.neighbourhood?.[0]?.name || '',
+                            m2: item.m2 || item.m2Built || 0,
+                            rooms: item.bedrooms || 0,
+                            agency: item.owner?.name || 'Particular',
+                            phone: item.owner?.whatsapp_phone || item.owner?.masked_phone || 'Consultar',
+                            link: link
+                        });
+                        newItemsFound++;
+                    }
+                });
+
+                // Si no hay ítems nuevos en esta página, detenemos la paginación
+                if (newItemsFound === 0) {
+                    hasNextPage = false;
+                } else {
+                    currentPage++;
+                    if (currentPage > 15) hasNextPage = false;
+                }
             }
         }
     } catch (e) {
@@ -104,8 +117,14 @@ async function scrapeCasasYMas(browser) {
 
             if (cards.length === 0) break;
 
+            let newItemsFound = 0;
             cards.each((i, el) => {
                 const card = $(el);
+                const link = 'https://www.casasymas.com.uy' + card.attr('href');
+                const id = card.attr('data-id') || (currentPage * 1000 + i);
+
+                if (allListings.some(x => x.link === link || x.id === id)) return;
+
                 const title = card.find('.titulo-prop').text().trim();
                 const priceText = card.find('.precio').text().trim();
                 const priceVal = parseInt(priceText.replace(/[^0-9]/g, '')) || 0;
@@ -128,9 +147,9 @@ async function scrapeCasasYMas(browser) {
                     if (match) phone = '+' + match[1];
                 }
 
-                pageResults.push({
+                allListings.push({
                     portal: 'CasasYMas',
-                    id: card.attr('data-id') || (currentPage * 1000 + i),
+                    id,
                     title,
                     price: priceVal,
                     currency,
@@ -139,17 +158,20 @@ async function scrapeCasasYMas(browser) {
                     rooms,
                     agency: 'Inmobiliaria / Particular',
                     phone,
-                    link: 'https://www.casasymas.com.uy' + card.attr('href')
+                    link
                 });
+                newItemsFound++;
             });
 
-            allListings = allListings.concat(pageResults);
-
-            const nextButton = $('.pagination .page-item a[aria-label="Next"]');
-            if (nextButton.length === 0 || currentPage >= 15) {
+            if (newItemsFound === 0) {
                 hasNextPage = false;
             } else {
-                currentPage++;
+                const nextButton = $('.pagination .page-item a[aria-label="Next"]');
+                if (nextButton.length === 0 || currentPage >= 15) {
+                    hasNextPage = false;
+                } else {
+                    currentPage++;
+                }
             }
         }
     } catch (e) {
@@ -169,31 +191,42 @@ function detectDuplicates(list1, list2) {
     const duplicates = [];
 
     for (const item2 of list2) {
-        let isDuplicate = false;
+        let foundDuplicateIdx = -1;
         const normNeighborhood2 = normalizeString(item2.neighborhood);
 
-        for (const item1 of list1) {
+        for (let i = 0; i < combined.length; i++) {
+            const item1 = combined[i];
             const normNeighborhood1 = normalizeString(item1.neighborhood);
+
+            // Criterios de duplicidad: mismo barrio, mismo precio y (mismos cuartos o m2 similares)
             const sameNeighborhood = (normNeighborhood1 === normNeighborhood2 && normNeighborhood1 !== '');
             const samePrice = (item1.price === item2.price && item1.price > 0);
             const similarM2 = Math.abs(item1.m2 - item2.m2) <= 3 && item1.m2 > 0;
             const sameRooms = item1.rooms === item2.rooms && item1.rooms > 0;
 
             if (sameNeighborhood && samePrice && (sameRooms || similarM2)) {
-                isDuplicate = true;
-                item1.isDuplicate = true;
-                item2.isDuplicate = true;
-                item1.duplicateRef = item2.link;
-                item2.duplicateRef = item1.link;
-                // Inherit agency info if available
-                if (item2.agency.includes('Particular') && !item1.agency.includes('Particular')) {
-                    item2.agency = item1.agency;
-                }
-                duplicates.push({ a: item1, b: item2 });
+                foundDuplicateIdx = i;
                 break;
             }
         }
-        combined.push(item2);
+
+        if (foundDuplicateIdx !== -1) {
+            const item1 = combined[foundDuplicateIdx];
+            item1.isDuplicate = true;
+            item2.isDuplicate = true;
+            item1.duplicateRef = item2.link;
+            item2.duplicateRef = item1.link;
+
+            // Preferir el portal que tenga teléfono real si uno dice 'Consultar'
+            if (item1.phone === 'Consultar' && item2.phone !== 'Consultar') {
+                item1.phone = item2.phone;
+            }
+
+            duplicates.push({ a: item1, b: item2 });
+            // No lo agregamos a combined para evitar que el usuario reciba la misma propiedad dos veces
+        } else {
+            combined.push(item2);
+        }
     }
     return { combined, duplicates };
 }
