@@ -7,7 +7,7 @@ Este documento detalla los cambios realizados para integrar el scraper, automati
 Se ha creado un flujo de trabajo de GitHub Actions para ejecutar el scraper diariamente.
 
 - **Archivo**: `.github/workflows/scraper.yml`
-- **Frecuencia**: Todos los días a las 07:30 AM (Hora Uruguay, UTC-3).
+- **Frecuencia**: Todos los días a las 22:00 (10:00 PM) (Hora Uruguay, UTC-3).
 - **Acción**:
     1. Descarga el código del repositorio.
     2. Instala las dependencias en la carpeta `unified-scraper`.
