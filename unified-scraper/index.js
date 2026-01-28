@@ -213,9 +213,8 @@ function detectDuplicates(list1, list2) {
         if (foundDuplicateIdx !== -1) {
             const item1 = combined[foundDuplicateIdx];
             item1.isDuplicate = true;
-            item2.isDuplicate = true;
-            item1.duplicateRef = item2.link;
-            item2.duplicateRef = item1.link;
+            item1.portal = "InfoCasas + CasasYMas";
+            item1.link = `${item1.link} + ${item2.link}`;
 
             // Preferir el portal que tenga teléfono real si uno dice 'Consultar'
             if (item1.phone === 'Consultar' && item2.phone !== 'Consultar') {
