@@ -147,6 +147,18 @@ async function scrapeCasasYMas(browser) {
                     if (match) phone = '+' + match[1];
                 }
 
+                let agency = 'Particular';
+                const agencyInput = card.find('input[name="inmobiliaria"]');
+                if (agencyInput.length > 0) {
+                    agency = agencyInput.val().trim();
+                } else {
+                    // Fallback: extraer del título si tiene el formato "iMas.uy - AGENCIA"
+                    const titleParts = title.split('iMas.uy');
+                    if (titleParts.length > 1) {
+                        agency = titleParts[1].replace(/^-/, '').trim() || 'Particular';
+                    }
+                }
+
                 allListings.push({
                     portal: 'CasasYMas',
                     id,
@@ -156,7 +168,7 @@ async function scrapeCasasYMas(browser) {
                     neighborhood,
                     m2,
                     rooms,
-                    agency: 'Inmobiliaria / Particular',
+                    agency,
                     phone,
                     link
                 });
