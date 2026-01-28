@@ -1,4 +1,3 @@
-import { Users, UserPlus, Mail, TrendingUp } from 'lucide-react'
 import StatCard from '@/components/ui/StatCard'
 
 interface DashboardStatsProps {
@@ -16,25 +15,25 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
       <StatCard
         title="Total Clientes"
         value={stats.totalClients}
-        icon={Users}
+        icon="Users"
         description="Organizaciones activas"
       />
       <StatCard
         title="Total Usuarios"
         value={stats.totalUsers}
-        icon={UserPlus}
+        icon="UserPlus"
         description="Usuarios registrados"
       />
       <StatCard
         title="Invitaciones Pendientes"
         value={stats.pendingInvitations}
-        icon={Mail}
+        icon="Mail"
         description="Esperando respuesta"
       />
       <StatCard
         title="Clientes Activos este Mes"
         value={stats.activeThisMonth}
-        icon={TrendingUp}
+        icon="TrendingUp"
         description="Últimos 30 días"
       />
     </div>

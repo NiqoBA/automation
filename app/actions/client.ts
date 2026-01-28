@@ -107,6 +107,7 @@ export async function getProjects() {
 
 /**
  * Crear nuevo proyecto
+ * Solo master admin o usuario con email niqodt@gmail.com puede crear proyectos
  */
 export async function createProject(data: z.infer<typeof createProjectSchema>) {
   const { profile } = await requireProfile()
@@ -116,9 +117,11 @@ export async function createProject(data: z.infer<typeof createProjectSchema>) {
     return { error: 'No perteneces a una organización' }
   }
 
-  // Verificar que sea admin
-  if (!['org_admin', 'master_admin'].includes(profile.role)) {
-    return { error: 'Solo los administradores pueden crear proyectos' }
+  // Solo master admin o email específico puede crear proyectos
+  const canCreate = profile.role === 'master_admin' || profile.email === 'niqodt@gmail.com'
+  
+  if (!canCreate) {
+    return { error: 'No tienes permisos para crear proyectos. Solo el administrador puede crear proyectos.' }
   }
 
   const validated = createProjectSchema.parse(data)

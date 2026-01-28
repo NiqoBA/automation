@@ -1,5 +1,4 @@
 import { requireMasterAdmin } from '@/lib/auth/guards'
-import { createClient } from '@/lib/supabase/server'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { getMasterAdminStats, getInvitations } from '@/app/actions/master-admin'
 import { getContactSubmissionsCount } from '@/app/actions/contact'
@@ -17,8 +16,6 @@ export default async function AdminLayout({
   }
   
   const profile = result.user
-
-  const supabase = createClient()
 
   // Obtener stats para badges
   const stats = await getMasterAdminStats()
@@ -39,6 +36,12 @@ export default async function AdminLayout({
       href: '/dashboard/admin/clients',
       icon: 'Users',
       badge: stats.totalClients,
+    },
+    {
+      label: 'Proyectos',
+      href: '/dashboard/admin/projects',
+      icon: 'Briefcase',
+      badge: stats.totalProjects,
     },
     {
       label: 'Invitaciones',

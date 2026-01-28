@@ -1,7 +1,6 @@
 import { requireMasterAdmin } from '@/lib/auth/guards'
 import { getInvoices, getMasterAdminStats } from '@/app/actions/master-admin'
 import StatCard from '@/components/dashboard/StatCard'
-import { DollarSign, CreditCard, AlertCircle, TrendingUp } from 'lucide-react'
 import InvoicesTable from '@/components/admin/InvoicesTable'
 
 export default async function BillingPage() {
@@ -30,8 +29,8 @@ export default async function BillingPage() {
   return (
     <div className="min-w-0 max-w-full space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-zinc-100">Facturación</h1>
-        <p className="text-zinc-400 mt-1">Gestiona las facturas y pagos</p>
+        <h1 className="text-3xl font-bold dark:text-zinc-100 text-gray-900">Facturación</h1>
+        <p className="dark:text-zinc-400 text-gray-900 mt-1">Gestiona las facturas y pagos</p>
       </div>
 
       {/* Stats Cards */}
@@ -40,31 +39,31 @@ export default async function BillingPage() {
           title="Total Facturado"
           value={`$${totalInvoiced.toLocaleString()}`}
           subtitle="Este mes"
-          icon={DollarSign}
+          icon="DollarSign"
         />
         <StatCard
           title="Pendiente de Cobro"
           value={`$${pendingAmount.toLocaleString()}`}
           subtitle="Facturas pendientes"
-          icon={CreditCard}
+          icon="CreditCard"
         />
         <StatCard
           title="Facturas Vencidas"
           value={overdueCount}
           subtitle="Requieren atención"
-          icon={AlertCircle}
+          icon="AlertCircle"
         />
         <StatCard
           title="Tasa de Cobro"
           value={`${collectionRate}%`}
           subtitle="Facturas pagadas"
-          icon={TrendingUp}
+          icon="TrendingUp"
         />
       </div>
 
       {/* Invoices Table */}
       <div>
-        <h2 className="text-xl font-bold text-zinc-100 mb-4">Todas las Facturas</h2>
+        <h2 className="text-xl font-bold text-black dark:text-zinc-100 mb-4">Todas las Facturas</h2>
         <InvoicesTable invoices={invoices} />
       </div>
     </div>

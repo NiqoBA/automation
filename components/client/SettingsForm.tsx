@@ -74,7 +74,7 @@ export default function SettingsForm({ profile, organization }: SettingsFormProp
       {/* Organization Settings */}
       {organization && ['org_admin', 'master_admin'].includes(profile.role) && (
         <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-          <h2 className="text-xl font-bold text-zinc-100 mb-4">
+          <h2 className="text-xl font-bold dark:text-zinc-100 text-gray-900 mb-4">
             Información de la Organización
           </h2>
           {error && (
@@ -136,7 +136,7 @@ export default function SettingsForm({ profile, organization }: SettingsFormProp
 
       {/* Profile Settings */}
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-        <h2 className="text-xl font-bold text-zinc-100 mb-4">Mi Perfil</h2>
+        <h2 className="text-xl font-bold dark:text-zinc-100 text-gray-900 mb-4">Mi Perfil</h2>
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
             {error}

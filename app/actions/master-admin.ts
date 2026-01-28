@@ -311,3 +311,118 @@ export async function getInvoices() {
 
   return invoices || []
 }
+
+/**
+ * Obtener todas las organizaciones para selector
+ */
+export async function getAllOrganizationsForSelect() {
+  await requireMasterAdmin()
+  const supabase = createClient()
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('organization_id')
+    .eq('role', 'master_admin')
+    .single()
+
+  let orgsQuery = supabase
+    .from('organizations')
+    .select('id, name')
+    .eq('status', 'active')
+    .order('name', { ascending: true })
+
+  if (profile?.organization_id) {
+    orgsQuery = orgsQuery.neq('id', profile.organization_id)
+  }
+
+  const { data: organizations, error } = await orgsQuery
+
+  if (error) {
+    console.error('Error al obtener organizaciones:', error)
+    return []
+  }
+
+  return organizations || []
+}
+
+/**
+ * Crear proyecto para una organización específica (solo master admin)
+ */
+export async function createProjectForOrganization(data: {
+  organization_id: string
+  name: string
+  description?: string
+  type?: string
+  status?: 'active' | 'paused' | 'completed' | 'cancelled'
+}) {
+  const { user: profile } = await requireMasterAdmin()
+  const supabase = createClient()
+
+  // Validar que la organización existe
+  const { data: organization, error: orgError } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('id', data.organization_id)
+    .single()
+
+  if (orgError || !organization) {
+    return { error: 'Organización no encontrada' }
+  }
+
+  // Validar datos del proyecto
+  if (!data.name || data.name.trim().length === 0) {
+    return { error: 'El nombre del proyecto es requerido' }
+  }
+
+  // Crear el proyecto
+  const { data: project, error } = await supabase
+    .from('projects')
+    .insert({
+      organization_id: data.organization_id,
+      name: data.name.trim(),
+      description: data.description?.trim() || null,
+      type: data.type?.trim() || null,
+      status: data.status || 'active',
+      created_by: profile.id,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error al crear proyecto:', error)
+    return { error: 'Error al crear el proyecto' }
+  }
+
+  return { success: true, data: project }
+}
+
+/**
+ * Obtener todos los proyectos con información de organización
+ */
+export async function getAllProjects() {
+  await requireMasterAdmin()
+  const supabase = createClient()
+
+  const { data: projects, error } = await supabase
+    .from('projects')
+    .select(`
+      *,
+      organizations (
+        id,
+        name
+      ),
+      profiles!projects_created_by_fkey (
+        id,
+        full_name,
+        email
+      )
+    `)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Error al obtener proyectos:', error)
+    return []
+  }
+
+  return projects || []
+}

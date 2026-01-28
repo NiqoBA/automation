@@ -10,8 +10,8 @@ export default async function ContactPage() {
   return (
     <div className="min-w-0 max-w-full space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-zinc-100">Contacto</h1>
-        <p className="text-zinc-400 mt-1">
+        <h1 className="text-3xl font-bold text-black dark:text-zinc-100">Contacto</h1>
+        <p className="text-black dark:text-zinc-400 mt-1">
           Envíos del formulario de contacto de la landing
         </p>
       </div>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Badge from '@/components/ui/Badge'
 import { Copy, Mail, X } from 'lucide-react'
 import type { Invitation } from '@/lib/types/database'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface InvitationsTableProps {
   invitations: Invitation[]
@@ -11,6 +12,8 @@ interface InvitationsTableProps {
 
 export default function InvitationsTable({ invitations }: InvitationsTableProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const { theme } = useTheme()
+  const isLight = theme === 'light'
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-UY', {
@@ -52,67 +55,71 @@ export default function InvitationsTable({ invitations }: InvitationsTableProps)
     return <Badge variant="info" size="sm">Pendiente</Badge>
   }
 
-  return (
-    <div className="w-full min-w-0 bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
-      <div className="p-6 border-b border-zinc-800">
-        <h2 className="text-xl font-bold text-zinc-100">Invitaciones</h2>
-        <p className="text-sm text-zinc-400 mt-1">
-          Gestiona las invitaciones enviadas a clientes
-        </p>
-      </div>
+  const bgClass = isLight ? 'bg-white border-gray-200' : 'bg-zinc-900/50 border-zinc-800'
+  const borderClass = isLight ? 'border-gray-200' : 'border-zinc-800'
+  const headerBgClass = isLight ? 'bg-gray-50 border-gray-200' : 'bg-zinc-900/50 border-zinc-800'
+  const textPrimaryClass = isLight ? 'text-black' : 'text-zinc-100'
+  const textSecondaryClass = isLight ? 'text-gray-600' : 'text-zinc-400'
+  const subtitleClass = isLight ? 'text-black' : 'text-zinc-400'
+  const textMutedClass = isLight ? 'text-gray-500' : 'text-zinc-400'
+  const hoverBgClass = isLight ? 'hover:bg-gray-50' : 'hover:bg-zinc-900/30'
+  const dividerClass = isLight ? 'divide-gray-200' : 'divide-zinc-800'
+  const buttonHoverClass = isLight ? 'hover:bg-gray-100' : 'hover:bg-zinc-800'
 
+  return (
+    <div className={`w-full min-w-0 rounded-xl overflow-hidden border transition-colors ${bgClass}`}>
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-zinc-900/50 border-b border-zinc-800">
+          <thead className={`border-b transition-colors ${headerBgClass}`}>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Empresa
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Plan
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Estado
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Enviada
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Expira
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Acciones
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-800">
+          <tbody className={`divide-y transition-colors ${dividerClass}`}>
             {invitations.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-12 text-center">
-                  <p className="text-zinc-400">No hay invitaciones</p>
+                  <p className={textMutedClass}>No hay invitaciones</p>
                 </td>
               </tr>
             ) : (
               invitations.map((invitation) => (
                 <tr
                   key={invitation.id}
-                  className="hover:bg-zinc-900/30 transition-colors"
+                  className={`transition-colors ${hoverBgClass}`}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-zinc-100">
+                    <div className={`text-sm font-medium ${textPrimaryClass}`}>
                       {invitation.email}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-zinc-400">
+                    <div className={`text-sm ${textSecondaryClass}`}>
                       {invitation.metadata?.company_name || '-'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-zinc-400">
+                    <div className={`text-sm ${textSecondaryClass}`}>
                       {invitation.metadata?.plan || '-'}
                     </div>
                   </td>
@@ -120,12 +127,12 @@ export default function InvitationsTable({ invitations }: InvitationsTableProps)
                     {getStatusBadge(invitation)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-zinc-400">
+                    <div className={`text-sm ${textSecondaryClass}`}>
                       {formatDate(invitation.created_at)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-zinc-400">
+                    <div className={`text-sm ${textSecondaryClass}`}>
                       {getRelativeTime(invitation.expires_at)}
                     </div>
                   </td>
@@ -135,13 +142,13 @@ export default function InvitationsTable({ invitations }: InvitationsTableProps)
                         <>
                           <button
                             onClick={() => copyLink(invitation.token)}
-                            className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-violet-400 transition-colors"
+                            className={`p-2 rounded-lg transition-colors ${textSecondaryClass} ${buttonHoverClass} hover:text-violet-400`}
                             title="Copiar Link"
                           >
                             <Copy className="w-4 h-4" />
                           </button>
                           <button
-                            className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-violet-400 transition-colors"
+                            className={`p-2 rounded-lg transition-colors ${textSecondaryClass} ${buttonHoverClass} hover:text-violet-400`}
                             title="Reenviar Email"
                           >
                             <Mail className="w-4 h-4" />
@@ -149,7 +156,7 @@ export default function InvitationsTable({ invitations }: InvitationsTableProps)
                         </>
                       )}
                       <button
-                        className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-red-400 transition-colors"
+                        className={`p-2 rounded-lg transition-colors ${textSecondaryClass} ${buttonHoverClass} hover:text-red-400`}
                         title="Cancelar"
                       >
                         <X className="w-4 h-4" />
