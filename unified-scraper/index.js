@@ -7,6 +7,20 @@ const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK || 'https://n8n.srv908725.hstgr.
 const MIN_PRICE_FOR_DETAIL = 100000;
 // ---------------------
 
+function getUruguayTime() {
+    const now = new Date();
+    // Formato YYYY-MM-DDTHH:mm:ss ajustado a Uruguay (GMT-3)
+    return new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'America/Montevideo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    }).format(now).replace(' ', 'T');
+}
+
 async function scrapeInfoCasas(browser) {
     console.log('[InfoCasas] Iniciando scraper...');
     const page = await browser.newPage();
@@ -59,10 +73,12 @@ async function scrapeInfoCasas(browser) {
                     if (!allListings.some(x => x.id === item.id || x.link === link)) {
                         // Construir URL de imagen si existe
                         let imgUrl = null;
-                        if (item.photo) {
-                            imgUrl = item.photo.startsWith('http')
-                                ? item.photo
-                                : `https://images.infocasas.com.uy/${item.photo.startsWith('/') ? item.photo.substring(1) : item.photo}`;
+                        const photoSource = item.img || (item.images && item.images.length > 0 ? item.images[0].image : null) || item.photo;
+
+                        if (photoSource) {
+                            imgUrl = photoSource.startsWith('http')
+                                ? photoSource
+                                : `https://images.infocasas.com.uy/${photoSource.startsWith('/') ? photoSource.substring(1) : photoSource}`;
                         }
 
                         allListings.push({
@@ -121,7 +137,7 @@ async function getCasasYMasDetail(browser, url) {
                         m2: listing.mainEntity?.floorSize?.value || 0,
                         rooms: listing.mainEntity?.numberOfBedrooms || 0,
                         neighborhood: listing.mainEntity?.address?.addressLocality || '',
-                        image: listing.image // Capturamos la imagen del LD+JSON
+                        image: $('meta[property="og:image"]').attr('content') || listing.image
                     };
                 }
             } catch (e) {
@@ -293,8 +309,10 @@ async function sendToN8N(data, summary) {
     console.log('[Webhook] Enviando datos a n8n...');
     try {
         const payload = {
-            timestamp: new Date().toISOString(),
-            date: new Date().toISOString().split('T')[0],
+            timestamp: getUruguayTime(),
+            date: getUruguayTime().split('T')[0],
+            start_time: summary.start_time,
+            end_time: summary.end_time,
             count: data.length,
             project_id: process.env.PROJECT_ID || null, // Importante para asociar a la DB
             summary: summary,
@@ -316,6 +334,7 @@ async function sendToN8N(data, summary) {
 }
 
 (async () => {
+    const startTime = getUruguayTime();
     const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox'] });
 
     try {
@@ -348,7 +367,9 @@ async function sendToN8N(data, summary) {
             total: finalResults.length,
             duplicates: duplicates.length,
             source_infocasas: infoCasasResults.length,
-            source_casasymas: casasYMasResults.length
+            source_casasymas: casasYMasResults.length,
+            start_time: startTime,
+            end_time: getUruguayTime()
         });
 
     } catch (error) {

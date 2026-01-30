@@ -1,0 +1,531 @@
+REPORTE UNIFICADO EXTRA (>= 100k) - 30/1/2026, 6:37:55 p. m.
+Total final: 88 (Duplicados entre portales: 6)
+
+#1 - InfoCasas
+Precio: U$S 470000 | Barrio: Carrasco Norte | M2: 116
+Inmobiliaria: Cadenas Negocios Inmobiliarios | Tel: 098305073
+Link: https://www.infocasas.com.uy/venta-apartamento-carrasco-norte-3-dormitorios-3-baños-garaje/193339579
+Imagen: https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_290.jpg
+--------------------------------------------------
+#2 - InfoCasas
+Precio: U$S 289000 | Barrio: Malvín | M2: 66
+Inmobiliaria: Grupo Aurora | Tel: 091209210
+Link: https://www.infocasas.com.uy/apartamento-en-venta-en-malvin-sobre-rambla-2-dormitorios-garaje/193342497
+Imagen: https://cdn2.infocasas.com.uy/repo/img/697d1471505fa_infocdn__qon1bh6vszssbjywbpru5rslgu6sf83oq13jkep5jpg.jpg
+--------------------------------------------------
+#3 - InfoCasas
+Precio: U$S 720000 | Barrio: Carrasco | M2: 255
+Inmobiliaria: Desarrollo Agropecuario | Tel: 099102822
+Link: https://www.infocasas.com.uy/venta-carrasco-sur-vivienda-o-empresa/193340977
+Imagen: https://cdn2.infocasas.com.uy/repo/img/697ccf98b31a7_infocdn__vuftgamzi1j2jrpeygoflsxabepllf7rs7pp7ah0jpg.jpg
+--------------------------------------------------
+#4 - InfoCasas
+Precio: U$S 160000 | Barrio: Ciudad Vieja | M2: 60
+Inmobiliaria: renuloxsa . | Tel: 095624672
+Link: https://www.infocasas.com.uy/dueño-vende-dos-oficinas-en-ciudad-vieja-no-inmobiliarias-/193340979
+Imagen: https://cdn1.infocasas.com.uy/repo/img/77ab496a6f85080781f0a3ade91602ce3902c0c4.jpg
+--------------------------------------------------
+#5 - InfoCasas
+Precio: U$S 113900 | Barrio: Centro | M2: 43
+Inmobiliaria: RE/MAX | Tel: 099001901 
+Link: https://www.infocasas.com.uy/venta-apartamento-centro-1-dormitorio-balcon-pozo/193340458
+Imagen: https://cdn1.infocasas.com.uy/repo/img/13651_UY.42.5.165.155.V8_690.jpg
+--------------------------------------------------
+#6 - InfoCasas
+Precio: U$S 110000 | Barrio: Palermo | M2: 31
+Inmobiliaria: RE/MAX | Tel: 099001901 
+Link: https://www.infocasas.com.uy/venta-monoambiente-a-estrenar-en-palermo/193340436
+Imagen: https://cdn1.infocasas.com.uy/repo/img/13651_UY.42.5.245.73.V12_330.jpg
+--------------------------------------------------
+#7 - InfoCasas
+Precio: U$S 135000 | Barrio: La Blanqueada | M2: 48
+Inmobiliaria: RE/MAX | Tel: 099001901 
+Link: https://www.infocasas.com.uy/venta-apartamento-1-dormitorio-en-la-blanqueada/193340567
+Imagen: https://cdn1.infocasas.com.uy/repo/img/13651_UY.42.6.91.89.V9_9.jpg
+--------------------------------------------------
+#8 - InfoCasas
+Precio: U$S 530000 | Barrio: Palermo | M2: 772
+Inmobiliaria: RE/MAX | Tel: 099001901 
+Link: https://www.infocasas.com.uy/venta-terrenos-en-palermo-dos-padrones/193340618
+Imagen: https://cdn1.infocasas.com.uy/repo/img/13651_UY.42.7.25.316.V2_457.jpg
+--------------------------------------------------
+#9 - InfoCasas
+Precio: U$S 120000 | Barrio: Aguada | M2: 57
+Inmobiliaria: RE/MAX | Tel: 099001901 
+Link: https://www.infocasas.com.uy/venta-apartamento-2-dormitorios-aguada/193340638
+Imagen: https://cdn1.infocasas.com.uy/repo/img/13651_UY.42.9.42.7.V5_937.jpg
+--------------------------------------------------
+#10 - InfoCasas
+Precio: U$S 320000 | Barrio: Aguada | M2: 616
+Inmobiliaria: Rossana Bonora | Tel: +59898327059
+Link: https://www.infocasas.com.uy/venta-de-gran-local-con-deposito-y-doble-ingreso-en-la-aguada/193341635
+Imagen: https://cdn2.infocasas.com.uy/repo/img/697cf295d481a_infocdn__brplrxvzh47uegnaizs4rjmwjpkssy2gmcgjszg8jpg.jpg
+--------------------------------------------------
+#11 - InfoCasas
+Precio: U$S 169500 | Barrio: Pocitos | M2: 70
+Inmobiliaria: Katz Propiedades | Tel: 097018842
+Link: https://www.infocasas.com.uy/proximo-pereira-y-guayaqui-70-m2-2-dormitorios-reciclado-/193339861
+Imagen: https://cdn1.infocasas.com.uy/web/697c578e53cc4_infocdn.jpg
+--------------------------------------------------
+#12 - InfoCasas
+Precio: U$S 145000 | Barrio: Parque Rodó | M2: 44
+Inmobiliaria: Tesouro | Tel: 093822666
+Link: https://www.infocasas.com.uy/venta-apartamento-de-2-dormitorios-en-parque-rodo/193339687
+Imagen: https://cdn1.infocasas.com.uy/repo/img/323_TES-5371-TRA_244.jpg
+--------------------------------------------------
+#13 - InfoCasas
+Precio: U$S 147000 | Barrio: Buceo | M2: 85
+Inmobiliaria: Imperium | Tel: +59892061555
+Link: https://www.infocasas.com.uy/venta-casa-en-propiedad-horizontal-de-altos-1er-piso-iluminada-amplia-con-parrillero-y-azotea-transitable/193340947
+Imagen: https://cdn2.infocasas.com.uy/repo/img/697cd1a6e380d_infocdn__xe6ykhxbt0hsmvabr8ocfiysnl7p9m9p459okd5djpg.jpg
+--------------------------------------------------
+#14 - InfoCasas
+Precio: U$S 129000 | Barrio: Malvín | M2: 67
+Inmobiliaria: RE/MAX | Tel: 099001901 
+Link: https://www.infocasas.com.uy/venta-apartamento-2-dormitorios-malvin-con-balcon/193340544
+Imagen: https://cdn1.infocasas.com.uy/repo/img/13651_UY.42.5.340.5_475.jpg
+--------------------------------------------------
+#15 - InfoCasas
+Precio: U$S 120000 | Barrio: Ciudad Vieja | M2: 73
+Inmobiliaria: RE/MAX | Tel: 099001901 
+Link: https://www.infocasas.com.uy/alquiler-apartamento-2-dorm-ciudad-vieja-soleado/193340623
+Imagen: https://cdn1.infocasas.com.uy/repo/img/13651_UY.42.7.55.121_250.jpg
+--------------------------------------------------
+#16 - CasasYMas
+Precio: U$S 510000 | Barrio: Carrasco Sur | M2: 130
+Inmobiliaria: Deambrosis y cia | Tel: +59892996920
+Link: https://www.casasymas.com.uy/propiedad/248510-venta-o-alquiler-estupenda-planta-en-el-mejor-punto-de-carrasco
+Imagen: https://cdn.casasymas.com.uy/501/p/248510_1769792886_1729.webp
+--------------------------------------------------
+#17 - CasasYMas
+Precio: U$S 229000 | Barrio: La Floresta | M2: 339
+Inmobiliaria: Daniela Soto Bienes Raices  | Tel: +59898413207
+Link: https://www.casasymas.com.uy/propiedad/248474-casa-en-venta-de-4-dormitorios-c-cochera-en-la-floresta
+Imagen: https://cdn.casasymas.com.uy/689/p/248474_697cbc3e70207.webp
+--------------------------------------------------
+#18 - CasasYMas
+Precio: U$S 250000 | Barrio: Tres Cruces | M2: 116
+Inmobiliaria: Daniela Soto Bienes Raices  | Tel: +59898413207
+Link: https://www.casasymas.com.uy/propiedad/248491-apartamento-en-venta-de-3-dormitorios-c-cochera-en-tres-cruces
+Imagen: https://cdn.casasymas.com.uy/689/p/248491_697ccc619061d.jpg
+--------------------------------------------------
+#19 - CasasYMas
+Precio: U$S 235000 | Barrio: Punta Carretas | M2: 54
+Inmobiliaria: Daniela Soto Bienes Raices  | Tel: +59898413207
+Link: https://www.casasymas.com.uy/propiedad/248484-apartamento-en-alquiler-de-1-dormitorio-c-cochera-en-punta-carretas
+Imagen: https://cdn.casasymas.com.uy/689/p/248484_697cc33cc22d3.jpg
+--------------------------------------------------
+#20 - CasasYMas
+Precio: U$S 245000 | Barrio: Tres Cruces | M2: 113
+Inmobiliaria: Daniela Soto Bienes Raices  | Tel: +59898413207
+Link: https://www.casasymas.com.uy/propiedad/248482-apartamento-en-venta-c-cochera-en-tres-cruces
+Imagen: https://cdn.casasymas.com.uy/689/p/248482_697cc301d975a.jpg
+--------------------------------------------------
+#21 - CasasYMas
+Precio: U$S 170000 | Barrio: Barra de Carrasco | M2: 50
+Inmobiliaria: Virginia Morales Negocios Inmobiliarios | Tel: +59899265139
+Link: https://www.casasymas.com.uy/propiedad/248512-apartamento-en-venta-de-1-dormitorio-en-barra-de-carrasco-canelones
+Imagen: https://cdn.casasymas.com.uy/25/p/248512_697ce6e4571f7.jpg
+--------------------------------------------------
+#22 - CasasYMas
+Precio: U$S 123000 | Barrio: Maldonado | M2: 0
+Inmobiliaria: Keller Williams One | Tel: Consultar
+Link: https://www.casasymas.com.uy/propiedad/248524-terreno-en-maldonado
+Imagen: https://cdn.casasymas.com.uy/170/p/248524_697cf22391efb.jpg
+--------------------------------------------------
+#23 - CasasYMas
+Precio: U$S 390000 | Barrio: Malvín Norte | M2: 471
+Inmobiliaria: Virginia Lopez Asesora Inmobiliaria | Tel: +59894387214
+Link: https://www.casasymas.com.uy/propiedad/248481-oficina-en-venta-en-malvin-norte-montevideo
+Imagen: https://cdn.casasymas.com.uy/544/p/248481_1769783228_4221.webp
+--------------------------------------------------
+#24 - CasasYMas
+Precio: U$S 1190000 | Barrio: Playa Mansa | M2: 153
+Inmobiliaria: Nicolás de Modena Inmobiliaria | Tel: +59892415537
+Link: https://www.casasymas.com.uy/propiedad/248500-apartamento-en-venta-de-3-dormitorios-en-playa-mansa-maldonado
+Imagen: https://cdn.casasymas.com.uy/254/p/248500_697ce68c76dbd.jpg
+--------------------------------------------------
+#25 - CasasYMas
+Precio: U$S 335000 | Barrio: Cordón Sur | M2: 190
+Inmobiliaria: Kosak Inversiones Inmobiliarias | Tel: +59897122319
+Link: https://www.casasymas.com.uy/propiedad/248496-casa-en-venta-de-3-dormitorios-con-garage-en-cordon-sur-montevideo
+Imagen: https://cdn.casasymas.com.uy/365/p/248496_697ccccf79136.jpg
+--------------------------------------------------
+#26 - CasasYMas
+Precio: U$S 295000 | Barrio: Solanas | M2: 75
+Inmobiliaria: Punta Ballena Inmobiliaria | Tel: +59894972631
+Link: https://www.casasymas.com.uy/propiedad/248533-casa-en-venta-de-2-dormitorios-en-solanas-maldonado
+Imagen: https://cdn.casasymas.com.uy/311/p/248533_697d1600c9d65.jpg
+--------------------------------------------------
+#27 - CasasYMas
+Precio: U$S 115000 | Barrio: Conciliación | M2: 91
+Inmobiliaria: Arteaga Hill Negocios Inmobiliarios Colón | Tel: +59892637474
+Link: https://www.casasymas.com.uy/propiedad/248583-vendo-casa-de-3-dormitorios-proximo-a-garzon
+Imagen: https://cdn.casasymas.com.uy/75/p/248583_697d1d3931dc4.jpg
+--------------------------------------------------
+#28 - CasasYMas
+Precio: U$S 1600000 | Barrio: Punta Gorda | M2: 618
+Inmobiliaria: Etcheverry Inmobiliaria | Tel: +59899148963
+Link: https://www.casasymas.com.uy/propiedad/248559-exclusiva-casa-en-venta-en-punta-gorda-5-dormitorios-diseno-inteligente-con-enfoque-en-confort-y-seg
+Imagen: https://cdn.casasymas.com.uy/11/p/248559_697d0049a5f8d.jpg
+--------------------------------------------------
+#29 - CasasYMas
+Precio: U$S 445000 | Barrio: Punta del Este | M2: 2320
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248553-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248553_697cfbac68335.jpg
+--------------------------------------------------
+#30 - CasasYMas
+Precio: U$S 360000 | Barrio: Punta del Este | M2: 1526
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248528-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248528_697cf2d7beedb.jpg
+--------------------------------------------------
+#31 - CasasYMas
+Precio: U$S 178000 | Barrio: Cordón | M2: 46
+Inmobiliaria: Afilia Propiedades | Tel: +59896110044
+Link: https://www.casasymas.com.uy/propiedad/248565-apartamento-en-venta-de-1-dormitorio-en-cordon-montevideo
+Imagen: https://cdn.casasymas.com.uy/308/p/248565_697d077ccbcd3.jpg
+--------------------------------------------------
+#32 - CasasYMas
+Precio: U$S 345000 | Barrio: Parque Miramar | M2: 115
+Inmobiliaria: Mooving Real Estate | Tel: +59899742105
+Link: https://www.casasymas.com.uy/propiedad/248449-apartamento-en-venta-de-2-dormitorios-en-parque-miramar-canelones
+Imagen: https://cdn.casasymas.com.uy/130/p/248449_697c1f5c9b753.jpg
+--------------------------------------------------
+#33 - CasasYMas
+Precio: U$S 135500 | Barrio: Centro | M2: 42
+Inmobiliaria: Arquibrokers Servicios Inmobiliarios | Tel: +59891502034
+Link: https://www.casasymas.com.uy/propiedad/248538-apartamento-de-un-dormitorio-en-venta-en-centro-705
+Imagen: https://cdn.casasymas.com.uy/367/p/248538_697cf7937cfad.jpg
+--------------------------------------------------
+#34 - CasasYMas
+Precio: U$S 330000 | Barrio: Punta del Este | M2: 1431
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248529-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248529_697cf325a905b.jpg
+--------------------------------------------------
+#35 - CasasYMas
+Precio: U$S 140000 | Barrio: Centro | M2: 245
+Inmobiliaria: Inmobiliaria Eulalia Moreno | Tel: +59899187138
+Link: https://www.casasymas.com.uy/propiedad/248582-local-en-planta-baja-sobre-calle-muy-transitada
+Imagen: https://cdn.casasymas.com.uy/686/p/248582_1769806619_6157.webp
+--------------------------------------------------
+#36 - CasasYMas
+Precio: U$S 315000 | Barrio: Prado | M2: 202
+Inmobiliaria: Ricardo Gorga Negocios Inmobiliarios | Tel: +59891561515
+Link: https://www.casasymas.com.uy/propiedad/248589-casa-en-venta-de-3-dormitorios-en-prado-montevideo
+Imagen: https://cdn.casasymas.com.uy/340/p/248589_697d20fef410d.jpg
+--------------------------------------------------
+#37 - CasasYMas
+Precio: U$S 400000 | Barrio: Playa Brava | M2: 130
+Inmobiliaria: Wave Real Estate | Tel: +59899130613
+Link: https://www.casasymas.com.uy/propiedad/248585-venta-alquiler-temporal-departamento-dos-dormitorios-playa-brava
+Imagen: https://cdn.casasymas.com.uy/540/p/248585_697d1d5360754.jpg
+--------------------------------------------------
+#38 - CasasYMas
+Precio: U$S 310000 | Barrio: Punta del Este | M2: 1347
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248515-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248515_697cf2c38cc3f.jpg
+--------------------------------------------------
+#39 - CasasYMas
+Precio: U$S 420000 | Barrio: Parque Miramar | M2: 85
+Inmobiliaria: Everest Real Estate | Tel: +59899448804
+Link: https://www.casasymas.com.uy/propiedad/248463-venta-con-renta-apartamento-3-dormitorios-parque-miramar
+Imagen: https://cdn.casasymas.com.uy/307/p/248463_697cb4f40d168.jpg
+--------------------------------------------------
+#40 - CasasYMas
+Precio: U$S 159000 | Barrio: Playa Hermosa  | M2: 89
+Inmobiliaria: Paulo Alvez | Tel: +59899852240
+Link: https://www.casasymas.com.uy/propiedad/248535-casa-en-venta-de-2-dormitorios-con-garage-en-playa-hermosa-maldonado
+Imagen: https://cdn.casasymas.com.uy/498/p/248535_697cf3630baee.jpg
+--------------------------------------------------
+#41 - CasasYMas
+Precio: U$S 328000 | Barrio: Punta del Este | M2: 1416
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248516-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248516_697cf2c7664db.jpg
+--------------------------------------------------
+#42 - CasasYMas
+Precio: U$S 420000 | Barrio: Canelones | M2: 135
+Inmobiliaria: FACHOLA Propiedades | Tel: +59899207483
+Link: https://www.casasymas.com.uy/propiedad/248561-casa-en-venta-c-cochera-en-la-juana
+Imagen: https://cdn.casasymas.com.uy/494/p/248561_697d0af4c3122.jpg
+--------------------------------------------------
+#43 - CasasYMas
+Precio: U$S 156000 | Barrio: Tres Cruces | M2: 42.5
+Inmobiliaria: Arquibrokers Servicios Inmobiliarios | Tel: +59891502034
+Link: https://www.casasymas.com.uy/propiedad/248494-apartamento-de-1-dormitorio-en-venta-en-tres-cruces-501
+Imagen: https://cdn.casasymas.com.uy/367/p/248494_697cfdaecc733.jpg
+--------------------------------------------------
+#44 - CasasYMas
+Precio: U$S 134500 | Barrio: Centro | M2: 40
+Inmobiliaria: Arquibrokers Servicios Inmobiliarios | Tel: +59891502034
+Link: https://www.casasymas.com.uy/propiedad/248542-apartamento-de-un-dormitorio-en-venta-en-centro-502
+Imagen: https://cdn.casasymas.com.uy/367/p/248542_697cf7c5a60f7.jpg
+--------------------------------------------------
+#45 - CasasYMas
+Precio: U$S 210000 | Barrio: Shangrila | M2: 72
+Inmobiliaria: Varela Inmobiliara Solymar | Tel: +59895720346
+Link: https://www.casasymas.com.uy/propiedad/248567-casa-en-venta-de-2-dormitorios-en-shangrila-canelones
+Imagen: https://cdn.casasymas.com.uy/284/p/248567_697d081733d1e.jpg
+--------------------------------------------------
+#46 - CasasYMas
+Precio: U$S 154000 | Barrio: Tres Cruces | M2: 43
+Inmobiliaria: Arquibrokers Servicios Inmobiliarios | Tel: +59891502034
+Link: https://www.casasymas.com.uy/propiedad/248492-apartamento-de-1-dormitorio-en-venta-en-tres-cruces-404
+Imagen: https://cdn.casasymas.com.uy/367/p/248492_697d0a9746ce6.jpg
+--------------------------------------------------
+#47 - CasasYMas
+Precio: U$S 159000 | Barrio: Piriápolis | M2: 89
+Inmobiliaria: Paulo Alvez | Tel: +59899852240
+Link: https://www.casasymas.com.uy/propiedad/248536-casa-en-venta-de-2-dormitorios-con-garage-en-piriapolis-maldonado
+Imagen: https://cdn.casasymas.com.uy/498/p/248536_697cf37d7739b.jpg
+--------------------------------------------------
+#48 - CasasYMas
+Precio: U$S 198800 | Barrio: Punta Carretas | M2: 42.14
+Inmobiliaria: Inmobiliaria Mape | Tel: +59898551178
+Link: https://www.casasymas.com.uy/propiedad/248503-venta-de-apartamento-de-1-dormitorio-en-pozo-en-punta-carretas
+Imagen: https://cdn.casasymas.com.uy/382/p/248503_697cd83aaa33e.jpg
+--------------------------------------------------
+#49 - CasasYMas
+Precio: U$S 140000 | Barrio: Jacinto Vera | M2: 0
+Inmobiliaria: Keller Williams One | Tel: Consultar
+Link: https://www.casasymas.com.uy/propiedad/248558-apartamento-duplex-2-dormitorios-jacinto-vera
+Imagen: https://cdn.casasymas.com.uy/170/p/248558_697d0386d4aba.jpg
+--------------------------------------------------
+#50 - CasasYMas
+Precio: U$S 249000 | Barrio: Punta Carretas | M2: 50
+Inmobiliaria: One Servicios Inmobiliarios | Tel: +59894372977
+Link: https://www.casasymas.com.uy/propiedad/248459-apartamento-en-venta-de-2-dormitorios-con-garage-en-punta-carretas-montevideo
+Imagen: https://cdn.casasymas.com.uy/421/p/248459_697ca1c613e12.jpg
+--------------------------------------------------
+#51 - CasasYMas
+Precio: U$S 155000 | Barrio: Maldonado | M2: 95
+Inmobiliaria: Keller Williams One | Tel: Consultar
+Link: https://www.casasymas.com.uy/propiedad/248514-venta-casa-4-dormitorios-en-maldonado
+Imagen: https://cdn.casasymas.com.uy/170/p/248514_697ceb4754c18.jpg
+--------------------------------------------------
+#52 - CasasYMas
+Precio: U$S 215000 | Barrio: Punta del Este | M2: 913
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248530-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248530_697cf32b18ed0.jpg
+--------------------------------------------------
+#53 - CasasYMas
+Precio: U$S 329480 | Barrio: Pocitos | M2: 104.08
+Inmobiliaria: Abate Propiedades | Tel: +59897353950
+Link: https://www.casasymas.com.uy/propiedad/248569-apartamento-en-venta-de-2-dormitorios-con-garage-en-pocitos-montevideo
+Imagen: https://cdn.casasymas.com.uy/147/p/248569_697d0aa7413ab.jpg
+--------------------------------------------------
+#54 - CasasYMas
+Precio: U$S 270000 | Barrio: Punta del Este | M2: 1177
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248531-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248531_697cf32e0f2cd.jpg
+--------------------------------------------------
+#55 - CasasYMas
+Precio: U$S 490000 | Barrio: Abra de Perdomo | M2: 0
+Inmobiliaria: Casagrande Negocios Inmobiliarios  | Tel: +59897434951
+Link: https://www.casasymas.com.uy/propiedad/248478-chacra-en-venta-de-6-dormitorios-en-abra-de-perdomo-maldonado
+Imagen: https://cdn.casasymas.com.uy/296/p/248478_697cbd6984e2e.webp
+--------------------------------------------------
+#56 - CasasYMas
+Precio: U$S 318000 | Barrio: Minas | M2: 0
+Inmobiliaria: Lupa Real Estate | Tel: +59891317858
+Link: https://www.casasymas.com.uy/propiedad/248508-chacra-en-venta-de-3-dormitorios-en-minas-lavalleja
+Imagen: https://cdn.casasymas.com.uy/394/p/248508_697cdf36c8925.webp
+--------------------------------------------------
+#57 - CasasYMas
+Precio: U$S 276000 | Barrio: Punta del Este | M2: 1202
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248517-venta-de-lote-1200-m2-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248517_697cf2ca89d29.jpg
+--------------------------------------------------
+#58 - CasasYMas
+Precio: U$S 2000000 | Barrio: Playa Mansa | M2: 227
+Inmobiliaria: Nicolás de Modena Inmobiliaria | Tel: +59892415537
+Link: https://www.casasymas.com.uy/propiedad/248584-apartamento-en-alquiler-y-venta-de-3-dormitorios-con-garage-en-playa-mansa-maldonado
+Imagen: https://cdn.casasymas.com.uy/254/p/248584_697d1d49974f1.jpg
+--------------------------------------------------
+#59 - CasasYMas
+Precio: U$S 320000 | Barrio: Aguada | M2: 600
+Inmobiliaria: Rossana Bonora Propiedades | Tel: +59898327059
+Link: https://www.casasymas.com.uy/propiedad/248534-venta-de-gran-local-con-deposito-y-doble-ingreso-en-la-aguada
+Imagen: https://cdn.casasymas.com.uy/193/p/248534_697cf3484fad5.jpg
+--------------------------------------------------
+#60 - CasasYMas
+Precio: U$S 162000 | Barrio: Carrasco | M2: 32
+Inmobiliaria: Keller Williams One | Tel: Consultar
+Link: https://www.casasymas.com.uy/propiedad/248472-apartamento-en-carrasco
+Imagen: https://cdn.casasymas.com.uy/170/p/248472_697cbd44cda2b.jpg
+--------------------------------------------------
+#61 - CasasYMas
+Precio: U$S 185000 | Barrio: Malvín | M2: 0
+Inmobiliaria: Nicolás de Modena Inmobiliaria | Tel: +59892415537
+Link: https://www.casasymas.com.uy/propiedad/248483-apartamento-en-venta-de-2-dormitorios-con-garage-en-malvin-montevideo
+Imagen: https://cdn.casasymas.com.uy/254/p/248483_697cc312cc741.jpg
+--------------------------------------------------
+#62 - CasasYMas
+Precio: U$S 352000 | Barrio: Punta del Este | M2: 1892
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248548-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248548_697cfb9828de6.jpg
+--------------------------------------------------
+#63 - CasasYMas
+Precio: U$S 143000 | Barrio: Centro | M2: 46
+Inmobiliaria: Arquibrokers Servicios Inmobiliarios | Tel: +59891502034
+Link: https://www.casasymas.com.uy/propiedad/248455-apartamento-de-un-dormitorio-en-venta-en-centro-703
+Imagen: https://cdn.casasymas.com.uy/367/p/248455_697c9a3cc6e95.jpg
+--------------------------------------------------
+#64 - CasasYMas
+Precio: U$S 320000 | Barrio: Playa Brava | M2: 67
+Inmobiliaria: Planorbe | Tel: +598098592827
+Link: https://www.casasymas.com.uy/propiedad/248465-venta-de-apartamento-obra-construccion-1-dormitorio-en-playa-brava-sls-hotel-residences-unidad-903
+Imagen: https://cdn.casasymas.com.uy/555/p/248465_697cbb9e9d8df.jpg
+--------------------------------------------------
+#65 - CasasYMas
+Precio: U$S 437500 | Barrio: Playa Mansa | M2: 88.46
+Inmobiliaria: Keller Williams One | Tel: Consultar
+Link: https://www.casasymas.com.uy/propiedad/248522-venta-apartamento-2-dormitorios-en-poseidon-laguna-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/170/p/248522_697ceee017195.jpg
+--------------------------------------------------
+#66 - CasasYMas
+Precio: U$S 145000 | Barrio: Península | M2: 0
+Inmobiliaria: RAQUEL DUARTE BIENES RAICES | Tel: +59898338016
+Link: https://www.casasymas.com.uy/propiedad/248566-apartamento-en-venta-de-1-dormitorio-en-peninsula-maldonado
+Imagen: https://cdn.casasymas.com.uy/529/p/248566_697d080e0ecf8.jpg
+--------------------------------------------------
+#67 - CasasYMas
+Precio: U$S 2900000 | Barrio: Playa Brava | M2: 407
+Inmobiliaria: RAQUEL DUARTE BIENES RAICES | Tel: +59898338016
+Link: https://www.casasymas.com.uy/propiedad/248546-apartamento-en-venta-de-4-dormitorios-con-garage-en-playa-brava-maldonado
+Imagen: https://cdn.casasymas.com.uy/529/p/248546_697cfb7d5d3f4.jpg
+--------------------------------------------------
+#68 - CasasYMas
+Precio: U$S 1028500 | Barrio: Ciudad Vieja | M2: 1051
+Inmobiliaria: Workplace Real Estate | Tel: +59896206729
+Link: https://www.casasymas.com.uy/propiedad/248462-oficina-en-venta-en-ciudad-vieja-montevideo
+Imagen: https://cdn.casasymas.com.uy/383/p/248462_697cad33c8e60.jpg
+--------------------------------------------------
+#69 - CasasYMas
+Precio: U$S 341000 | Barrio: Punta del Este | M2: 1798
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248550-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248550_697cfba133850.jpg
+--------------------------------------------------
+#70 - CasasYMas
+Precio: U$S 765000 | Barrio: Playa Brava | M2: 159
+Inmobiliaria: Planorbe | Tel: +598098592827
+Link: https://www.casasymas.com.uy/propiedad/248470-venta-de-apartamento-obra-construccion-2-dormitorios-en-playa-brava-sls-hotel-residences-unidad-1401
+Imagen: https://cdn.casasymas.com.uy/555/p/248470_697cbc02c63f0.jpg
+--------------------------------------------------
+#71 - CasasYMas
+Precio: U$S 1335000 | Barrio: Playa Brava | M2: 223
+Inmobiliaria: Planorbe | Tel: +598098592827
+Link: https://www.casasymas.com.uy/propiedad/248471-venta-de-apartamento-obra-construccion-3-dormitorios-en-playa-brava-sls-hotel-residences-unidad-2101
+Imagen: https://cdn.casasymas.com.uy/555/p/248471_697cbc10ebc0d.jpg
+--------------------------------------------------
+#72 - CasasYMas
+Precio: U$S 138000 | Barrio: Centro | M2: 46
+Inmobiliaria: Arquibrokers Servicios Inmobiliarios | Tel: +59891502034
+Link: https://www.casasymas.com.uy/propiedad/248456-apartamento-de-un-dormitorio-en-venta-en-centro-402
+Imagen: https://cdn.casasymas.com.uy/367/p/248456_697c9a56198ac.jpg
+--------------------------------------------------
+#73 - CasasYMas
+Precio: U$S 309000 | Barrio: Malvín | M2: 101
+Inmobiliaria: Arquibrokers Servicios Inmobiliarios | Tel: +59891502034
+Link: https://www.casasymas.com.uy/propiedad/248479-apartamento-de-dos-dormitorios-en-venta-en-malvin
+Imagen: https://cdn.casasymas.com.uy/367/p/248479_697cc2fa758cd.jpg
+--------------------------------------------------
+#74 - CasasYMas
+Precio: U$S 175000 | Barrio: Pocitos Nuevo | M2: 40
+Inmobiliaria: Kosak Inversiones Inmobiliarias | Tel: +59897122319
+Link: https://www.casasymas.com.uy/propiedad/248575-apartamento-en-venta-de-1-dormitorio-en-pocitos-nuevo-montevideo
+Imagen: https://cdn.casasymas.com.uy/365/p/248575_697d1ca27ce41.jpg
+--------------------------------------------------
+#75 - CasasYMas
+Precio: U$S 157000 | Barrio: Centro | M2: 58
+Inmobiliaria: Arquibrokers Servicios Inmobiliarios | Tel: +59891502034
+Link: https://www.casasymas.com.uy/propiedad/248457-apartamento-de-un-dormitorio-en-venta-en-centro-701
+Imagen: https://cdn.casasymas.com.uy/367/p/248457_697c9a6988aa4.jpg
+--------------------------------------------------
+#76 - CasasYMas
+Precio: U$S 210000 | Barrio: Punta del Este | M2: 1006
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248551-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248551_697cfba4e0749.jpg
+--------------------------------------------------
+#77 - CasasYMas
+Precio: U$S 295000 | Barrio: Punta del Este | M2: 1271
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248526-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248526_697cf2ce86389.jpg
+--------------------------------------------------
+#78 - CasasYMas
+Precio: U$S 130000 | Barrio: Playa Hermosa  | M2: 80
+Inmobiliaria: Paulo Alvez | Tel: +59899852240
+Link: https://www.casasymas.com.uy/propiedad/248586-casa-en-venta-de-3-dormitorios-en-playa-hermosa-maldonado
+Imagen: https://cdn.casasymas.com.uy/498/p/248586_697d1d6ce4591.jpg
+--------------------------------------------------
+#79 - CasasYMas
+Precio: U$S 560000 | Barrio: Malvín | M2: 150
+Inmobiliaria: Onex Desarrollos Inmobiliarios | Tel: +59894520799
+Link: https://www.casasymas.com.uy/propiedad/248475-casa-en-venta-de-3-dormitorios-con-garage-en-malvin-montevideo
+Imagen: https://cdn.casasymas.com.uy/294/p/248475_697ceb115ef44.jpg
+--------------------------------------------------
+#80 - CasasYMas
+Precio: U$S 225000 | Barrio: Punta del Este | M2: 1108
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248549-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248549_697cfb9e5655b.jpg
+--------------------------------------------------
+#81 - CasasYMas
+Precio: U$S 215000 | Barrio: Punta del Este | M2: 1029
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248552-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248552_697cfbaa7be02.jpg
+--------------------------------------------------
+#82 - CasasYMas
+Precio: U$S 772000 | Barrio: Playa Brava | M2: 155
+Inmobiliaria: Planorbe | Tel: +598098592827
+Link: https://www.casasymas.com.uy/propiedad/248469-venta-de-apartamento-obra-construccion-2-dormitorios-en-playa-brava-sls-hotel-residences-unidad-1304
+Imagen: https://cdn.casasymas.com.uy/555/p/248469_697cbbf441f7e.jpg
+--------------------------------------------------
+#83 - CasasYMas
+Precio: U$S 230000 | Barrio: Punta del Este | M2: 1114
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248555-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248555_697cfbae79e38.jpg
+--------------------------------------------------
+#84 - CasasYMas
+Precio: U$S 242000 | Barrio: Punta del Este | M2: 1032
+Inmobiliaria: Caetano Negocios Inmobiliarios | Tel: +59895559230
+Link: https://www.casasymas.com.uy/propiedad/248532-venta-lote-en-veramansa-playa-mansa
+Imagen: https://cdn.casasymas.com.uy/379/p/248532_697cf33226fa1.jpg
+--------------------------------------------------
+#85 - CasasYMas
+Precio: U$S 515000 | Barrio: Playa Brava | M2: 112
+Inmobiliaria: Planorbe | Tel: +598098592827
+Link: https://www.casasymas.com.uy/propiedad/248466-venta-de-apartamento-obra-construccion-1-dormitorio-en-playa-brava-sls-hotel-residences-unidad-910
+Imagen: https://cdn.casasymas.com.uy/555/p/248466_697cbbc57489a.jpg
+--------------------------------------------------
+#86 - CasasYMas
+Precio: U$S 780000 | Barrio: Playa Brava | M2: 159
+Inmobiliaria: Planorbe | Tel: +598098592827
+Link: https://www.casasymas.com.uy/propiedad/248468-venta-de-apartamento-obra-construccion-2-dormitorios-en-playa-brava-sls-hotel-residences-unidad-1806
+Imagen: https://cdn.casasymas.com.uy/555/p/248468_697cbbe5e232b.jpg
+--------------------------------------------------
+#87 - CasasYMas
+Precio: U$S 975000 | Barrio: San Nicolás | M2: 211
+Inmobiliaria: Perez del Castillo Inmobiliaria | Tel: 094680408095739831
+Link: https://www.casasymas.com.uy/propiedad/248537-casa-en-venta-de-3-dormitorios-en-san-nicolas-montevideo
+Imagen: https://cdn.casasymas.com.uy/318/p/248537_697cf43b72158.jpg
+--------------------------------------------------
+#88 - CasasYMas
+Precio: U$S 655000 | Barrio: Playa Brava | M2: 128
+Inmobiliaria: Planorbe | Tel: +598098592827
+Link: https://www.casasymas.com.uy/propiedad/248467-venta-de-apartamento-obra-construccion-2-dormitorios-en-playa-brava-sls-hotel-residences-unidad-1702
+Imagen: https://cdn.casasymas.com.uy/555/p/248467_697cbbd64274d.jpg
+--------------------------------------------------

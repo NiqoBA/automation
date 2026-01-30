@@ -1,0 +1,562 @@
+{
+  "id": 193339579,
+  "idFincaLegacy": null,
+  "title": "Venta  Apartamento Carrasco Norte 3 Dormitorios 3 Baños Garaje",
+  "typeID": 2,
+  "address": "Antonio Bachini",
+  "showAddress": false,
+  "country_id": 1,
+  "description": "Apartamento con orientación Este - Oeste en Edificio Verdenia. Muy Luminoso!<br><br>Dentro de los Verdenias, los conocidos como PH (Pent House), donde se destaca su amplia terraza social y la terraza privada del dormitorio principal. <br><br>Descrippción:<br><br>Hall de entrada con despojador, living y comedor con salida a terraza con parrillero.<br>Cocina definida con doble circulación, equipada con horno, anafe y campana. Lavadero independiente.<br>Dormitorio de servicio con baño (actualmente usado como escritorio).<br> <br>Dos dormitorios: suite principal con salida a terraza independiente, vestidor y baño cómodo, el otro dormitorio con placard y un baño completo (que oficia de baño social).<br>Originalmente era un apartamento de 3 dormitorios que se reformó generando una amplia recepción (dicho dormitorio se puede volver a armar ya que las puertas y placares estan a disposición). Actualmente el apartamento es de 2 dormitorios y servicio. <br><br>Calefacción individual eléctrica y agua caliente calefón.<br><br>La unidad incluye 2 garages individuales con un box cada uno.<br><br>Edificio con muy buena seguridad 24 hs y muchos amenities: Barbacoas, piscina, play room, gym, cine, etc.<br><br>Se destaca:<br>-Seguridad del edificio<br>-Amenities<br>-Calidad constructiva<br> <br> Detalles de construcción:<br>- Pisos de madera tipo ingenieril<br>- Aberturas DVH<br> <br>Estado general: muy buen estado <br>(CW245641)",
+  "code": "MCF3C0",
+  "code2": "CW245641",
+  "finances": true,
+  "grouped_ids": "193339579,193339579",
+  "img": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_290.jpg",
+  "isMapFeatured": false,
+  "price": {
+    "amount": 470000,
+    "admin_included": 496000,
+    "hidePrice": false,
+    "currency": {
+      "id": 1,
+      "name": "U$S",
+      "rate": 1
+    }
+  },
+  "price_amount_usd": 470000,
+  "price_admin_usd": 496000,
+  "owner": {
+    "id": 37791,
+    "name": "Cadenas Negocios Inmobiliarios",
+    "masked_phone": "+5989",
+    "whatsapp_phone": "098305073",
+    "has_whatsapp": true,
+    "active": true,
+    "logo": "https://cdn1.infocasas.com.uy/repo/img/5a5f59d955729_cadenas.jpg",
+    "inmoLink": null,
+    "inmoPropsLink": "/inmobiliarias/37791-cadenas negocios inmobiliarios/propiedades",
+    "inmofull": false,
+    "type": "inmobiliaria",
+    "particular": false,
+    "address": "Ing. Luis Andreoni 7268",
+    "subsidiaries": [
+      {
+        "id": 2932,
+        "name": "Casa central",
+        "masked_phone": "09830",
+        "address": "Ing. Luis Andreoni 7268",
+        "office_hours": "10:00 a 19:00"
+      }
+    ]
+  },
+  "locations": {
+    "location_point": "POINT (-56.052461 -34.872658)",
+    "location_main": {},
+    "country": [
+      {
+        "id": "9dcb7f15-bd4f-445a-88a1-8ed73a53f935",
+        "name": "Uruguay",
+        "slug": [
+          "country-uruguay"
+        ]
+      }
+    ],
+    "state": [
+      {
+        "id": "a475c197-e6d7-4833-aa87-0ffd96a879ec",
+        "name": "Montevideo",
+        "slug": [
+          "state-uruguay-montevideo"
+        ],
+        "indicative": null
+      }
+    ],
+    "city": [],
+    "locality": {},
+    "commune": {},
+    "zone": {},
+    "region": {},
+    "neighbourhood": [
+      {
+        "id": "4b84c3d4-b9b8-4805-bd51-dc7ddaa7ae0a",
+        "name": "Carrasco Norte",
+        "slug": [
+          "neighbourhood-montevideo-carrasco-norte"
+        ]
+      }
+    ]
+  },
+  "seller": null,
+  "technicalSheet": [
+    {
+      "field": "property_type_name",
+      "value": "Apartamento",
+      "text": "Tipo de Propiedad"
+    },
+    {
+      "field": "construction_state_name",
+      "value": "Excelente estado",
+      "text": "Estado"
+    },
+    {
+      "field": "bathrooms",
+      "value": "3",
+      "text": "Baños"
+    },
+    {
+      "field": "constructionYear",
+      "value": "",
+      "text": "Antigüedad"
+    },
+    {
+      "field": "bedrooms",
+      "value": "3",
+      "text": "Dormitorios"
+    },
+    {
+      "field": "sea_distance_name",
+      "value": "",
+      "text": "Distancia al Mar"
+    },
+    {
+      "field": "seaview",
+      "value": "",
+      "text": "Vista al Mar"
+    },
+    {
+      "field": "garage",
+      "value": "2",
+      "text": "Garajes"
+    },
+    {
+      "field": "financing",
+      "value": "Si",
+      "text": "Financiación"
+    },
+    {
+      "field": "orientation",
+      "value": "E",
+      "text": "Orientación"
+    },
+    {
+      "field": "m2Built",
+      "value": "116 m2",
+      "text": "M² edificados"
+    },
+    {
+      "field": "m2Terrace",
+      "value": "42 m2",
+      "text": "M² de terraza"
+    },
+    {
+      "field": "condominio",
+      "value": "",
+      "text": "Barrio Privado"
+    },
+    {
+      "field": "code",
+      "value": "MCF3C0",
+      "text": "Referencia"
+    },
+    {
+      "field": "over_name",
+      "value": "No aplica",
+      "text": "Sobre"
+    },
+    {
+      "field": "neighborhood_name",
+      "value": "Carrasco Norte",
+      "text": "Zona"
+    },
+    {
+      "field": "disposition_name",
+      "value": "Al frente",
+      "text": "Disposición"
+    },
+    {
+      "field": "commonExpenses",
+      "value": "$ 26.000",
+      "text": "Gastos Comunes"
+    },
+    {
+      "field": "floor",
+      "value": "3",
+      "text": "Planta"
+    },
+    {
+      "field": "story",
+      "value": "1",
+      "text": "Cantidad de Plantas"
+    },
+    {
+      "field": "barter",
+      "value": "",
+      "text": "Acepta permuta"
+    },
+    {
+      "field": "socialHousing",
+      "value": "",
+      "text": "Vivienda Social"
+    }
+  ],
+  "image_count": 30,
+  "file_count": 0,
+  "imgSize": 0,
+  "link": "/venta-apartamento-carrasco-norte-3-dormitorios-3-baños-garaje/193339579",
+  "property_type": {
+    "id": 2,
+    "name": "Apartamento"
+  },
+  "operation_type": {
+    "id": 1,
+    "name": "Venta"
+  },
+  "barter": false,
+  "facilities": [
+    {
+      "id": 3,
+      "name": "Calefacción Individual",
+      "group": "Confort del apartamento"
+    },
+    {
+      "id": 7,
+      "name": "Dormitorio de servicio",
+      "group": "Confort del apartamento"
+    },
+    {
+      "id": 9,
+      "name": "Garaje",
+      "group": "Confort del apartamento"
+    },
+    {
+      "id": 13,
+      "name": "Parrillero / Barbacoa",
+      "group": "Confort del apartamento"
+    },
+    {
+      "id": 15,
+      "name": "Placard en dormitorio",
+      "group": "Confort del apartamento"
+    },
+    {
+      "id": 16,
+      "name": "Balcón / Terraza",
+      "group": "Confort del apartamento"
+    },
+    {
+      "id": 17,
+      "name": "Terraza Lavadero",
+      "group": "Confort del apartamento"
+    },
+    {
+      "id": 20,
+      "name": "Ascensor",
+      "group": "Confort del edificio"
+    },
+    {
+      "id": 21,
+      "name": "Barbacoa",
+      "group": "Confort del edificio"
+    },
+    {
+      "id": 27,
+      "name": "Piscina",
+      "group": "Confort del edificio"
+    }
+  ],
+  "m2": 116,
+  "m2Built": 116,
+  "m2apto": 0,
+  "m2Terrain": 158,
+  "m2Terrace": 42,
+  "hectares": null,
+  "created_at": "2026-01-30",
+  "updated_at": "2026-01-30",
+  "latitude": -34.872658,
+  "longitude": -56.052461,
+  "images": [
+    {
+      "id": 271529256,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_290.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529257,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_140.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529258,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_780.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529259,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_269.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529260,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_955.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529261,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_743.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529262,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_196.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529263,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_343.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529264,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_706.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529267,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_227.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529271,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_394.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529273,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_643.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529275,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_937.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529277,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_587.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529279,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_992.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529282,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_78.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529285,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_657.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529287,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_431.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529288,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_129.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529289,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_302.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529290,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_849.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529296,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_994.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529297,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_802.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529298,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_873.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529352,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_336.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529376,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_510.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529379,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_508.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529383,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_394.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529384,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_63.jpg",
+      "tag": null
+    },
+    {
+      "id": 271529386,
+      "image": "https://cdn1.infocasas.com.uy/repo/img/37791_CW245641_670.jpg",
+      "tag": null
+    }
+  ],
+  "files": [],
+  "source": null,
+  "color": 3,
+  "project_group_md5": "property_193339579",
+  "project": [],
+  "pausd": false,
+  "pointType": true,
+  "zoom": 14,
+  "youtube": "https://www.youtube.com/watch?v=XvClm5Aa96A",
+  "highlight": 10,
+  "active": true,
+  "deleted": false,
+  "relevance": 94.9091,
+  "antiquity": null,
+  "construction_year": 2019,
+  "notes": "",
+  "sold": false,
+  "soldDate": null,
+  "discount": null,
+  "draft": false,
+  "sign": null,
+  "guarantee": null,
+  "facilitiesNotApply": false,
+  "commonExpenses": {
+    "amount": 26000,
+    "hidePrice": false,
+    "currency": {
+      "id": 2,
+      "name": "$"
+    }
+  },
+  "price_variation": {},
+  "ceCurrencyID": 2,
+  "highlightDate": "2026-01-30",
+  "socialMediaLinks": [
+    {
+      "slug": "facebook",
+      "name": "facebook",
+      "url": "https://www.facebook.com/sharer/sharer.php?u=https://www.infocasas.com.uy/venta-apartamento-carrasco-norte-3-dormitorios-3-baños-garaje/193339579",
+      "icon": "icon-facebook-1",
+      "order": null
+    },
+    {
+      "slug": "linkedin",
+      "name": "linkedin",
+      "url": "https://www.linkedin.com/shareArticle?mini=true&url=https://www.infocasas.com.uy/venta-apartamento-carrasco-norte-3-dormitorios-3-baños-garaje/193339579",
+      "icon": "icon-linkedin",
+      "order": null
+    },
+    {
+      "slug": "twitter",
+      "name": "twitter",
+      "url": "https://twitter.com/intent/tweet?url=https://www.infocasas.com.uy/venta-apartamento-carrasco-norte-3-dormitorios-3-baños-garaje/193339579",
+      "icon": "icon-twitter",
+      "order": null
+    },
+    {
+      "slug": "email",
+      "name": "email",
+      "url": "mailto:?subject=Propiedad Recomendada - InfoCasas&body=Link de la Propiedad: https://www.infocasas.com.uy/venta-apartamento-carrasco-norte-3-dormitorios-3-baños-garaje/193339579",
+      "icon": "icon-mail",
+      "order": null
+    }
+  ],
+  "garage": 2,
+  "office": false,
+  "dispositionID": 2,
+  "bathrooms": 3,
+  "rooms": 4,
+  "seaview": false,
+  "livingPlace": false,
+  "condominium": false,
+  "frontLength": null,
+  "floorsCount": 0,
+  "apartmentsPerFloor": 4,
+  "floor": 3,
+  "neighborhood_id": 15,
+  "estate_id": 10,
+  "farmhouse": false,
+  "allowedHeight": "",
+  "isFavorite": false,
+  "isExternal": false,
+  "guests": null,
+  "seasons": [],
+  "price_season": {},
+  "occupancies": [],
+  "temporal_price": null,
+  "temporal_currency": {},
+  "seaDistanceName": null,
+  "tour3d": null,
+  "legacy_propID": 193339579,
+  "isProject": null,
+  "isProjectUnit": false,
+  "operation_type_id": 1,
+  "property_type_id": 2,
+  "currency": "U$S",
+  "currency_id": 1,
+  "hidePrice": false,
+  "stratum": null,
+  "commonExpenses_currency": "$",
+  "constStatesID": 3,
+  "bedrooms": 3,
+  "event": {
+    "show": false,
+    "fecha_inicio_evento": null,
+    "link": null,
+    "logo": null,
+    "tag": null
+  },
+  "turbo_product": {
+    "start_date": null,
+    "end_date": null,
+    "duration": null
+  },
+  "tag": {},
+  "commercial_units": {},
+  "modify_score": 0,
+  "modify_score_client": 0,
+  "description_count": 1434,
+  "categories_count": 10,
+  "has_images": true,
+  "has_video": true,
+  "paid_quota": true,
+  "logo": null,
+  "include_administration": false,
+  "md5": 193339579,
+  "hasGarage": true,
+  "penthouse": false,
+  "idForm": null,
+  "finalization_date": null,
+  "fair": {},
+  "hasTour3d": false,
+  "duplicated": []
+}
