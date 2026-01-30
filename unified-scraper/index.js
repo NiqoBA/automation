@@ -57,6 +57,14 @@ async function scrapeInfoCasas(browser) {
 
                     const link = `https://www.infocasas.com.uy${item.link}`;
                     if (!allListings.some(x => x.id === item.id || x.link === link)) {
+                        // Construir URL de imagen si existe
+                        let imgUrl = null;
+                        if (item.photo) {
+                            imgUrl = item.photo.startsWith('http')
+                                ? item.photo
+                                : `https://images.infocasas.com.uy/${item.photo.startsWith('/') ? item.photo.substring(1) : item.photo}`;
+                        }
+
                         allListings.push({
                             portal: 'InfoCasas',
                             id: item.id,
@@ -68,7 +76,8 @@ async function scrapeInfoCasas(browser) {
                             rooms: item.bedrooms || 0,
                             agency: item.owner?.name || 'Particular',
                             phone: item.owner?.whatsapp_phone || item.owner?.masked_phone || 'Consultar',
-                            link: link
+                            link: link,
+                            img_url: imgUrl
                         });
                         newItemsFound++;
                     }
@@ -111,7 +120,8 @@ async function getCasasYMasDetail(browser, url) {
                         description: listing.description || '',
                         m2: listing.mainEntity?.floorSize?.value || 0,
                         rooms: listing.mainEntity?.numberOfBedrooms || 0,
-                        neighborhood: listing.mainEntity?.address?.addressLocality || ''
+                        neighborhood: listing.mainEntity?.address?.addressLocality || '',
+                        image: listing.image // Capturamos la imagen del LD+JSON
                     };
                 }
             } catch (e) {
@@ -188,7 +198,8 @@ async function scrapeCasasYMas(browser) {
                             rooms: detail.rooms,
                             agency: detail.agency,
                             phone: detail.phone,
-                            link: original.link
+                            link: original.link,
+                            img_url: detail.image
                         });
                     }
                 });
@@ -246,6 +257,11 @@ function detectDuplicates(list1, list2) {
             const item1 = combined[foundDuplicateIdx];
             item1.isDuplicate = true;
 
+            // Conservar imagen si el primero no tenía
+            if (!item1.img_url && item2.img_url) {
+                item1.img_url = item2.img_url;
+            }
+
             // Solo combinamos si son portales distintos y aún no ha sido combinado
             if (item1.portal !== item2.portal && !item1.portal.includes(' + ')) {
                 // Identificamos cual es cual antes de sobreescribir el portal
@@ -278,6 +294,9 @@ async function sendToN8N(data, summary) {
     try {
         const payload = {
             timestamp: new Date().toISOString(),
+            date: new Date().toISOString().split('T')[0],
+            count: data.length,
+            project_id: process.env.PROJECT_ID || null, // Importante para asociar a la DB
             summary: summary,
             properties: data
         };
@@ -317,6 +336,7 @@ async function sendToN8N(data, summary) {
             output += `Precio: ${item.currency} ${item.price} | Barrio: ${item.neighborhood} | M2: ${item.m2}\n`;
             output += `Inmobiliaria: ${item.agency} | Tel: ${item.phone}\n`;
             output += `Link: ${item.link}\n`;
+            output += `Imagen: ${item.img_url || 'N/A'}\n`;
             output += '--------------------------------------------------\n';
         });
 
@@ -337,3 +357,4 @@ async function sendToN8N(data, summary) {
         await browser.close();
     }
 })();
+

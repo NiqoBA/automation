@@ -1,6 +1,8 @@
 'use client'
 
+import { useRouter, useSearchParams } from 'next/navigation'
 import Badge from '@/components/ui/Badge'
+import { Eye, Edit, Trash2 } from 'lucide-react'
 import { Project } from '@/lib/types/database'
 import { Organization } from '@/lib/types/database'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -21,7 +23,16 @@ interface AdminProjectsTableProps {
 export default function AdminProjectsTable({ projects }: AdminProjectsTableProps) {
   const { theme } = useTheme()
   const isLight = theme === 'light'
-  
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const handleFocusProject = (projectId: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('focusProject', projectId)
+    params.set('tab', 'overview')
+    router.push(`?${params.toString()}`)
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-UY', {
       year: 'numeric',
@@ -46,13 +57,13 @@ export default function AdminProjectsTable({ projects }: AdminProjectsTableProps
   }
 
   const bgClass = isLight ? 'bg-white border-gray-200' : 'bg-zinc-900/50 border-zinc-800'
-  const borderClass = isLight ? 'border-gray-200' : 'border-zinc-800'
   const headerBgClass = isLight ? 'bg-gray-50 border-gray-200' : 'bg-zinc-900/50 border-zinc-800'
   const textPrimaryClass = isLight ? 'text-black' : 'text-zinc-100'
   const textSecondaryClass = isLight ? 'text-gray-600' : 'text-zinc-400'
   const textMutedClass = isLight ? 'text-gray-500' : 'text-zinc-400'
   const hoverBgClass = isLight ? 'hover:bg-gray-50' : 'hover:bg-zinc-900/30'
   const dividerClass = isLight ? 'divide-gray-200' : 'divide-zinc-800'
+  const buttonHoverClass = isLight ? 'hover:bg-gray-100' : 'hover:bg-zinc-800'
 
   return (
     <div className={`w-full min-w-0 rounded-xl overflow-hidden border transition-colors ${bgClass}`}>
@@ -78,13 +89,16 @@ export default function AdminProjectsTable({ projects }: AdminProjectsTableProps
               <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Fecha Creación
               </th>
+              <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
+                Acciones
+              </th>
             </tr>
           </thead>
 
           <tbody className={`divide-y transition-colors ${dividerClass}`}>
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center">
+                <td colSpan={7} className="px-6 py-12 text-center">
                   <p className={textMutedClass}>No hay proyectos</p>
                 </td>
               </tr>
@@ -127,6 +141,23 @@ export default function AdminProjectsTable({ projects }: AdminProjectsTableProps
                       {formatDate(project.created_at)}
                     </div>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleFocusProject(project.id)}
+                        className={`p-2 rounded-lg transition-colors ${textSecondaryClass} ${buttonHoverClass} hover:text-violet-400`}
+                        title="Ver dashboard del proyecto"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className={`p-2 rounded-lg transition-colors ${textSecondaryClass} ${buttonHoverClass} hover:text-violet-400`}>
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button className={`p-2 rounded-lg transition-colors ${textSecondaryClass} ${buttonHoverClass} hover:text-red-400`}>
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
@@ -136,3 +167,4 @@ export default function AdminProjectsTable({ projects }: AdminProjectsTableProps
     </div>
   )
 }
+

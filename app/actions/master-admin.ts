@@ -373,3 +373,28 @@ export async function getAllProjects() {
 
   return projects || []
 }
+
+/**
+ * Actualizar estado de un proyecto (solo master admin)
+ */
+export async function updateProjectStatus(projectId: string, status: 'active' | 'paused' | 'completed' | 'cancelled') {
+  await requireMasterAdmin()
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('projects')
+    .update({
+      status,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', projectId)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error al actualizar estado del proyecto:', error)
+    return { error: 'Error al actualizar el estado del proyecto' }
+  }
+
+  return { success: true, data }
+}

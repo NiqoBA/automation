@@ -26,7 +26,12 @@ export default function ProjectFocusedView({ projectId, projectData, userRole }:
     return (
         <div className="w-full h-full animate-in fade-in slide-in-from-bottom-2 duration-300">
             {activeTab === 'overview' && (
-                <OverviewView projectId={projectId} stats={projectData.stats} />
+                <OverviewView
+                    projectId={projectId}
+                    stats={projectData.stats}
+                    project={projectData.project}
+                    userRole={userRole}
+                />
             )}
             {activeTab === 'properties' && (
                 <PropertiesView projectId={projectId} />

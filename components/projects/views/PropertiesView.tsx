@@ -110,6 +110,7 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
                             <table className="w-full">
                                 <thead className={headerClass}>
                                     <tr>
+                                        <th className="text-left px-4 py-3 font-medium">Vista</th>
                                         <th className="text-left px-4 py-3 font-medium">Título</th>
                                         <th className="text-left px-4 py-3 font-medium">Precio</th>
                                         <th className="text-left px-4 py-3 font-medium">m²</th>
@@ -130,6 +131,25 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
                                     ) : (
                                         data.properties.map((property: any) => (
                                             <tr key={property.id} className={`border-t transition-colors ${rowClass}`}>
+                                                <td className="px-4 py-3">
+                                                    <div className="w-16 h-12 rounded-lg bg-zinc-800 overflow-hidden flex-shrink-0 border border-zinc-700/50">
+                                                        {property.img_url ? (
+                                                            <img
+                                                                src={property.img_url}
+                                                                alt={property.title}
+                                                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                                                                onError={(e) => {
+                                                                    (e.target as HTMLImageElement).src = 'https://placehold.co/400x300/18181b/a1a1aa?text=Sin+Imagen'
+                                                                }}
+                                                                loading="lazy"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-[10px] text-zinc-500 font-medium bg-zinc-800/50">
+                                                                NO IMG
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
                                                 <td className={`px-4 py-3 ${textClass}`}>
                                                     <div className="max-w-[250px] truncate" title={property.title}>
                                                         {property.title || 'Sin título'}
