@@ -1,3 +1,5 @@
+'use client'
+
 import { useRouter, useSearchParams } from 'next/navigation'
 import Badge from '@/components/ui/Badge'
 import { Edit, Trash2, Eye } from 'lucide-react'
