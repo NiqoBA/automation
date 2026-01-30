@@ -149,15 +149,18 @@ export async function inviteClient(data: z.infer<typeof inviteClientSchema>) {
 
   // 2. Invitar al usuario usando Supabase Auth
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://somosinflexo.com'
+  // Incluir email y company_name en la URL para que el formulario pueda pre-llenarse aunque el token expire
+  const redirectUrl = `${siteUrl}/auth/register?email=${encodeURIComponent(validated.email)}&company_name=${encodeURIComponent(validated.companyName)}`
+
   const { data: inviteData, error: inviteError } = await adminSupabase.auth.admin.inviteUserByEmail(
     validated.email,
     {
       data: {
         company_name: validated.companyName,
-        organization_id: orgId, // Pasamos el ID para que el registro lo use
+        organization_id: orgId,
         plan: validated.plan || 'Starter',
       },
-      redirectTo: `${siteUrl}/auth/register`,
+      redirectTo: redirectUrl,
     }
   )
 

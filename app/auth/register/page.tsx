@@ -5,7 +5,7 @@ import RegisterForm from '@/components/auth/RegisterForm'
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: { 
+  searchParams: {
     email?: string
     company_name?: string
     error?: string
@@ -56,7 +56,7 @@ export default async function RegisterPage({
           <p className="text-gray-400">Has sido invitado a Inflexo AI</p>
         </div>
         <div className="bg-[#0a0a0a] border border-gray-800 rounded-2xl p-8">
-          {hasError && (
+          {hasError && !email && (
             <div className="mb-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
               <h3 className="text-amber-400 font-semibold mb-2">Link Expirado o Inválido</h3>
               <p className="text-amber-300/80 text-sm mb-3">
@@ -67,7 +67,14 @@ export default async function RegisterPage({
               </p>
             </div>
           )}
-          <RegisterForm email={email} companyName={companyName} hasError={!!hasError} />
+          {hasError && email && (
+            <div className="mb-6 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <p className="text-blue-300 text-sm">
+                Completa el formulario para finalizar tu registro.
+              </p>
+            </div>
+          )}
+          <RegisterForm email={email} companyName={companyName} hasError={!!hasError && !email} />
         </div>
       </div>
     </div>

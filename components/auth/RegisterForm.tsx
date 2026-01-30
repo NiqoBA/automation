@@ -138,8 +138,8 @@ export default function RegisterForm({
     )
   }
 
-  // Si hay error de link expirado y no hay email, no mostrar el formulario
-  if (hasError && !userEmail) {
+  // Si hay error de link expirado y no hay email de ninguna fuente, no mostrar el formulario
+  if (hasError && !userEmail && !initialEmail) {
     return (
       <div className="text-center py-8">
         <p className="text-zinc-400 text-sm">
