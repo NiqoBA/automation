@@ -2,8 +2,8 @@ name: Daily Scraper
 
 on:
   schedule:
-    # 22:00 (10 PM) Uruguay Time (UTC-3) is 01:00 UTC
-    - cron: '0 1 * * *'
+    # 21:00 (9 PM) Uruguay Time (UTC-3) is 00:00 UTC
+    - cron: '0 0 * * *'
   # Allow manual trigger
   workflow_dispatch:
 
