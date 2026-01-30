@@ -18,11 +18,11 @@ const employeeCountOptions = [
 
 const countries = ['Uruguay', 'Argentina', 'Brasil', 'Chile', 'Paraguay', 'Otro']
 
-export default function RegisterForm({ 
-  email: initialEmail, 
+export default function RegisterForm({
+  email: initialEmail,
   companyName: initialCompanyName,
   hasError = false
-}: { 
+}: {
   email?: string
   companyName?: string
   hasError?: boolean
@@ -47,95 +47,52 @@ export default function RegisterForm({
   useEffect(() => {
     async function loadUserData() {
       try {
-        // Primero, verificar si hay un hash en la URL que Supabase necesita procesar
-        // Esto es necesario cuando el usuario hace clic en el link del email
+        // 1. Procesar el hash de la URL si existe
         if (typeof window !== 'undefined' && window.location.hash) {
           const hashParams = new URLSearchParams(window.location.hash.substring(1))
           const accessToken = hashParams.get('access_token')
           const refreshToken = hashParams.get('refresh_token')
-          
-          // Si hay tokens en el hash, establecer la sesión
+          const errorCode = hashParams.get('error_code')
+
+          // Si hay tokens, establecer sesión
           if (accessToken && refreshToken) {
             const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
               access_token: accessToken,
               refresh_token: refreshToken,
             })
-            
-            if (sessionError) {
-              console.error('Error al establecer sesión:', sessionError)
-              setError('Error al procesar el link de invitación. Intenta de nuevo.')
-              setLoadingInvitation(false)
-              return
-            }
-            
-            // Limpiar el hash de la URL después de procesarlo
-            if (sessionData?.session) {
+
+            if (!sessionError && sessionData?.session) {
               window.history.replaceState(null, '', window.location.pathname + window.location.search)
             }
           }
-        }
-        
-        // Esperar un momento para que Supabase procese el hash si existía
-        await new Promise(resolve => setTimeout(resolve, 500))
-        
-        // Obtener el usuario actual (después de procesar el hash si existía)
-        const { data: { user }, error: userError } = await supabase.auth.getUser()
-        
-        if (userError) {
-          console.error('Error al obtener usuario:', userError)
-        }
-        
-        // También intentar obtener la sesión
-        const { data: { session } } = await supabase.auth.getSession()
-        
-        if (session && !user) {
-          // Si hay sesión pero no usuario, intentar obtener el usuario de nuevo
-          const { data: { user: retryUser } } = await supabase.auth.getUser()
-          if (retryUser && retryUser.email) {
-            const userMetadata = retryUser.user_metadata || {}
-            const email = retryUser.email
-            const companyName = userMetadata.company_name || initialCompanyName || ''
-            
-            setUserEmail(email)
-            setValue('email', email)
-            
-            if (companyName) {
-              setValue('company_name', companyName)
-            }
-            setLoadingInvitation(false)
-            return
+          // Si hay un error de expiración pero tenemos el email en la URL, no bloqueamos
+          else if (errorCode === 'otp_expired' && initialEmail) {
+            console.warn('El link de Supabase expiró, pero continuaremos con el email de la invitación.')
+            // No seteamos error para que el formulario sea visible
           }
         }
-        
+
+        // 2. Intentar obtener usuario actual
+        const { data: { user } } = await supabase.auth.getUser()
+
         if (user && user.email) {
-          // Obtener metadata del usuario (company_name, etc.)
-          const userMetadata = user.user_metadata || {}
           const email = user.email
+          const userMetadata = user.user_metadata || {}
           const companyName = userMetadata.company_name || initialCompanyName || ''
-          
-          // Establecer email (siempre del usuario invitado)
+
           setUserEmail(email)
           setValue('email', email)
-          
-          if (companyName) {
-            setValue('company_name', companyName)
-          }
+          if (companyName) setValue('company_name', companyName)
         } else if (initialEmail) {
-          // Si no hay usuario pero hay email en query params (fallback)
+          // Si no hay sesión, pero hay email en la URL (invitación manual)
           setUserEmail(initialEmail)
           setValue('email', initialEmail)
-          if (initialCompanyName) {
-            setValue('company_name', initialCompanyName)
-          }
-        } else if (!hasError) {
-          // Si no hay email disponible y no hay error de URL, mostrar error
-          setError('No se encontró una invitación válida. Asegúrate de hacer clic en el link del email.')
+          if (initialCompanyName) setValue('company_name', initialCompanyName)
+        } else if (hasError && !initialEmail) {
+          setError('El link de invitación es inválido o ha expirado. Por favor solicita uno nuevo.')
         }
       } catch (err: any) {
-        console.error('Error al cargar datos del usuario:', err)
-        if (!hasError) {
-          setError('Error al procesar la invitación. Intenta de nuevo.')
-        }
+        console.error('Error al cargar datos:', err)
       } finally {
         setLoadingInvitation(false)
       }
@@ -207,7 +164,7 @@ export default function RegisterForm({
         {...register('email')}
         value={userEmail}
       />
-      
+
       {/* Mostrar email como información, no como campo editable */}
       {userEmail && (
         <div className="p-3 rounded-lg bg-zinc-800/50 border border-zinc-700">
@@ -275,9 +232,8 @@ export default function RegisterForm({
           {...register('company_name')}
           type="text"
           id="company_name"
-          className={`w-full px-4 py-3 rounded-lg border border-gray-700 bg-[#0d0d0d] text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-colors ${
-            initialCompanyName ? 'opacity-90' : ''
-          }`}
+          className={`w-full px-4 py-3 rounded-lg border border-gray-700 bg-[#0d0d0d] text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-colors ${initialCompanyName ? 'opacity-90' : ''
+            }`}
           placeholder="Mi Empresa S.A."
           disabled={!!initialCompanyName}
         />

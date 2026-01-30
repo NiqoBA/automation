@@ -37,11 +37,11 @@ export async function getMasterAdminStats(): Promise<MasterAdminStats> {
     .from('organizations')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active')
-  
+
   if (profile.organization_id) {
     totalClientsQuery = totalClientsQuery.neq('id', profile.organization_id)
   }
-  
+
   const { count: totalClients } = await totalClientsQuery
 
   // Total de proyectos (suma de todos los proyectos de todas las orgs)
@@ -84,58 +84,29 @@ export async function getAllClients(): Promise<ClientWithStats[]> {
   await requireMasterAdmin()
   const supabase = createClient()
 
-  // Obtener todas las organizaciones (excepto la del master admin si tiene una)
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('organization_id')
-    .eq('role', 'master_admin')
-    .single()
-
-  let orgsQuery = supabase
-    .from('organizations')
+  // Usar la nueva vista de gestión de clientes que ya trae los conteos
+  const { data: clients, error } = await supabase
+    .from('client_management_view')
     .select('*')
     .order('created_at', { ascending: false })
 
-  if (profile?.organization_id) {
-    orgsQuery = orgsQuery.neq('id', profile.organization_id)
-  }
-
-  const { data: organizations, error: orgError } = await orgsQuery
-
-  if (orgError || !organizations) {
-    console.error('Error al obtener organizaciones:', orgError)
+  if (error || !clients) {
+    console.error('Error al obtener clientes:', error)
     return []
   }
 
-  // Para cada organización, contar usuarios y proyectos
-  const clientsWithStats: ClientWithStats[] = []
-
-  for (const org of organizations) {
-    const [usersResult, projectsResult] = await Promise.all([
-      supabase
-        .from('profiles')
-        .select('id', { count: 'exact', head: true })
-        .eq('organization_id', org.id),
-      supabase
-        .from('projects')
-        .select('id', { count: 'exact', head: true })
-        .eq('organization_id', org.id),
-    ])
-
-    clientsWithStats.push({
-      id: org.id,
-      name: org.name,
-      rut: org.rut,
-      country: org.country,
-      employee_count: org.employee_count,
-      status: org.status || 'active',
-      created_at: org.created_at,
-      user_count: usersResult.count || 0,
-      project_count: projectsResult.count || 0,
-    })
-  }
-
-  return clientsWithStats
+  // Mapear al formato esperado por el frontend si es necesario
+  return clients.map(client => ({
+    id: client.id,
+    name: client.name || 'Sin nombre',
+    rut: client.rut || '-',
+    country: client.country || 'Uruguay',
+    employee_count: client.employee_count || '-',
+    status: client.status,
+    created_at: client.created_at,
+    user_count: client.user_count || 0,
+    project_count: client.project_count || 0,
+  }))
 }
 
 /**
@@ -144,85 +115,58 @@ export async function getAllClients(): Promise<ClientWithStats[]> {
 export async function inviteClient(data: z.infer<typeof inviteClientSchema>) {
   const { user: profile } = await requireMasterAdmin()
   const adminSupabase = createAdminClient()
-  const supabase = createClient()
 
   // Validar schema
   const validated = inviteClientSchema.parse(data)
 
-  // Verificar que el email no esté registrado
-  const { data: listData } = await adminSupabase.auth.admin.listUsers({ perPage: 1000 })
-  const existingUser = listData?.users?.find(
-    (u) => u.email?.toLowerCase() === validated.email.toLowerCase()
-  )
-  if (existingUser) {
-    return { error: 'Este email ya está registrado' }
-  }
-
-  // Verificar que no haya invitación pendiente
-  const { data: existingInvitation } = await supabase
-    .from('invitations')
-    .select('*')
-    .eq('email', validated.email)
-    .eq('status', 'pending')
-    .gt('expires_at', new Date().toISOString())
+  // 1. Verificar si ya existe una organización pendiente para este email
+  const { data: existingOrg } = await adminSupabase
+    .from('organizations')
+    .select('id')
+    .eq('account_email', validated.email)
     .maybeSingle()
 
-  if (existingInvitation) {
-    return { error: 'Ya existe una invitación pendiente para este email' }
+  let orgId = existingOrg?.id
+
+  if (!orgId) {
+    // Solo crear si no existe
+    const { data: org, error: orgError } = await adminSupabase
+      .from('organizations')
+      .insert({
+        name: validated.companyName,
+        status: 'Solicitud',
+        account_email: validated.email,
+      })
+      .select()
+      .single()
+
+    if (orgError) {
+      console.error('Error al crear organización para invitación:', orgError)
+      return { error: 'Error al crear la organización' }
+    }
+    orgId = org.id
   }
 
-  // Crear invitación usando Supabase Auth
+  // 2. Invitar al usuario usando Supabase Auth
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://somosinflexo.com'
   const { data: inviteData, error: inviteError } = await adminSupabase.auth.admin.inviteUserByEmail(
     validated.email,
     {
       data: {
         company_name: validated.companyName,
+        organization_id: orgId, // Pasamos el ID para que el registro lo use
         plan: validated.plan || 'Starter',
-        notes: validated.notes || '',
       },
       redirectTo: `${siteUrl}/auth/register`,
     }
   )
 
-  if (inviteError || !inviteData.user) {
+  if (inviteError) {
     console.error('Error al invitar usuario:', inviteError)
-    
-    // Manejar específicamente el error de rate limit
-    if (inviteError?.message?.toLowerCase().includes('rate limit') || 
-        inviteError?.message?.toLowerCase().includes('too many requests')) {
-      return { 
-        error: 'Se alcanzó el límite de envío de emails. Por favor, espera unos minutos antes de intentar nuevamente. Si el problema persiste, contacta al soporte.' 
-      }
-    }
-    
-    return { error: inviteError?.message || 'Error al crear la invitación' }
+    return { error: inviteError.message || 'Error al enviar invitación' }
   }
 
-  // Crear registro en nuestra tabla de invitations para tracking
-  const { error: invitationError } = await adminSupabase
-    .from('invitations')
-    .insert({
-      email: validated.email,
-      organization_id: null, // Se creará cuando acepte
-      invited_by: profile.id,
-      role: 'org_admin',
-      token: inviteData.user.id, // Usar el ID del usuario como token
-      status: 'pending',
-      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 días
-      metadata: {
-        company_name: validated.companyName,
-        plan: validated.plan || 'Starter',
-        notes: validated.notes || '',
-      },
-    })
-
-  if (invitationError) {
-    console.error('Error al crear registro de invitación:', invitationError)
-    return { error: 'Error al crear el registro de invitación' }
-  }
-
-  return { success: true, message: `Invitación enviada a ${validated.email}` }
+  return { success: true, message: `Invitación enviada a ${validated.email}. Estado: Solicitud` }
 }
 
 /**

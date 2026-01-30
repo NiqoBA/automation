@@ -18,108 +18,126 @@ export async function registerWithInvitation(
   const supabase = createClient()
   const adminSupabase = createAdminClient()
 
-  // Verificar que el usuario existe y está invitado
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  
-  if (userError || !user) {
-    // Si el error es de link expirado, dar mensaje más específico
-    if (userError?.message?.includes('expired') || userError?.message?.includes('invalid')) {
-      return { error: 'El link de invitación ha expirado. Por favor, solicita una nueva invitación al administrador.' }
-    }
-    return { error: 'No se encontró una invitación válida. Asegúrate de hacer clic en el link del email de invitación.' }
-  }
+  // 1. Intentar obtener el usuario de la sesión actual
+  const { data: { user: currentUser } } = await supabase.auth.getUser()
 
-  // Usar SIEMPRE el email del usuario invitado (el único válido)
-  const finalEmail = user.email
-  
+  // Usamos el email proporcionado o el de la sesión
+  const finalEmail = currentUser?.email || email
+
   if (!finalEmail) {
-    return { error: 'No se encontró el email del usuario invitado' }
+    return { error: 'No se pudo determinar el email para el registro.' }
   }
 
   // Verificar si el usuario ya tiene perfil (ya completó el registro)
-  const { data: existingProfile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('id', user.id)
-    .maybeSingle()
+  // Intentamos obtener el ID del usuario actual o buscamos por email
+  let userId = currentUser?.id
 
-  if (existingProfile) {
-    // Si ya tiene perfil, redirigir al dashboard según su rol
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role, organization_id')
-      .eq('id', user.id)
-      .single()
-    
-    revalidatePath('/', 'layout')
-    if (profile?.role === 'master_admin') {
-      redirect('/dashboard/admin')
-    } else if (profile?.organization_id) {
-      redirect('/dashboard/org')
-    } else {
-      redirect('/auth/login')
+  if (!userId) {
+    const { data: { users }, error: listError } = await adminSupabase.auth.admin.listUsers()
+    if (!listError) {
+      userId = users.find(u => u.email === finalEmail)?.id
     }
-    return // Esto nunca se ejecutará por el redirect, pero TypeScript lo necesita
   }
 
-  // Actualizar la contraseña del usuario y metadata
-  // Nota: Si el email ya está confirmado (por el link), esto solo actualiza la contraseña
-  const { error: updateError } = await supabase.auth.updateUser({
-    password,
-    data: {
-      full_name: fullName,
-    },
-  })
+  if (userId) {
+    const { data: existingProfile } = await adminSupabase
+      .from('profiles')
+      .select('id, role, organization_id')
+      .eq('id', userId)
+      .maybeSingle()
 
-  if (updateError) {
-    // Si el error es que la contraseña es la misma o similar, continuar de todas formas
-    if (updateError.message?.includes('same') || updateError.message?.includes('similar')) {
-      // Continuar con el registro
-    } else {
-      return { error: updateError.message || 'Error al establecer la contraseña' }
+    if (existingProfile) {
+      if (existingProfile.role === 'master_admin') redirect('/dashboard/admin')
+      if (existingProfile.organization_id) redirect('/dashboard/org')
+      redirect('/auth/login')
     }
+  }
+
+  // Si no tenemos userId, significa que el usuario de Auth aún no se creó o el link falló
+  // Lo creamos manualmente usando el admin client
+  if (!userId) {
+    const { data: newUser, error: createError } = await adminSupabase.auth.admin.createUser({
+      email: finalEmail,
+      password: password,
+      email_confirm: true,
+      user_metadata: { full_name: fullName, company_name: companyName }
+    })
+
+    if (createError) return { error: createError.message }
+    userId = newUser.user.id
+  } else {
+    // Si ya existe pero no tiene perfil, aseguramos la contraseña y metadata
+    await adminSupabase.auth.admin.updateUserById(userId, {
+      password: password,
+      user_metadata: { full_name: fullName }
+    })
   }
 
   // Obtener metadata de la invitación (company_name, etc.)
-  const userMetadata = user.user_metadata || {}
+  const userMetadata = currentUser?.user_metadata || {}
   const finalCompanyName = userMetadata.company_name || companyName
 
-  // Buscar invitación en nuestra tabla para obtener información
-  const { data: invitation } = await adminSupabase
-    .from('invitations')
+  // Buscar si ya existe una organización para este email (creada durante la invitación)
+  const { data: existingOrg } = await adminSupabase
+    .from('organizations')
     .select('*')
-    .eq('email', finalEmail)
-    .eq('status', 'pending')
+    .eq('account_email', finalEmail)
     .maybeSingle()
 
-  // Crear organización (siempre nueva para invitaciones de master admin)
-  // Usar cliente admin para evitar problemas de RLS
-  const { data: newOrg, error: orgError } = await adminSupabase
-    .from('organizations')
-    .insert({
-      name: finalCompanyName,
-      rut,
-      country,
-      employee_count: employeeCount,
-    })
-    .select()
-    .single()
+  let finalOrgId: string;
 
-  if (orgError || !newOrg) {
-    console.error('Error al crear organización:', orgError)
-    return { error: orgError?.message || 'Error al crear organización' }
+  if (existingOrg) {
+    // Si existe, la actualizamos y usamos su ID
+    const { data: updatedOrg, error: updateOrgError } = await adminSupabase
+      .from('organizations')
+      .update({
+        name: finalCompanyName,
+        rut,
+        country,
+        employee_count: employeeCount,
+        status: 'active', // <--- Transición a Activo
+      })
+      .eq('id', existingOrg.id)
+      .select()
+      .single()
+
+    if (updateOrgError) {
+      console.error('Error al actualizar organización existente:', updateOrgError)
+      return { error: 'Error al actualizar la organización' }
+    }
+    finalOrgId = updatedOrg.id
+  } else {
+    // Si NO existe (caso raro/antiguo), creamos una nueva directamente activa
+    const { data: newOrg, error: orgError } = await adminSupabase
+      .from('organizations')
+      .insert({
+        name: finalCompanyName,
+        rut,
+        country,
+        employee_count: employeeCount,
+        status: 'active',
+        account_email: finalEmail,
+      })
+      .select()
+      .single()
+
+    if (orgError || !newOrg) {
+      console.error('Error al crear organización nueva:', orgError)
+      return { error: orgError?.message || 'Error al crear la organización' }
+    }
+    finalOrgId = newOrg.id
   }
 
   // Create profile usando cliente admin para evitar RLS
   const { error: profileError } = await adminSupabase
     .from('profiles')
     .insert({
-      id: user.id,
-      organization_id: newOrg.id,
+      id: userId,
+      organization_id: finalOrgId,
       email: finalEmail,
       full_name: fullName,
       phone: phone || null,
-      role: 'org_admin', // Los invitados por master admin son org_admin
+      role: 'org_admin',
     })
 
   if (profileError) {
@@ -130,9 +148,9 @@ export async function registerWithInvitation(
       const { data: existingProfile } = await adminSupabase
         .from('profiles')
         .select('role')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single()
-      
+
       if (existingProfile?.role === 'master_admin') {
         redirect('/dashboard/admin')
       } else {
@@ -147,8 +165,8 @@ export async function registerWithInvitation(
   const { error: memberError } = await adminSupabase
     .from('organization_members')
     .insert({
-      organization_id: newOrg.id,
-      user_id: user.id,
+      organization_id: finalOrgId,
+      user_id: userId,
       role: 'admin',
     })
 
@@ -160,23 +178,15 @@ export async function registerWithInvitation(
     }
   }
 
-  // Update invitation status si existe en nuestra tabla
-  if (invitation) {
-    await adminSupabase
-      .from('invitations')
-      .update({ status: 'accepted' })
-      .eq('id', invitation.id)
-  }
-
   // Obtener el perfil creado para verificar el rol y organization_id
   const { data: createdProfile } = await supabase
     .from('profiles')
     .select('role, organization_id')
-    .eq('id', user.id)
+    .eq('id', userId)
     .single()
 
   revalidatePath('/', 'layout')
-  
+
   // Redirigir al dashboard según el rol
   if (createdProfile?.role === 'master_admin') {
     redirect('/dashboard/admin')

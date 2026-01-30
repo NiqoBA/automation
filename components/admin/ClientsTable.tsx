@@ -131,11 +131,12 @@ export default function ClientsTable({ clients }: ClientsTableProps) {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Badge
                       variant={
-                        client.status === 'active' ? 'success' : 'default'
+                        client.status === 'active' || client.status === 'activo' ? 'success' :
+                          client.status === 'Solicitud' ? 'warning' : 'default'
                       }
                       size="sm"
                     >
-                      {client.status === 'active' ? 'Activo' : client.status}
+                      {client.status === 'active' || client.status === 'activo' ? 'Activo' : client.status}
                     </Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
