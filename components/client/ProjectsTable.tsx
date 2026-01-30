@@ -1,5 +1,4 @@
-'use client'
-
+import { useRouter, useSearchParams } from 'next/navigation'
 import Badge from '@/components/ui/Badge'
 import { Edit, Trash2, Eye } from 'lucide-react'
 import type { Project } from '@/lib/types/database'
@@ -15,12 +14,22 @@ interface ProjectWithCreator extends Project {
 
 interface ProjectsTableProps {
   projects: ProjectWithCreator[]
+  userRole?: string
 }
 
-export default function ProjectsTable({ projects }: ProjectsTableProps) {
+export default function ProjectsTable({ projects, userRole = 'org_admin' }: ProjectsTableProps) {
   const { theme } = useTheme()
   const isLight = theme === 'light'
-  
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const handleFocusProject = (projectId: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('focusProject', projectId)
+    params.set('tab', 'overview')
+    router.push(`?${params.toString()}`)
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-UY', {
       year: 'numeric',
@@ -45,12 +54,10 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
   }
 
   const bgClass = isLight ? 'bg-white border-gray-200' : 'bg-zinc-900/50 border-zinc-800'
-  const borderClass = isLight ? 'border-gray-200' : 'border-zinc-800'
   const headerBgClass = isLight ? 'bg-gray-50 border-gray-200' : 'bg-zinc-900/50 border-zinc-800'
   const textPrimaryClass = isLight ? 'text-black' : 'text-zinc-100'
   const textSecondaryClass = isLight ? 'text-gray-600' : 'text-zinc-400'
   const textMutedClass = isLight ? 'text-gray-500' : 'text-zinc-400'
-  const subtitleClass = isLight ? 'text-black' : 'text-zinc-400'
   const hoverBgClass = isLight ? 'hover:bg-gray-50' : 'hover:bg-zinc-900/30'
   const dividerClass = isLight ? 'divide-gray-200' : 'divide-zinc-800'
   const buttonHoverClass = isLight ? 'hover:bg-gray-100' : 'hover:bg-zinc-800'
@@ -132,7 +139,11 @@ export default function ProjectsTable({ projects }: ProjectsTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
-                      <button className={`p-2 rounded-lg transition-colors ${textSecondaryClass} ${buttonHoverClass} hover:text-violet-400`}>
+                      <button
+                        onClick={() => handleFocusProject(project.id)}
+                        className={`p-2 rounded-lg transition-colors ${textSecondaryClass} ${buttonHoverClass} hover:text-violet-400`}
+                        title="Ver dashboard del proyecto"
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button className={`p-2 rounded-lg transition-colors ${textSecondaryClass} ${buttonHoverClass} hover:text-violet-400`}>
