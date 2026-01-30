@@ -56,7 +56,7 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
         return formatter.format(price)
     }
 
-    const portals = ['Mercadolibre', 'Infocasas', 'Gallito']
+    const portals = ['Mercadolibre', 'InfoCasas', 'CasasYMas', 'Gallito']
 
     return (
         <div className="space-y-4">
@@ -173,8 +173,9 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
                                                 <td className={`px-4 py-3 ${mutedClass}`}>
                                                     <span className={`px-2 py-1 rounded text-xs font-medium
                             ${property.portal === 'Mercadolibre' ? 'bg-yellow-500/20 text-yellow-500' :
-                                                            property.portal === 'Infocasas' ? 'bg-blue-500/20 text-blue-500' :
-                                                                'bg-green-500/20 text-green-500'}`}
+                                                            (property.portal === 'Infocasas' || property.portal === 'InfoCasas') ? 'bg-blue-500/20 text-blue-500' :
+                                                                (property.portal === 'CasasYMas' || property.portal === 'Gallito') ? 'bg-emerald-500/20 text-emerald-500' :
+                                                                    'bg-zinc-500/20 text-zinc-500'}`}
                                                     >
                                                         {property.portal}
                                                     </span>
