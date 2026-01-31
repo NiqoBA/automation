@@ -33,6 +33,7 @@ export default function DashboardLayoutClient({
 }: DashboardLayoutClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [projectSidebarCollapsed, setProjectSidebarCollapsed] = useState(false)
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const focusProjectId = searchParams.get('focusProject')
@@ -54,6 +55,10 @@ export default function DashboardLayoutClient({
     const saved = localStorage.getItem('sidebarCollapsed')
     if (saved === 'true') {
       setSidebarCollapsed(true)
+    }
+    const projectSaved = localStorage.getItem('projectSidebarCollapsed')
+    if (projectSaved === 'true') {
+      setProjectSidebarCollapsed(true)
     }
   }, [])
 
@@ -79,13 +84,13 @@ export default function DashboardLayoutClient({
   }, [focusProjectId])
 
   const effectiveSidebarWidth = focusProjectId ? 64 : (sidebarCollapsed ? 64 : 224)
-  const secondarySidebarWidth = focusProjectId ? 224 : 0
+  const secondarySidebarWidth = focusProjectId ? (projectSidebarCollapsed ? 64 : 224) : 0
   const mainPadding = effectiveSidebarWidth + secondarySidebarWidth
 
   return (
     <div className={`min-h-screen flex overflow-x-hidden transition-colors duration-200 ${theme === 'light'
-        ? 'bg-gray-50 text-gray-900'
-        : 'bg-black text-white'
+      ? 'bg-gray-50 text-gray-900'
+      : 'bg-black text-white'
       }`}>
       {/* Sidebar Desktop */}
       <aside
@@ -93,8 +98,8 @@ export default function DashboardLayoutClient({
         style={{ width: `${effectiveSidebarWidth}px` }}
       >
         <div className={`flex flex-col flex-grow transition-colors duration-200 ${theme === 'light'
-            ? 'bg-white border-r border-gray-200'
-            : 'bg-zinc-900 border-r border-zinc-800'
+          ? 'bg-white border-r border-gray-200'
+          : 'bg-zinc-900 border-r border-zinc-800'
           }`}>
           {/* Logo */}
           <div className={`flex items-center flex-shrink-0 px-4 py-4 border-b transition-colors duration-200 ${theme === 'light' ? 'border-gray-200' : 'border-zinc-800'
@@ -126,12 +131,12 @@ export default function DashboardLayoutClient({
                     key={item.href}
                     href={item.href}
                     className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} gap-2 px-3 py-2 rounded-lg transition-all duration-150 ${isActive
-                        ? theme === 'light'
-                          ? 'bg-violet-50 text-violet-600 border border-violet-200'
-                          : 'bg-gradient-to-r from-violet-600/20 to-purple-600/20 text-violet-400 border border-violet-500/20'
-                        : theme === 'light'
-                          ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                          : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
+                      ? theme === 'light'
+                        ? 'bg-violet-50 text-violet-600 border border-violet-200'
+                        : 'bg-gradient-to-r from-violet-600/20 to-purple-600/20 text-violet-400 border border-violet-500/20'
+                      : theme === 'light'
+                        ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                        : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
                       }`}
                     title={sidebarCollapsed ? item.label : undefined}
                   >
@@ -141,8 +146,8 @@ export default function DashboardLayoutClient({
                     </div>
                     {!sidebarCollapsed && item.badge !== undefined && item.badge > 0 && (
                       <span className={`px-1.5 py-0.5 text-xs font-medium rounded-full ${theme === 'light'
-                          ? 'bg-violet-100 text-violet-600'
-                          : 'bg-violet-500/20 text-violet-400'
+                        ? 'bg-violet-100 text-violet-600'
+                        : 'bg-violet-500/20 text-violet-400'
                         }`}>
                         {item.badge}
                       </span>
@@ -158,8 +163,8 @@ export default function DashboardLayoutClient({
               <button
                 onClick={toggleTheme}
                 className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-start'} gap-2 px-3 py-2 rounded-lg transition-colors ${theme === 'light'
-                    ? 'text-gray-600 hover:bg-gray-100'
-                    : 'text-zinc-400 hover:bg-zinc-800'
+                  ? 'text-gray-600 hover:bg-gray-100'
+                  : 'text-zinc-400 hover:bg-zinc-800'
                   }`}
                 title={sidebarCollapsed ? (theme === 'dark' ? 'Modo claro' : 'Modo oscuro') : undefined}
               >
@@ -197,8 +202,8 @@ export default function DashboardLayoutClient({
                     <button
                       type="submit"
                       className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${theme === 'light'
-                          ? 'text-gray-600 hover:bg-gray-100'
-                          : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
+                        ? 'text-gray-600 hover:bg-gray-100'
+                        : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
                         }`}
                     >
                       <LogOut className="w-4 h-4" />
@@ -230,8 +235,8 @@ export default function DashboardLayoutClient({
               <button
                 onClick={toggleSidebar}
                 className={`w-full flex items-center justify-center p-2 rounded-lg transition-colors ${theme === 'light'
-                    ? 'text-gray-600 hover:bg-gray-100'
-                    : 'text-zinc-400 hover:bg-zinc-800'
+                  ? 'text-gray-600 hover:bg-gray-100'
+                  : 'text-zinc-400 hover:bg-zinc-800'
                   }`}
                 title={sidebarCollapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}
               >
@@ -252,6 +257,8 @@ export default function DashboardLayoutClient({
           projectId={focusProjectId}
           userRole={user.role}
           leftOffset={effectiveSidebarWidth}
+          collapsed={projectSidebarCollapsed}
+          onCollapse={setProjectSidebarCollapsed}
         />
       )}
 
@@ -288,12 +295,12 @@ export default function DashboardLayoutClient({
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center justify-between gap-2 px-3 py-2 rounded-lg transition-colors ${isActive
-                        ? theme === 'light'
-                          ? 'bg-violet-50 text-violet-600 border border-violet-200'
-                          : 'bg-gradient-to-r from-violet-600/20 to-purple-600/20 text-violet-400 border border-violet-500/20'
-                        : theme === 'light'
-                          ? 'text-gray-600 hover:bg-gray-100'
-                          : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
+                      ? theme === 'light'
+                        ? 'bg-violet-50 text-violet-600 border border-violet-200'
+                        : 'bg-gradient-to-r from-violet-600/20 to-purple-600/20 text-violet-400 border border-violet-500/20'
+                      : theme === 'light'
+                        ? 'text-gray-600 hover:bg-gray-100'
+                        : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
                       }`}
                   >
                     <div className="flex items-center gap-2">
@@ -302,8 +309,8 @@ export default function DashboardLayoutClient({
                     </div>
                     {item.badge !== undefined && item.badge > 0 && (
                       <span className={`px-1.5 py-0.5 text-xs font-medium rounded-full ${theme === 'light'
-                          ? 'bg-violet-100 text-violet-600'
-                          : 'bg-violet-500/20 text-violet-400'
+                        ? 'bg-violet-100 text-violet-600'
+                        : 'bg-violet-500/20 text-violet-400'
                         }`}>
                         {item.badge}
                       </span>
@@ -317,8 +324,8 @@ export default function DashboardLayoutClient({
               <button
                 onClick={toggleTheme}
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${theme === 'light'
-                    ? 'text-gray-600 hover:bg-gray-100'
-                    : 'text-zinc-400 hover:bg-zinc-800'
+                  ? 'text-gray-600 hover:bg-gray-100'
+                  : 'text-zinc-400 hover:bg-zinc-800'
                   }`}
               >
                 {theme === 'dark' ? (
@@ -349,8 +356,8 @@ export default function DashboardLayoutClient({
                 <button
                   type="submit"
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${theme === 'light'
-                      ? 'text-gray-600 hover:bg-gray-100'
-                      : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
+                    ? 'text-gray-600 hover:bg-gray-100'
+                    : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
                     }`}
                 >
                   <LogOut className="w-4 h-4" />

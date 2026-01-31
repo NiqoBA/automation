@@ -39,13 +39,24 @@ export default function LogsView({ projectId }: LogsViewProps) {
     }
 
     const formatDate = (date: string) => {
-        return new Date(date).toLocaleString('es-UY', {
+        return new Date(date).toLocaleDateString('es-UY', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
         })
+    }
+
+    const formatTime = (time: string) => {
+        if (!time) return '-'
+        // The time columns are postgres 'time' types (HH:MM:SS)
+        // Check if it's already a time string or a full ISO string
+        if (time.includes('T')) {
+            return new Date(time).toLocaleTimeString('es-UY', {
+                hour: '2-digit',
+                minute: '2-digit',
+            })
+        }
+        return time.substring(0, 5)
     }
 
     const cardBg = isLight ? 'bg-white border-gray-200' : 'bg-zinc-900/50 border-zinc-800'
@@ -76,10 +87,11 @@ export default function LogsView({ projectId }: LogsViewProps) {
                         <thead className={headerBg}>
                             <tr>
                                 <th className={`text-left px-4 py-3 text-sm font-medium ${textSecondary}`}>Estado</th>
+                                <th className={`text-left px-4 py-3 text-sm font-medium ${textSecondary}`}>Fecha</th>
                                 <th className={`text-left px-4 py-3 text-sm font-medium ${textSecondary}`}>Inicio</th>
                                 <th className={`text-left px-4 py-3 text-sm font-medium ${textSecondary}`}>Fin</th>
-                                <th className={`text-left px-4 py-3 text-sm font-medium ${textSecondary}`}>Propiedades</th>
-                                <th className={`text-left px-4 py-3 text-sm font-medium ${textSecondary}`}>Costo</th>
+                                <th className={`text-right px-4 py-3 text-sm font-medium ${textSecondary}`}>Propiedades</th>
+                                <th className={`text-right px-4 py-3 text-sm font-medium ${textSecondary}`}>Costo</th>
                                 <th className={`text-left px-4 py-3 text-sm font-medium ${textSecondary}`}>Error</th>
                             </tr>
                         </thead>
@@ -93,16 +105,19 @@ export default function LogsView({ projectId }: LogsViewProps) {
                                         </div>
                                     </td>
                                     <td className={`px-4 py-3 text-sm ${textSecondary}`}>
-                                        {formatDate(log.start_time)}
+                                        {formatDate(log.created_at)}
                                     </td>
                                     <td className={`px-4 py-3 text-sm ${textSecondary}`}>
-                                        {log.end_time ? formatDate(log.end_time) : '-'}
+                                        {formatTime(log.start_time)}
                                     </td>
-                                    <td className={`px-4 py-3 text-sm font-semibold ${textPrimary}`}>
-                                        {log.total_found || 0}
+                                    <td className={`px-4 py-3 text-sm ${textSecondary}`}>
+                                        {log.end_time ? formatTime(log.end_time) : '-'}
                                     </td>
-                                    <td className={`px-4 py-3 text-sm font-medium text-emerald-500`}>
-                                        {log.amount_total !== null ? `$${(log.amount_total / 100).toFixed(2)}` : '-'}
+                                    <td className={`px-4 py-3 text-sm font-semibold text-right ${textPrimary}`}>
+                                        {log.property_count || log.total_found || 0}
+                                    </td>
+                                    <td className={`px-4 py-3 text-sm font-medium text-right text-emerald-500`}>
+                                        ${log.amount_total?.toFixed(2) || '0.00'}
                                     </td>
                                     <td className="px-4 py-3">
                                         {log.error_message ? (

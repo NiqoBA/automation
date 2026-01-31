@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import { useTheme } from '@/contexts/ThemeContext'
 import OverviewView from './views/OverviewView'
 import PropertiesView from './views/PropertiesView'
+import InmobiliariasView from './views/InmobiliariasView'
 import LogsView from './views/LogsView'
 import TicketsView from './views/TicketsView'
 import UpdatesView from './views/UpdatesView'
@@ -15,7 +16,7 @@ interface ProjectFocusedViewProps {
     userRole: string
 }
 
-type TabType = 'overview' | 'properties' | 'logs' | 'tickets' | 'updates' | 'members'
+type TabType = 'overview' | 'properties' | 'inmobiliarias' | 'logs' | 'tickets' | 'updates' | 'members'
 
 export default function ProjectFocusedView({ projectId, projectData, userRole }: ProjectFocusedViewProps) {
     const searchParams = useSearchParams()
@@ -29,12 +30,19 @@ export default function ProjectFocusedView({ projectId, projectData, userRole }:
                 <OverviewView
                     projectId={projectId}
                     stats={projectData.stats}
+                    topAgencies={projectData.topAgencies}
                     project={projectData.project}
                     userRole={userRole}
                 />
             )}
             {activeTab === 'properties' && (
                 <PropertiesView projectId={projectId} />
+            )}
+            {activeTab === 'inmobiliarias' && (
+                <InmobiliariasView
+                    projectId={projectId}
+                    allAgencies={projectData.allAgencies ?? []}
+                />
             )}
             {activeTab === 'logs' && (
                 <LogsView projectId={projectId} />

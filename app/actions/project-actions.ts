@@ -62,12 +62,52 @@ export async function getProjectDashboard(projectId: string) {
     const supabase = createClient()
 
     // Obtener estadísticas
-    const [propertiesCount, logsCount, ticketsCount, updatesCount] = await Promise.all([
+    const [propertiesCount, logsCount, ticketsCount, updatesCount, agenciesData] = await Promise.all([
         supabase.from('scraper_properties').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
         supabase.from('scraper_logs').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
         supabase.from('tickets').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
         supabase.from('project_updates').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
+        supabase.from('scraper_properties').select('agency, phone').eq('project_id', projectId),
     ])
+
+    const normAccent = (s: string) =>
+        (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()
+
+    const agencyData = new Map<string, { name: string; count: number; phoneCounts: Map<string, number> }>()
+    ;(agenciesData.data || [])
+        .filter((p) => p.agency?.trim())
+        .forEach((p) => {
+            const raw = p.agency!.trim()
+            const key = normAccent(raw)
+            const phone = p.phone?.trim() || ''
+            const existing = agencyData.get(key)
+            if (existing) {
+                existing.count++
+                if (phone) {
+                    const c = existing.phoneCounts.get(phone) || 0
+                    existing.phoneCounts.set(phone, c + 1)
+                }
+            } else {
+                const phoneCounts = new Map<string, number>()
+                if (phone) phoneCounts.set(phone, 1)
+                agencyData.set(key, { name: raw, count: 1, phoneCounts })
+            }
+        })
+
+    const allAgencies = Array.from(agencyData.values())
+        .map((a) => {
+            let topPhone = ''
+            let maxCount = 0
+            a.phoneCounts.forEach((c, p) => {
+                if (c > maxCount) {
+                    maxCount = c
+                    topPhone = p
+                }
+            })
+            return { name: a.name, count: a.count, phone: topPhone }
+        })
+        .sort((a, b) => b.count - a.count)
+    const topAgencies = allAgencies.slice(0, 5)
 
     return {
         success: true,
@@ -78,7 +118,10 @@ export async function getProjectDashboard(projectId: string) {
                 logs: logsCount.count || 0,
                 tickets: ticketsCount.count || 0,
                 updates: updatesCount.count || 0,
+                agencies: agencyData.size,
             },
+            topAgencies,
+            allAgencies,
             userRole: access.profile.role,
         }
     }
@@ -96,6 +139,13 @@ export async function getProjectProperties(
         minPrice?: number
         maxPrice?: number
         portal?: string
+        agency?: string
+        orderBy?: string
+        orderDir?: 'asc' | 'desc'
+        onlyDuplicates?: boolean
+        onlyFavorites?: boolean
+        startDate?: string
+        endDate?: string
     } = {}
 ) {
     const access = await verifyProjectAccess(projectId)
@@ -104,7 +154,21 @@ export async function getProjectProperties(
     }
 
     const supabase = createClient()
-    const { page = 1, perPage = 20, neighborhood, minPrice, maxPrice, portal } = options
+    const {
+        page = 1,
+        perPage = 20,
+        neighborhood,
+        minPrice,
+        maxPrice,
+        portal,
+        agency,
+        orderBy = 'created_at',
+        orderDir = 'desc',
+        onlyDuplicates = false,
+        onlyFavorites = false,
+        startDate,
+        endDate
+    } = options
     const from = (page - 1) * perPage
     const to = from + perPage - 1
 
@@ -112,7 +176,14 @@ export async function getProjectProperties(
         .from('scraper_properties')
         .select('*', { count: 'exact' })
         .eq('project_id', projectId)
-        .order('created_at', { ascending: false })
+
+    // Handle ordering
+    if (orderBy === 'm2') {
+        const orderPart = `CAST(NULLIF(regexp_replace(m2, '[^0-9.]', '', 'g'), '') AS NUMERIC)`
+        query = query.order(orderPart, { ascending: orderDir === 'asc', nullsFirst: false })
+    } else {
+        query = query.order(orderBy, { ascending: orderDir === 'asc' })
+    }
 
     if (neighborhood) {
         query = query.ilike('neighborhood', `%${neighborhood}%`)
@@ -126,24 +197,301 @@ export async function getProjectProperties(
     if (portal) {
         query = query.eq('portal', portal)
     }
+    if (agency && agency.trim()) {
+        query = query.ilike('agency', `%${agency.trim()}%`)
+    }
+    // onlyDuplicates filter is applied in JS after grouping (cross-portal duplicates only)
+    if (startDate) {
+        query = query.gte('created_at', startDate)
+    }
+    if (endDate) {
+        // Add 23:59:59 to endDate if it's just a date string
+        const endStr = endDate.includes('T') ? endDate : `${endDate}T23:59:59`
+        query = query.lte('created_at', endStr)
+    }
+    if (onlyFavorites) {
+        query = query.eq('favourite', true)
+    }
 
-    const { data, count, error } = await query.range(from, to)
+    const { data: rawData, count: totalRawCount, error } = await query
 
     if (error) {
         console.error('Error fetching properties:', error)
         return { error: 'Error al obtener propiedades' }
     }
 
+    // JS Consolidation Logic
+    // Duplicados: misma inmobiliaria + mismo precio + ubicación similar (LIKE, no exacta). El título NO influye.
+    // Al mergear ML + otro portal: priorizar datos del otro portal.
+    const ML = 'Mercado Libre'
+    const isML = (portal: string) => (portal || '').toLowerCase().includes('mercado') && (portal || '').toLowerCase().includes('libre')
+
+    const norm = (s: string) => (s || '').toLowerCase().trim()
+    const normAccent = (s: string) =>
+        (s || '')
+            .normalize('NFD')
+            .replace(/\p{Diacritic}/gu, '')
+            .toLowerCase()
+            .trim()
+    const neighborhoodsMatch = (a: string, b: string) => {
+        const na = norm(a)
+        const nb = norm(b)
+        if (!na || !nb) return na === nb
+        return na.includes(nb) || nb.includes(na)
+    }
+    const agenciesMatch = (a: string, b: string) => normAccent(a) === normAccent(b)
+    const priceMatch = (a: unknown, b: unknown) => Number(a) === Number(b) && Number(a) > 0
+
+    const agencyPhoneCounts = new Map<string, Map<string, number>>()
+    rawData?.forEach((p) => {
+        const key = normAccent(p.agency || '')
+        const phone = p.phone?.trim()
+        if (!key || !phone) return
+        if (!agencyPhoneCounts.has(key)) agencyPhoneCounts.set(key, new Map())
+        const m = agencyPhoneCounts.get(key)!
+        m.set(phone, (m.get(phone) || 0) + 1)
+    })
+    const agencyPhoneMap = new Map<string, string>()
+    agencyPhoneCounts.forEach((counts, key) => {
+        let top = ''
+        let max = 0
+        counts.forEach((c, ph) => { if (c > max) { max = c; top = ph } })
+        if (top) agencyPhoneMap.set(key, top)
+    })
+
+    const groups: any[] = []
+    rawData?.forEach((p) => {
+        const match = groups.find(
+            (g) =>
+                agenciesMatch(g.agency, p.agency) &&
+                priceMatch(g.price, p.price) &&
+                neighborhoodsMatch(g.neighborhood, p.neighborhood)
+        )
+        if (match) {
+            match.portal_count++
+            if (!match.portals.some((x: string) => norm(x) === norm(p.portal))) {
+                match.portals.push(p.portal)
+                match.all_links.push({ portal: p.portal, link: p.link })
+            }
+            // Priorizar datos de portales NO-ML sobre Mercado Libre
+            const pIsML = isML(p.portal)
+            const setIf = (dst: any, key: string, val: any) => {
+                const v = val != null ? String(val).trim() : ''
+                if (!v) return
+                if (pIsML) {
+                    if (!dst[key] || !String(dst[key]).trim()) dst[key] = val
+                } else {
+                    dst[key] = val
+                }
+            }
+            setIf(match, 'title', p.title)
+            setIf(match, 'neighborhood', p.neighborhood)
+            setIf(match, 'phone', p.phone)
+            setIf(match, 'img_url', p.img_url)
+            setIf(match, 'm2', p.m2)
+            if ((p as any).description) setIf(match, 'description', (p as any).description)
+            if (new Date(p.created_at) < new Date(match.created_at)) match.created_at = p.created_at
+            match.favourite = match.favourite || !!p.favourite
+        } else {
+            groups.push({
+                ...p,
+                portals: [p.portal],
+                all_links: [{ portal: p.portal, link: p.link }],
+                portal_count: 1
+            })
+        }
+    })
+
+    // "Duplicado" label + agency_phone + is_favorite (desde columna favourite)
+    let filteredGrouped = groups.map((p) => ({
+        ...p,
+        is_cross_portal_duplicate: (p.portals?.length ?? 0) > 1,
+        agency_phone: agencyPhoneMap.get(normAccent(p.agency || '')) || '',
+        is_favorite: !!p.favourite
+    }))
+
+    if (onlyDuplicates) {
+        filteredGrouped = filteredGrouped.filter(p => p.is_cross_portal_duplicate)
+    }
+    if (onlyFavorites) {
+        filteredGrouped = filteredGrouped.filter(p => p.is_favorite)
+    }
+
+    // Explicit sorting of grouped results since grouping can mess up DB order
+    filteredGrouped.sort((a, b) => {
+        let valA, valB
+        if (orderBy === 'price') {
+            valA = a.price || 0
+            valB = b.price || 0
+        } else if (orderBy === 'm2') {
+            valA = parseFloat(String(a.m2).replace(/[^0-9.]/g, '')) || 0
+            valB = parseFloat(String(b.m2).replace(/[^0-9.]/g, '')) || 0
+        } else {
+            valA = new Date(a.created_at).getTime()
+            valB = new Date(b.created_at).getTime()
+        }
+
+        if (orderDir === 'asc') return valA > valB ? 1 : -1
+        return valA < valB ? 1 : -1
+    })
+
+    // Manual Pagination on synthesized data
+    const totalGrouped = filteredGrouped.length
+    const paginated = filteredGrouped.slice(from, to + 1)
+
     return {
         success: true,
         data: {
-            properties: data || [],
-            total: count || 0,
+            properties: paginated,
+            total: totalGrouped,
             page,
             perPage,
-            totalPages: Math.ceil((count || 0) / perPage),
+            totalPages: Math.ceil(totalGrouped / perPage),
         }
     }
+}
+
+/**
+ * Marcar o desmarcar propiedad como favorita
+ */
+export async function togglePropertyFavorite(projectId: string, propertyId: string) {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) {
+        return { error: 'No tienes acceso a este proyecto' }
+    }
+
+    const supabase = createAdminClient()
+
+    const { data: prop } = await supabase
+        .from('scraper_properties')
+        .select('id, favourite')
+        .eq('id', propertyId)
+        .eq('project_id', projectId)
+        .single()
+
+    if (!prop) {
+        return { error: 'Propiedad no encontrada' }
+    }
+
+    const newFavourite = !prop.favourite
+    const { error } = await supabase
+        .from('scraper_properties')
+        .update({ favourite: newFavourite })
+        .eq('id', propertyId)
+        .eq('project_id', projectId)
+
+    if (error) return { error: error.message }
+    revalidatePath(`/dashboard/projects/${projectId}`)
+    return { success: true, is_favorite: newFavourite }
+}
+
+/**
+ * Consolidar duplicados en la base de datos: mismas propiedades (title, neighborhood, price, portal) se fusionan en una sola fila con la fecha más antigua.
+ * Solo consolida duplicados del MISMO portal. Los duplicados entre distintos portales se mantienen como filas separadas.
+ *
+ * Ejecución síncrona (legado) - para proyectos pequeños. Para proyectos grandes, usar enqueueConsolidateDuplicates.
+ */
+export async function consolidateDuplicateProperties(projectId: string) {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) {
+        return { error: 'No tienes acceso a este proyecto' }
+    }
+
+    const adminSupabase = createAdminClient()
+    const { runConsolidateDuplicateProperties } = await import('@/lib/jobs/tasks/consolidate-duplicates')
+    const res = await runConsolidateDuplicateProperties(adminSupabase, projectId)
+
+    if (!res.success) return { error: res.error }
+
+    revalidatePath(`/dashboard/projects/${projectId}`)
+    revalidatePath(`/dashboard/projects/${projectId}/properties`)
+    return { success: true, deletedCount: res.deletedCount }
+}
+
+/**
+ * Encola consolidación de duplicados para ejecución asíncrona por worker.
+ * Retorna jobId para que la UI haga poll del estado.
+ * Ver docs/arquitectura-inflexo.md
+ */
+export async function enqueueConsolidateDuplicates(projectId: string) {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) {
+        return { error: 'No tienes acceso a este proyecto' }
+    }
+
+    const { enqueueConsolidateDuplicates: enqueue } = await import('@/lib/jobs/queue')
+    return enqueue(projectId)
+}
+
+/**
+ * Obtiene el estado de un job de consolidación.
+ */
+export async function getConsolidationJobStatus(projectId: string, jobId: string) {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) {
+        return { error: 'No tienes acceso a este proyecto' }
+    }
+
+    const { getJobStatus } = await import('@/lib/jobs/queue')
+    return getJobStatus(jobId, projectId)
+}
+
+/**
+ * Consolidar inmobiliarias: todas las propiedades de una pasan a nombre de la otra
+ */
+export async function consolidateAgencies(
+    projectId: string,
+    fromAgency: string,
+    toAgency: string
+) {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) {
+        return { error: 'No tienes acceso a este proyecto' }
+    }
+    if (!fromAgency?.trim() || !toAgency?.trim()) {
+        return { error: 'Debes indicar ambas inmobiliarias' }
+    }
+
+    const normAccent = (s: string) =>
+        (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()
+    const fromKey = normAccent(fromAgency)
+    const toKey = normAccent(toAgency)
+    if (fromKey === toKey) {
+        return { error: 'Las inmobiliarias son la misma' }
+    }
+
+    const adminSupabase = createAdminClient()
+    const { data: properties, error: fetchError } = await adminSupabase
+        .from('scraper_properties')
+        .select('id, agency')
+        .eq('project_id', projectId)
+
+    if (fetchError) {
+        console.error('Error fetching properties:', fetchError)
+        return { error: 'Error al obtener propiedades' }
+    }
+
+    const idsToUpdate = (properties || [])
+        .filter((p) => normAccent(p.agency || '') === fromKey)
+        .map((p) => p.id)
+
+    if (idsToUpdate.length === 0) {
+        return { error: 'No se encontraron propiedades de esa inmobiliaria' }
+    }
+
+    const { error: updateError } = await adminSupabase
+        .from('scraper_properties')
+        .update({ agency: toAgency.trim() })
+        .in('id', idsToUpdate)
+
+    if (updateError) {
+        console.error('Error updating agencies:', updateError)
+        return { error: `Error al actualizar: ${updateError.message}` }
+    }
+
+    revalidatePath(`/dashboard/projects/${projectId}`)
+    revalidatePath(`/dashboard/projects/${projectId}/properties`)
+    return { success: true, updatedCount: idsToUpdate.length }
 }
 
 /**
