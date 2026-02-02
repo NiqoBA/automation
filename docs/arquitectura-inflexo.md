@@ -88,7 +88,7 @@
 | **Job Queue** | Tabla `jobs` en Supabase | Migración `019_job_queue.sql` |
 | **Estados de jobs** | `pending`, `running`, `completed`, `failed` | Definido en schema |
 | **Reintentos** | `attempts`, `max_attempts` | Soporte en schema |
-| **Worker script** | `scripts/run-jobs.js` o similar | Script independiente |
+| **Worker script** | `scripts/run-jobs.ts` | Modo `--once` para event-driven |
 | **n8n** | Orquestación scraper → DB | Ya en producción |
 
 ---
@@ -108,20 +108,21 @@
    └─> Usuario ve propiedades actualizadas
 ```
 
-### Ejemplo: Consolidar duplicados (nuevo flujo desacoplado)
+### Ejemplo: Consolidar duplicados (flujo event-driven)
 
 ```
 1. Usuario hace clic en "Consolidar duplicados en DB"
 2. Core App llama a enqueueConsolidateDuplicates(projectId)
    └─> Inserta job en tabla `jobs`, retorna job_id
+   └─> Dispara repository_dispatch (job-enqueued) a GitHub API
 3. UI muestra "Consolidación en curso..." y hace poll de estado
-4. Worker (script o cron) procesa jobs pendientes
-   └─> Ejecuta lógica existente de consolidateDuplicateProperties
-   └─> Actualiza job a completed/failed
+4. GitHub Actions recibe el evento y ejecuta npm run jobs:worker:once
+   └─> Procesa TODOS los jobs pendientes secuencialmente
+   └─> Actualiza cada job a completed/failed
 5. UI detecta completed y refresca datos
 ```
 
-**Flujo legado (compatibilidad):** Si no se usa Job Queue, se puede seguir llamando `consolidateDuplicateProperties` directamente (comportamiento actual). El wrapper permite opt-in al modelo desacoplado.
+**Flujo legado (compatibilidad):** Si el dispatch falla o no está configurado, el fallback síncrono sigue disponible tras ~2 min de polling.
 
 ---
 
@@ -157,7 +158,7 @@
 - [ ] Si es pesada: crear **Job** en tabla `jobs` con `type` único.
 - [ ] Implementar **Worker** que consuma jobs de ese tipo (script, Edge Function, o servicio externo).
 - [ ] En la Core App: solo **enqueue** el job y mostrar estado (poll o WebSocket si se implementa).
-- [ ] Documentar trigger (cron, webhook, manual).
+- [ ] Documentar trigger (repository_dispatch, manual, cron backup).
 - [ ] Configurar reintentos y manejo de errores en el worker.
 - [ ] Agregar logging en `scraper_logs` o tabla equivalente si aplica.
 
@@ -233,45 +234,130 @@
 | `lib/jobs/queue.ts` | Enqueue y consulta de estado |
 | `lib/jobs/tasks/consolidate-duplicates.ts` | Lógica de consolidación (reutilizable) |
 | `lib/jobs/worker-utils.ts` | Utilidades del worker (NO usar en Core App) |
-| `scripts/run-jobs.ts` | Worker de jobs (ejecutar con `npm run jobs:worker`) |
+| `scripts/run-jobs.ts` | Worker de jobs (`npm run jobs:worker:once` en GitHub Actions) |
+| `lib/jobs/dispatch.ts` | Dispara repository_dispatch al encolar (best-effort) |
 | `supabase/migrations/019_job_queue.sql` | Schema de jobs |
 
 ---
 
-## 9. Configuración del Worker de Jobs
+## 9. Modelo Event-Driven con GitHub Actions
 
-Para que la consolidación asíncrona funcione, el worker debe ejecutarse periódicamente.
+### Diagrama del flujo
 
-### GitHub Actions (producción)
+```
+Usuario → clic "Consolidar"
+    │
+    ▼
+enqueueConsolidateDuplicates(projectId)
+    │
+    ├─> INSERT en tabla jobs
+    │
+    └─> POST repository_dispatch (job-enqueued)  [best-effort, no bloquea]
+            │
+            ▼
+    GitHub Actions recibe evento
+            │
+            ▼
+    npm run jobs:worker:once
+            │
+            ▼
+    Procesa todos los jobs pendientes → jobs completados
+```
 
-El workflow `.github/workflows/jobs-worker.yml` se ejecuta cada 5 minutos.
+### Ventajas
 
-**Secretos requeridos** (Configurar en GitHub → Settings → Secrets and variables → Actions):
+- **0 costo** — Dentro del free tier de GitHub Actions
+- **Latencia baja** — El workflow corre en segundos tras el enqueue
+- **Escalable** para pocos clientes
+- **Sin VPS** — No requiere servidor ni worker en loop
+
+### Limitaciones (honestas)
+
+- No apto para alta concurrencia (cientos de jobs/minuto)
+- Dependencia de GitHub Actions
+- El cron diario de backup puede no alcanzar si el dispatch falla y hay jobs críticos
+
+---
+
+## 10. Configuración del Worker de Jobs
+
+El modelo principal es **event-driven**: cada enqueue dispara el workflow. No se usa cron frecuente.
+
+### Secretos en GitHub (Settings → Secrets and variables → Actions)
 
 | Secreto | Descripción |
 |---------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role key (bypass RLS) |
 
-### Opción B: Cron local/servidor
+### Variables en el backend (Vercel / .env.local)
 
-```bash
-# Cada 5 minutos
-*/5 * * * * cd /ruta/al/proyecto && npm run jobs:worker
-```
+| Variable | Descripción |
+|----------|-------------|
+| `GH_DISPATCH_TOKEN` | GitHub Personal Access Token (permiso `repo`) |
+| `GITHUB_REPO` | Repositorio en formato `owner/repo` (ej: `tu-org/landing`) |
 
-### Opción C: Manual (desarrollo)
+### Modos del worker
 
-```bash
-npm run jobs:worker
-```
+| Comando | Comportamiento |
+|---------|----------------|
+| `npm run jobs:worker` | Procesa 1 job y termina (legado) |
+| `npm run jobs:worker:once` | Procesa TODOS los jobs pendientes y termina (principal) |
 
-Ejecutar en una terminal separada o cuando se necesite procesar la cola.
+### Cron de backup (opcional)
 
-### Variables de entorno requeridas
+El workflow incluye un cron diario (12:00 UTC) como respaldo. Si el dispatch falla, los jobs pendientes se procesarán en la próxima ejecución del cron.
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
+---
+
+## 11. Escalado futuro
+
+| Fase | Modelo | Cuándo |
+|------|--------|--------|
+| **Actual** | GitHub Actions event-driven | Pocos clientes, pocos jobs |
+| **Intermedia** | Múltiples workflows concurrentes | Más jobs, mismo código |
+| **Avanzada** | Worker en loop / VPS / containers | Alta concurrencia |
+| **Premium** | Workers aislados por cliente | Clientes con SLA estricto |
+
+No se requiere modificar código para pasar de fase 1 a 2: el mismo `repository_dispatch` puede disparar workflows paralelos si GitHub lo permite.
+
+---
+
+## 12. Próximos pasos (Checklist)
+
+Manual operativo para poner en marcha el modelo event-driven:
+
+- [ ] **Crear GitHub Personal Access Token**
+  - GitHub → Settings → Developer settings → Personal access tokens
+  - Permisos mínimos: `repo` (o solo el scope necesario para `repository_dispatch`)
+  - Copiar el token
+
+- [ ] **Guardar secretos en GitHub**
+  - Repo → Settings → Secrets and variables → Actions
+  - Crear `GH_DISPATCH_TOKEN` con el PAT
+  - Verificar que existan `NEXT_PUBLIC_SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`
+
+- [ ] **Configurar variables en el backend**
+  - En Vercel (o donde hostees): Variables de entorno
+  - `GH_DISPATCH_TOKEN` = (el PAT)
+  - `GITHUB_REPO` = `owner/repo` (ej: `nicov/landing`)
+
+- [ ] **Verificar workflow**
+  - El archivo `.github/workflows/jobs-worker.yml` debe existir
+  - Debe escuchar `repository_dispatch` con tipo `job-enqueued`
+
+- [ ] **Probar el flujo**
+  1. Hacer clic en "Consolidar duplicados en DB"
+  2. En GitHub Actions, verificar que se disparó un run
+  3. Verificar que el job pasó a `completed`
+
+- [ ] **Monitorear consumo**
+  - GitHub → Insights → Actions
+  - Verificar que no se supere el límite mensual (~2000 min free tier)
+
+- [ ] **(Opcional) Cron diario de respaldo**
+  - Ya está en el workflow (`0 12 * * *`)
+  - Puede ajustarse o desactivarse según necesidad
 
 ---
 

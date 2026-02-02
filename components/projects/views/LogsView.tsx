@@ -91,7 +91,6 @@ export default function LogsView({ projectId }: LogsViewProps) {
                                 <th className={`text-left px-4 py-3 text-sm font-medium ${textSecondary}`}>Inicio</th>
                                 <th className={`text-left px-4 py-3 text-sm font-medium ${textSecondary}`}>Fin</th>
                                 <th className={`text-right px-4 py-3 text-sm font-medium ${textSecondary}`}>Propiedades</th>
-                                <th className={`text-right px-4 py-3 text-sm font-medium ${textSecondary}`}>Costo</th>
                                 <th className={`text-left px-4 py-3 text-sm font-medium ${textSecondary}`}>Error</th>
                             </tr>
                         </thead>
@@ -115,9 +114,6 @@ export default function LogsView({ projectId }: LogsViewProps) {
                                     </td>
                                     <td className={`px-4 py-3 text-sm font-semibold text-right ${textPrimary}`}>
                                         {log.property_count || log.total_found || 0}
-                                    </td>
-                                    <td className={`px-4 py-3 text-sm font-medium text-right text-emerald-500`}>
-                                        ${log.amount_total?.toFixed(2) || '0.00'}
                                     </td>
                                     <td className="px-4 py-3">
                                         {log.error_message ? (

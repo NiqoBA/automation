@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "jobs:worker": "tsx scripts/run-jobs.ts"
+    "jobs:worker": "tsx scripts/run-jobs.ts",
+    "jobs:worker:once": "tsx scripts/run-jobs.ts --once"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

@@ -1,10 +1,12 @@
 /**
  * Job Queue - Enqueue y consulta de estado.
  * El procesamiento se hace en workers externos (scripts/run-jobs).
+ * Al encolar se dispara GitHub Actions vía repository_dispatch (event-driven).
  * Ver docs/arquitectura-inflexo.md
  */
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { triggerJobWorkerDispatch } from './dispatch'
 
 export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
 export type JobType = 'consolidate_duplicates'
@@ -57,6 +59,8 @@ export async function enqueueConsolidateDuplicates(
     console.error('Error enqueueing job:', error)
     return { success: false, error: error.message }
   }
+
+  triggerJobWorkerDispatch()
 
   return { success: true, jobId: data.id }
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getProjectProperties, enqueueConsolidateDuplicates, getConsolidationJobStatus, consolidateDuplicateProperties, togglePropertyFavorite } from '@/app/actions/project-actions'
+import { getProjectProperties, consolidateDuplicateProperties, togglePropertyFavorite } from '@/app/actions/project-actions'
 import { useTheme } from '@/contexts/ThemeContext'
 import { ExternalLink, ChevronLeft, ChevronRight, Search, Loader2, Phone, MessageCircle, ChevronUp, ChevronDown, ArrowUpDown, Calendar, Star } from 'lucide-react'
 
@@ -27,8 +27,7 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
     const [startDate, setStartDate] = useState('')
     const [endDate, setEndDate] = useState('')
     const [consolidating, setConsolidating] = useState(false)
-    const [consolidateStatus, setConsolidateStatus] = useState<'idle' | 'queued' | 'running' | 'completed' | 'failed'>('idle')
-    const [pendingFavoriteToggle, setPendingFavoriteToggle] = useState<Set<string>>(new Set())
+    const [optimisticFavorites, setOptimisticFavorites] = useState<Record<string, boolean>>({})
 
     const loadData = async () => {
         setLoading(true)
@@ -47,6 +46,7 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
         })
         setData(result.data)
         setLoading(false)
+        setOptimisticFavorites({})
     }
 
     useEffect(() => {
@@ -228,78 +228,21 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
                         <button
                             onClick={async () => {
                                 setConsolidating(true)
-                                setConsolidateStatus('idle')
-                                const result = await enqueueConsolidateDuplicates(projectId)
-                                if (result && 'error' in result) {
-                                    setConsolidating(false)
+                                const result = await consolidateDuplicateProperties(projectId)
+                                setConsolidating(false)
+                                if (result?.error) {
                                     alert(result.error)
-                                    return
+                                } else if (result?.deletedCount !== undefined && result.deletedCount > 0) {
+                                    loadData()
+                                    alert(`Se consolidaron ${result.deletedCount} registros duplicados.`)
                                 }
-                                if (!result || !('jobId' in result) || !result.jobId) {
-                                    setConsolidating(false)
-                                    return
-                                }
-                                setConsolidateStatus('queued')
-                                const jobId = result.jobId
-                                const maxAttempts = 60
-                                let attempts = 0
-                                const poll = async () => {
-                                    attempts++
-                                    const statusRes = await getConsolidationJobStatus(projectId, jobId)
-                                    const hasJob = statusRes && 'success' in statusRes && statusRes.success && 'job' in statusRes && statusRes.job
-                                    if (!hasJob) {
-                                        if (attempts >= maxAttempts) {
-                                            setConsolidating(false)
-                                            setConsolidateStatus('idle')
-                                            return
-                                        }
-                                        setTimeout(poll, 2000)
-                                        return
-                                    }
-                                    const { status } = statusRes.job
-                                    setConsolidateStatus(status === 'running' ? 'running' : status === 'completed' ? 'completed' : status === 'failed' ? 'failed' : 'queued')
-                                    if (status === 'completed') {
-                                        const deleted = (statusRes.job.result as { deletedCount?: number })?.deletedCount ?? 0
-                                        loadData()
-                                        setConsolidating(false)
-                                        setConsolidateStatus('idle')
-                                        if (deleted > 0) alert(`Se consolidaron ${deleted} registros duplicados.`)
-                                    } else if (status === 'failed') {
-                                        alert(statusRes.job.error_message || 'Error al consolidar')
-                                        setConsolidating(false)
-                                        setConsolidateStatus('idle')
-                                    } else if (attempts >= maxAttempts) {
-                                        const useSync = window.confirm(
-                                            'El worker de jobs no está activo. ¿Ejecutar consolidación de forma directa? (Puede tardar unos segundos)'
-                                        )
-                                        setConsolidating(false)
-                                        setConsolidateStatus('idle')
-                                        if (useSync) {
-                                            setConsolidating(true)
-                                            const syncRes = await consolidateDuplicateProperties(projectId)
-                                            setConsolidating(false)
-                                            if (syncRes?.error) alert(syncRes.error)
-                                            else if (syncRes?.deletedCount !== undefined && syncRes.deletedCount > 0) {
-                                                loadData()
-                                                alert(`Se consolidaron ${syncRes.deletedCount} registros duplicados.`)
-                                            }
-                                        } else {
-                                            alert('La consolidación está en cola. Ejecute "npm run jobs:worker" o configure un cron para procesar jobs.')
-                                        }
-                                    } else {
-                                        setTimeout(poll, 2000)
-                                    }
-                                }
-                                poll()
                             }}
                             disabled={consolidating}
                             className={`ml-auto px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
                                 ${consolidating ? 'opacity-50 cursor-not-allowed' : ''}
                                 ${isLight ? 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300' : 'bg-zinc-700 text-zinc-200 hover:bg-zinc-600'}`}
                         >
-                            {consolidating
-                                ? (consolidateStatus === 'queued' ? 'Encolado...' : consolidateStatus === 'running' ? 'Consolidando...' : 'Procesando...')
-                                : 'Consolidar duplicados en DB'}
+                            {consolidating ? 'Consolidando...' : 'Consolidar duplicados en DB'}
                         </button>
                     </div>
                 </div>
@@ -377,21 +320,26 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
                                                     </td>
                                                     <td className="px-2 py-3 w-10">
                                                         {(() => {
-                                                            const isPending = pendingFavoriteToggle.has(property.id)
-                                                            const isFav = isPending ? !property.is_favorite : property.is_favorite
+                                                            const isFav = property.id in optimisticFavorites
+                                                                ? optimisticFavorites[property.id]
+                                                                : property.is_favorite
                                                             return (
                                                                 <button
                                                                     type="button"
-                                                                    onClick={async (e) => {
+                                                                    onClick={(e) => {
                                                                         e.stopPropagation()
-                                                                        setPendingFavoriteToggle(prev => new Set(prev).add(property.id))
-                                                                        const res = await togglePropertyFavorite(projectId, property.id)
-                                                                        setPendingFavoriteToggle(prev => {
-                                                                            const next = new Set(prev)
-                                                                            next.delete(property.id)
-                                                                            return next
+                                                                        const nextFav = !isFav
+                                                                        setOptimisticFavorites(prev => ({ ...prev, [property.id]: nextFav }))
+                                                                        togglePropertyFavorite(projectId, property.id).then((res) => {
+                                                                            if (res?.error) {
+                                                                                setOptimisticFavorites(prev => {
+                                                                                    const next = { ...prev }
+                                                                                    delete next[property.id]
+                                                                                    return next
+                                                                                })
+                                                                                alert(res.error)
+                                                                            }
                                                                         })
-                                                                        if (!res?.error) loadData()
                                                                     }}
                                                                     className="p-1 rounded hover:bg-zinc-800/30 transition-colors"
                                                                     title={isFav ? 'Quitar de favoritos' : 'Marcar como favorita'}

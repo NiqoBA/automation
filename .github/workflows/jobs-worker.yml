@@ -1,13 +1,15 @@
-# Worker de Jobs - Procesa cola de tareas pesadas (consolidación, etc.)
+# Worker de Jobs - Event-driven (repository_dispatch)
 # Ver docs/arquitectura-inflexo.md
 
 name: Jobs Worker
 
 on:
-  schedule:
-    # Cada 5 minutos
-    - cron: '*/5 * * * *'
+  repository_dispatch:
+    types: [job-enqueued]
   workflow_dispatch:
+  # Backup: 1 vez al día por si falla el dispatch (opcional)
+  schedule:
+    - cron: '0 12 * * *'
 
 jobs:
   process-jobs:
@@ -26,8 +28,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Jobs Worker
-        run: npm run jobs:worker
+      - name: Run Jobs Worker (--once)
+        run: npm run jobs:worker:once
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
