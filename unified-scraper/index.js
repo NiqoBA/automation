@@ -33,7 +33,7 @@ async function scrapeInfoCasas(browser) {
 
     try {
         while (hasNextPage) {
-            const url = currentPage === 1 ? baseUrl : `${baseUrl}/pagina/${currentPage}`;
+            const url = currentPage === 1 ? baseUrl : `${baseUrl}/pagina${currentPage}`;
             console.log(`[InfoCasas] Navegando a página ${currentPage}...`);
 
             await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
@@ -67,8 +67,7 @@ async function scrapeInfoCasas(browser) {
             } else {
                 let newItemsFound = 0;
                 pageListings.forEach(item => {
-                    if (item.price?.amount < MIN_PRICE_FOR_DETAIL && item.price?.currency?.name === 'U$S') return;
-
+                    // No price filter for InfoCasas — data comes from JSON, no extra fetch cost
                     const link = `https://www.infocasas.com.uy${item.link}`;
                     if (!allListings.some(x => x.id === item.id || x.link === link)) {
                         // Construir URL de imagen si existe

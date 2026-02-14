@@ -67,7 +67,7 @@ export async function getProjectDashboard(projectId: string) {
         supabase.from('scraper_logs').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
         supabase.from('tickets').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
         supabase.from('project_updates').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
-        supabase.from('scraper_properties').select('agency, phone').eq('project_id', projectId),
+        supabase.from('scraper_properties').select('agency, phone, portal, price, created_at').eq('project_id', projectId),
     ])
 
     const normAccent = (s: string) =>
@@ -109,6 +109,85 @@ export async function getProjectDashboard(projectId: string) {
         .sort((a, b) => b.count - a.count)
     const topAgencies = allAgencies.slice(0, 5)
 
+    // --- Platform stats ---
+    const allProps = agenciesData.data || []
+    const platformMap = new Map<string, { total: number; agencies: Set<string>; totalPrice: number; priceCount: number }>()
+    allProps.forEach((p: any) => {
+        const portal = p.portal || 'Desconocido'
+        const agencyKey = normAccent(p.agency || '')
+        const price = Number(p.price) || 0
+        const existing = platformMap.get(portal)
+        if (existing) {
+            existing.total++
+            if (agencyKey) existing.agencies.add(agencyKey)
+            if (price > 0) { existing.totalPrice += price; existing.priceCount++ }
+        } else {
+            const agencies = new Set<string>()
+            if (agencyKey) agencies.add(agencyKey)
+            platformMap.set(portal, {
+                total: 1,
+                agencies,
+                totalPrice: price > 0 ? price : 0,
+                priceCount: price > 0 ? 1 : 0
+            })
+        }
+    })
+    const platformStats = Array.from(platformMap.entries())
+        .map(([portal, data]) => ({
+            portal,
+            total: data.total,
+            agencies: data.agencies.size,
+            avgPrice: data.priceCount > 0 ? Math.round(data.totalPrice / data.priceCount) : 0
+        }))
+        .sort((a, b) => b.total - a.total)
+
+    // --- New agencies (first seen in last 3 days) ---
+    const agencyFirstSeenMap = new Map<string, { name: string; portal: string; firstSeen: string; count: number }>()
+    allProps.filter((p: any) => p.agency?.trim()).forEach((p: any) => {
+        const raw = p.agency!.trim()
+        const key = `${normAccent(raw)}::${p.portal || ''}`
+        const existing = agencyFirstSeenMap.get(key)
+        const date = p.created_at
+        if (existing) {
+            existing.count++
+            if (date < existing.firstSeen) existing.firstSeen = date
+        } else {
+            agencyFirstSeenMap.set(key, { name: raw, portal: p.portal || '', firstSeen: date, count: 1 })
+        }
+    })
+    const threeDaysAgo = new Date()
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
+    const newAgencies = Array.from(agencyFirstSeenMap.values())
+        .filter(a => new Date(a.firstSeen) >= threeDaysAgo)
+        .sort((a, b) => new Date(b.firstSeen).getTime() - new Date(a.firstSeen).getTime())
+
+    // --- Monthly stats ---
+    const monthlyMap = new Map<string, Map<string, { total: number; agencies: Set<string> }>>()
+    allProps.forEach((p: any) => {
+        const date = new Date(p.created_at)
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+        const portal = p.portal || 'Desconocido'
+        const agencyKey = normAccent(p.agency || '')
+        if (!monthlyMap.has(monthKey)) monthlyMap.set(monthKey, new Map())
+        const portalMap = monthlyMap.get(monthKey)!
+        const existing = portalMap.get(portal)
+        if (existing) {
+            existing.total++
+            if (agencyKey) existing.agencies.add(agencyKey)
+        } else {
+            const agencies = new Set<string>()
+            if (agencyKey) agencies.add(agencyKey)
+            portalMap.set(portal, { total: 1, agencies })
+        }
+    })
+    const monthlyStats: { month: string; portal: string; total: number; agencies: number }[] = []
+    monthlyMap.forEach((portalMap, month) => {
+        portalMap.forEach((data, portal) => {
+            monthlyStats.push({ month, portal, total: data.total, agencies: data.agencies.size })
+        })
+    })
+    monthlyStats.sort((a, b) => b.month.localeCompare(a.month) || b.total - a.total)
+
     return {
         success: true,
         data: {
@@ -122,6 +201,9 @@ export async function getProjectDashboard(projectId: string) {
             },
             topAgencies,
             allAgencies,
+            platformStats,
+            newAgencies,
+            monthlyStats,
             userRole: access.profile.role,
         }
     }
@@ -495,6 +577,354 @@ export async function consolidateAgencies(
 }
 
 /**
+ * Obtener inmobiliarias enriquecidas con métricas detalladas
+ */
+export async function getEnrichedAgencies(
+    projectId: string,
+    options: { portal?: string; onlyNew?: boolean; newSinceDays?: number } = {}
+) {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) {
+        return { error: 'No tienes acceso a este proyecto' }
+    }
+
+    const supabase = createClient()
+    const { portal, onlyNew = false, newSinceDays = 3 } = options
+
+    let query = supabase
+        .from('scraper_properties')
+        .select('agency, phone, portal, price, neighborhood, created_at')
+        .eq('project_id', projectId)
+
+    if (portal) {
+        query = query.eq('portal', portal)
+    }
+
+    const { data: allProps, error } = await query
+    if (error) {
+        console.error('Error fetching enriched agencies:', error)
+        return { error: 'Error al obtener datos de inmobiliarias' }
+    }
+
+    const normAccent = (s: string) =>
+        (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()
+
+    const agencyMap = new Map<string, {
+        name: string
+        count: number
+        portals: Set<string>
+        neighborhoods: Set<string>
+        prices: number[]
+        totalPrice: number
+        priceCount: number
+        firstSeen: string
+        lastSeen: string
+        phoneCounts: Map<string, number>
+    }>()
+
+    ;(allProps || []).filter(p => p.agency?.trim()).forEach(p => {
+        const raw = p.agency!.trim()
+        const key = normAccent(raw)
+        const phone = p.phone?.trim() || ''
+        const portalName = p.portal || ''
+        const price = Number(p.price) || 0
+        const neighborhood = (p.neighborhood || '').trim()
+        const date = p.created_at
+        const existing = agencyMap.get(key)
+        if (existing) {
+            existing.count++
+            if (portalName) existing.portals.add(portalName)
+            if (neighborhood) existing.neighborhoods.add(normAccent(neighborhood))
+            if (price > 0) { existing.totalPrice += price; existing.priceCount++; existing.prices.push(price) }
+            if (date < existing.firstSeen) existing.firstSeen = date
+            if (date > existing.lastSeen) existing.lastSeen = date
+            if (phone) existing.phoneCounts.set(phone, (existing.phoneCounts.get(phone) || 0) + 1)
+        } else {
+            const portals = new Set<string>()
+            if (portalName) portals.add(portalName)
+            const neighborhoods = new Set<string>()
+            if (neighborhood) neighborhoods.add(normAccent(neighborhood))
+            const phoneCounts = new Map<string, number>()
+            if (phone) phoneCounts.set(phone, 1)
+            agencyMap.set(key, {
+                name: raw,
+                count: 1,
+                portals,
+                neighborhoods,
+                prices: price > 0 ? [price] : [],
+                totalPrice: price > 0 ? price : 0,
+                priceCount: price > 0 ? 1 : 0,
+                firstSeen: date,
+                lastSeen: date,
+                phoneCounts
+            })
+        }
+    })
+
+    const sinceDate = new Date()
+    sinceDate.setDate(sinceDate.getDate() - newSinceDays)
+
+    const agencies = Array.from(agencyMap.values())
+        .map(a => {
+            let topPhone = ''
+            let maxPhoneCount = 0
+            a.phoneCounts.forEach((c, p) => { if (c > maxPhoneCount) { maxPhoneCount = c; topPhone = p } })
+            const isNew = new Date(a.firstSeen) >= sinceDate
+
+            const sortedPrices = [...a.prices].sort((x, y) => x - y)
+            const minPrice = sortedPrices.length > 0 ? sortedPrices[0] : 0
+            const maxPrice = sortedPrices.length > 0 ? sortedPrices[sortedPrices.length - 1] : 0
+
+            // Activity period in weeks (min 1)
+            const firstMs = new Date(a.firstSeen).getTime()
+            const lastMs = new Date(a.lastSeen).getTime()
+            const weeksActive = Math.max(1, (lastMs - firstMs) / (7 * 24 * 60 * 60 * 1000))
+            const publicationsPerWeek = Math.round((a.count / weeksActive) * 10) / 10
+
+            const neighborhoodCount = a.neighborhoods.size
+            const portalCount = a.portals.size
+
+            // Activity score: publications * portal diversity * zone coverage (log-scaled)
+            const activityScore = Math.round(
+                a.count * (1 + Math.log2(portalCount)) * (1 + Math.log2(Math.max(1, neighborhoodCount)))
+            )
+
+            return {
+                name: a.name,
+                count: a.count,
+                phone: topPhone,
+                portals: Array.from(a.portals),
+                avgPrice: a.priceCount > 0 ? Math.round(a.totalPrice / a.priceCount) : 0,
+                minPrice,
+                maxPrice,
+                neighborhoodCount,
+                publicationsPerWeek,
+                activityScore,
+                firstSeen: a.firstSeen,
+                lastSeen: a.lastSeen,
+                isNew
+            }
+        })
+        .filter(a => !onlyNew || a.isNew)
+        .sort((a, b) => b.count - a.count)
+
+    return { success: true, data: agencies }
+}
+
+/**
+ * Detectar propiedades compartidas entre inmobiliarias:
+ * misma zona + mismo precio + distinta agencia.
+ * Guarda resultados en scraper_shared_properties y retorna las detecciones.
+ */
+export async function detectSharedProperties(projectId: string) {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) {
+        return { error: 'No tienes acceso a este proyecto' }
+    }
+
+    const adminSupabase = createAdminClient()
+
+    const { data: props, error } = await adminSupabase
+        .from('scraper_properties')
+        .select('id, agency, price, neighborhood, portal, title, created_at')
+        .eq('project_id', projectId)
+        .gt('price', 0)
+
+    if (error) {
+        console.error('Error fetching properties for shared detection:', error)
+        return { error: 'Error al obtener propiedades' }
+    }
+
+    const normAccent = (s: string) =>
+        (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()
+
+    // Group by (normalized neighborhood, price)
+    const groups = new Map<string, typeof props>()
+    ;(props || []).filter(p => p.agency && normAccent(p.agency) !== 'particular').forEach(p => {
+        const key = `${normAccent(p.neighborhood || '')}::${p.price}`
+        if (!groups.has(key)) groups.set(key, [])
+        groups.get(key)!.push(p)
+    })
+
+    // Find groups with multiple distinct agencies
+    const pairs: { property_id: string; matched_property_id: string; agency_a: string; agency_b: string; price: number; neighborhood: string }[] = []
+    groups.forEach(group => {
+        // Deduplicate by agency
+        const byAgency = new Map<string, (typeof group)[0]>()
+        group.forEach(p => {
+            const key = normAccent(p.agency || '')
+            if (!byAgency.has(key)) byAgency.set(key, p)
+        })
+        const uniqueAgencies = Array.from(byAgency.values())
+        if (uniqueAgencies.length < 2) return
+
+        // Generate pairs
+        for (let i = 0; i < uniqueAgencies.length; i++) {
+            for (let j = i + 1; j < uniqueAgencies.length; j++) {
+                const a = uniqueAgencies[i]
+                const b = uniqueAgencies[j]
+                // Ensure consistent ordering to avoid duplicates
+                const [first, second] = a.id < b.id ? [a, b] : [b, a]
+                pairs.push({
+                    property_id: first.id,
+                    matched_property_id: second.id,
+                    agency_a: first.agency!,
+                    agency_b: second.agency!,
+                    price: first.price,
+                    neighborhood: first.neighborhood || ''
+                })
+            }
+        }
+    })
+
+    // Clear old detections for this project and insert new ones
+    await adminSupabase
+        .from('scraper_shared_properties')
+        .delete()
+        .eq('project_id', projectId)
+
+    if (pairs.length > 0) {
+        const rows = pairs.map(p => ({ project_id: projectId, ...p }))
+        const { error: insertError } = await adminSupabase
+            .from('scraper_shared_properties')
+            .insert(rows)
+        if (insertError) {
+            console.error('Error inserting shared properties:', insertError)
+            return { error: 'Error al guardar detecciones' }
+        }
+    }
+
+    revalidatePath(`/dashboard/projects/${projectId}`)
+    return { success: true, count: pairs.length }
+}
+
+/**
+ * Obtener propiedades compartidas detectadas
+ */
+export async function getSharedProperties(projectId: string) {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) {
+        return { error: 'No tienes acceso a este proyecto' }
+    }
+
+    const supabase = createClient()
+    const { data, error } = await supabase
+        .from('scraper_shared_properties')
+        .select(`
+            id,
+            agency_a,
+            agency_b,
+            price,
+            neighborhood,
+            detected_at,
+            property:scraper_properties!scraper_shared_properties_property_id_fkey(id, title, portal, link, img_url),
+            matched_property:scraper_properties!scraper_shared_properties_matched_property_id_fkey(id, title, portal, link, img_url)
+        `)
+        .eq('project_id', projectId)
+        .order('detected_at', { ascending: false })
+
+    if (error) {
+        console.error('Error fetching shared properties:', error)
+        return { error: 'Error al obtener propiedades compartidas' }
+    }
+
+    return { success: true, data: data || [] }
+}
+
+/**
+ * Obtener estadísticas de mercado por barrio
+ */
+export async function getNeighborhoodStats(
+    projectId: string,
+    options: { portal?: string } = {}
+) {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) {
+        return { error: 'No tienes acceso a este proyecto' }
+    }
+
+    const supabase = createClient()
+    const { portal } = options
+
+    let query = supabase
+        .from('scraper_properties')
+        .select('neighborhood, agency, price, portal')
+        .eq('project_id', projectId)
+
+    if (portal) {
+        query = query.eq('portal', portal)
+    }
+
+    const { data: allProps, error } = await query
+    if (error) {
+        console.error('Error fetching neighborhood stats:', error)
+        return { error: 'Error al obtener estadísticas por zona' }
+    }
+
+    const normAccent = (s: string) =>
+        (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()
+
+    const neighborhoodMap = new Map<string, {
+        rawName: string
+        agencies: Map<string, number>
+        prices: number[]
+        totalProps: number
+    }>()
+
+    ;(allProps || []).filter(p => p.neighborhood?.trim()).forEach(p => {
+        const raw = p.neighborhood!.trim()
+        const key = normAccent(raw)
+        const agencyKey = normAccent(p.agency || '')
+        const price = Number(p.price) || 0
+        const existing = neighborhoodMap.get(key)
+        if (existing) {
+            existing.totalProps++
+            if (agencyKey) existing.agencies.set(agencyKey, (existing.agencies.get(agencyKey) || 0) + 1)
+            if (price > 0) existing.prices.push(price)
+        } else {
+            const agencies = new Map<string, number>()
+            if (agencyKey) agencies.set(agencyKey, 1)
+            neighborhoodMap.set(key, {
+                rawName: raw,
+                agencies,
+                prices: price > 0 ? [price] : [],
+                totalProps: 1
+            })
+        }
+    })
+
+    const neighborhoods = Array.from(neighborhoodMap.values())
+        .map(n => {
+            const sorted = [...n.prices].sort((a, b) => a - b)
+            const totalAgencies = n.agencies.size
+            const agencyCounts = Array.from(n.agencies.entries())
+                .map(([name, count]) => ({ name, count }))
+                .sort((a, b) => b.count - a.count)
+
+            // Dominance index (Herfindahl-Hirschman simplified): 0 = perfectly distributed, 1 = monopoly
+            const totalFromAgencies = agencyCounts.reduce((s, a) => s + a.count, 0)
+            const dominanceIndex = totalFromAgencies > 0
+                ? Math.round(agencyCounts.reduce((s, a) => s + Math.pow(a.count / totalFromAgencies, 2), 0) * 100) / 100
+                : 0
+
+            return {
+                neighborhood: n.rawName,
+                totalProperties: n.totalProps,
+                totalAgencies,
+                avgPrice: sorted.length > 0 ? Math.round(sorted.reduce((s, p) => s + p, 0) / sorted.length) : 0,
+                minPrice: sorted.length > 0 ? sorted[0] : 0,
+                maxPrice: sorted.length > 0 ? sorted[sorted.length - 1] : 0,
+                topAgencies: agencyCounts.slice(0, 5),
+                dominanceIndex
+            }
+        })
+        .filter(n => n.totalProperties >= 2)
+        .sort((a, b) => b.totalProperties - a.totalProperties)
+
+    return { success: true, data: neighborhoods }
+}
+
+/**
  * Obtener logs del proyecto
  */
 export async function getProjectLogs(projectId: string) {
@@ -723,6 +1153,131 @@ export async function removeProjectMember(projectId: string, userId: string) {
 /**
  * Obtener lista de proyectos accesibles por el usuario
  */
+/**
+ * Generar alertas automáticas basadas en el análisis de datos del scraper.
+ * Inserta alertas como project_updates con update_type específico.
+ * Tipos: alert_shared_property, alert_new_agency_zone, alert_high_activity.
+ */
+export async function generateScraperAlerts(projectId: string) {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) {
+        return { error: 'No tienes acceso a este proyecto' }
+    }
+
+    const adminSupabase = createAdminClient()
+    const alerts: { title: string; content: string; update_type: string }[] = []
+
+    // 1. Shared property alerts
+    const sharedResult = await detectSharedProperties(projectId)
+    if (sharedResult.success && sharedResult.count && sharedResult.count > 0) {
+        const { data: sharedItems } = await adminSupabase
+            .from('scraper_shared_properties')
+            .select('agency_a, agency_b, neighborhood, price')
+            .eq('project_id', projectId)
+            .limit(5)
+
+        const examples = (sharedItems || [])
+            .map(s => `• ${s.neighborhood}: ${s.agency_a} vs ${s.agency_b} (U$S ${Number(s.price).toLocaleString()})`)
+            .join('\n')
+
+        alerts.push({
+            title: `Se detectaron ${sharedResult.count} propiedades compartidas`,
+            content: `Se encontraron propiedades publicadas por diferentes inmobiliarias en la misma zona y al mismo precio.\n\nEjemplos:\n${examples}`,
+            update_type: 'alert_shared_property'
+        })
+    }
+
+    // 2. New agency in zone alerts
+    const normAccent = (s: string) =>
+        (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()
+
+    const { data: allProps } = await adminSupabase
+        .from('scraper_properties')
+        .select('agency, neighborhood, created_at')
+        .eq('project_id', projectId)
+
+    if (allProps && allProps.length > 0) {
+        // Detect agencies that appeared in a new neighborhood in the last 3 days
+        const agencyZones = new Map<string, { firstSeen: Map<string, string> }>()
+        allProps.filter(p => p.agency?.trim() && p.neighborhood?.trim()).forEach(p => {
+            const agKey = normAccent(p.agency!)
+            const zoneKey = normAccent(p.neighborhood!)
+            if (!agencyZones.has(agKey)) agencyZones.set(agKey, { firstSeen: new Map() })
+            const az = agencyZones.get(agKey)!
+            const existing = az.firstSeen.get(zoneKey)
+            if (!existing || p.created_at < existing) az.firstSeen.set(zoneKey, p.created_at)
+        })
+
+        const threeDaysAgo = new Date()
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
+        const newEntries: string[] = []
+        agencyZones.forEach((data, agKey) => {
+            data.firstSeen.forEach((date, zone) => {
+                if (new Date(date) >= threeDaysAgo) {
+                    // Find raw agency name
+                    const raw = allProps.find(p => normAccent(p.agency || '') === agKey)?.agency || agKey
+                    const rawZone = allProps.find(p => normAccent(p.neighborhood || '') === zone)?.neighborhood || zone
+                    newEntries.push(`• ${raw} comenzó a publicar en ${rawZone}`)
+                }
+            })
+        })
+
+        if (newEntries.length > 0) {
+            alerts.push({
+                title: `${newEntries.length} inmobiliarias en zonas nuevas`,
+                content: `En los últimos 3 días se detectaron inmobiliarias publicando en zonas donde no habían aparecido antes.\n\n${newEntries.slice(0, 10).join('\n')}${newEntries.length > 10 ? `\n... y ${newEntries.length - 10} más` : ''}`,
+                update_type: 'alert_new_agency_zone'
+            })
+        }
+
+        // 3. High activity alert: zones with unusual activity (>= 5 props in last 24h)
+        const oneDayAgo = new Date()
+        oneDayAgo.setDate(oneDayAgo.getDate() - 1)
+        const recentByZone = new Map<string, number>()
+        allProps.filter(p => p.neighborhood?.trim() && new Date(p.created_at) >= oneDayAgo).forEach(p => {
+            const zone = normAccent(p.neighborhood!)
+            recentByZone.set(zone, (recentByZone.get(zone) || 0) + 1)
+        })
+
+        const highActivityZones: string[] = []
+        recentByZone.forEach((count, zone) => {
+            if (count >= 5) {
+                const rawZone = allProps.find(p => normAccent(p.neighborhood || '') === zone)?.neighborhood || zone
+                highActivityZones.push(`• ${rawZone}: ${count} publicaciones`)
+            }
+        })
+
+        if (highActivityZones.length > 0) {
+            alerts.push({
+                title: `Alta actividad en ${highActivityZones.length} zona${highActivityZones.length !== 1 ? 's' : ''}`,
+                content: `Las siguientes zonas tuvieron actividad inusual en las últimas 24 horas:\n\n${highActivityZones.join('\n')}`,
+                update_type: 'alert_high_activity'
+            })
+        }
+    }
+
+    // Insert alerts as project_updates
+    if (alerts.length > 0) {
+        const rows = alerts.map(a => ({
+            project_id: projectId,
+            created_by: null,
+            title: a.title,
+            content: a.content,
+            update_type: a.update_type
+        }))
+        const { error: insertError } = await adminSupabase
+            .from('project_updates')
+            .insert(rows)
+        if (insertError) {
+            console.error('Error inserting alerts:', insertError)
+            return { error: 'Error al generar alertas' }
+        }
+    }
+
+    revalidatePath(`/dashboard/projects/${projectId}`)
+    return { success: true, alertsGenerated: alerts.length }
+}
+
 export async function getAccessibleProjects() {
     const { profile } = await requireProfile()
     const supabase = createClient()

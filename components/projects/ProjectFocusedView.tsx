@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTheme } from '@/contexts/ThemeContext'
 import OverviewView from './views/OverviewView'
@@ -23,6 +24,7 @@ export default function ProjectFocusedView({ projectId, projectData, userRole }:
     const activeTab = (searchParams.get('tab') as TabType) || 'overview'
     const { theme } = useTheme()
     const isLight = theme === 'light'
+    const [selectedPlatform, setSelectedPlatform] = useState('')
 
     return (
         <div className="w-full h-full animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -31,17 +33,27 @@ export default function ProjectFocusedView({ projectId, projectData, userRole }:
                     projectId={projectId}
                     stats={projectData.stats}
                     topAgencies={projectData.topAgencies}
+                    platformStats={projectData.platformStats ?? []}
+                    newAgencies={projectData.newAgencies ?? []}
+                    monthlyStats={projectData.monthlyStats ?? []}
                     project={projectData.project}
                     userRole={userRole}
+                    selectedPlatform={selectedPlatform}
+                    onPlatformChange={setSelectedPlatform}
                 />
             )}
             {activeTab === 'properties' && (
-                <PropertiesView projectId={projectId} />
+                <PropertiesView
+                    projectId={projectId}
+                    selectedPlatform={selectedPlatform}
+                    onPlatformChange={setSelectedPlatform}
+                />
             )}
             {activeTab === 'inmobiliarias' && (
                 <InmobiliariasView
                     projectId={projectId}
-                    allAgencies={projectData.allAgencies ?? []}
+                    selectedPlatform={selectedPlatform}
+                    onPlatformChange={setSelectedPlatform}
                 />
             )}
             {activeTab === 'logs' && (

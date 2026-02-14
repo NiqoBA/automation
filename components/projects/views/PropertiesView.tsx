@@ -4,18 +4,20 @@ import { useState, useEffect } from 'react'
 import { getProjectProperties, consolidateDuplicateProperties, togglePropertyFavorite } from '@/app/actions/project-actions'
 import { useTheme } from '@/contexts/ThemeContext'
 import { ExternalLink, ChevronLeft, ChevronRight, Search, Loader2, Phone, MessageCircle, ChevronUp, ChevronDown, ArrowUpDown, Calendar, Star } from 'lucide-react'
+import PlatformSelector from '@/components/projects/PlatformSelector'
 
 interface PropertiesViewProps {
     projectId: string
+    selectedPlatform: string
+    onPlatformChange: (platform: string) => void
 }
 
-export default function PropertiesView({ projectId }: PropertiesViewProps) {
+export default function PropertiesView({ projectId, selectedPlatform, onPlatformChange }: PropertiesViewProps) {
     const { theme } = useTheme()
     const isLight = theme === 'light'
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState<any>(null)
     const [page, setPage] = useState(1)
-    const [selectedPortal, setSelectedPortal] = useState('')
     const [agencyFilter, setAgencyFilter] = useState('')
     const [minPrice, setMinPrice] = useState('')
     const [maxPrice, setMaxPrice] = useState('')
@@ -28,12 +30,13 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
     const [endDate, setEndDate] = useState('')
     const [consolidating, setConsolidating] = useState(false)
     const [optimisticFavorites, setOptimisticFavorites] = useState<Record<string, boolean>>({})
+    const [platformCounts, setPlatformCounts] = useState<Record<string, number>>({})
 
     const loadData = async () => {
         setLoading(true)
         const result = await getProjectProperties(projectId, {
             page,
-            portal: selectedPortal || undefined,
+            portal: selectedPlatform || undefined,
             agency: agencyFilter.trim() || undefined,
             minPrice: minPrice ? parseInt(minPrice) : undefined,
             maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
@@ -49,17 +52,35 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
         setOptimisticFavorites({})
     }
 
+    // Load platform counts once for the selector badges
+    useEffect(() => {
+        const loadCounts = async () => {
+            const result = await getProjectProperties(projectId, { perPage: 99999 })
+            if (result.data?.properties) {
+                const counts: Record<string, number> = {}
+                result.data.properties.forEach((p: any) => {
+                    const portals = p.portals || [p.portal]
+                    portals.forEach((portal: string) => {
+                        if (portal) counts[portal] = (counts[portal] || 0) + 1
+                    })
+                })
+                setPlatformCounts(counts)
+            }
+        }
+        loadCounts()
+    }, [projectId])
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setPage(1)
             loadData()
         }, 400) // Debounce of 400ms for real-time feel
         return () => clearTimeout(timer)
-    }, [selectedPortal, agencyFilter, minPrice, maxPrice])
+    }, [agencyFilter, minPrice, maxPrice])
 
     useEffect(() => {
         loadData()
-    }, [projectId, page, sortColumn, sortDir, onlyDuplicates, onlyFavorites, startDate, endDate])
+    }, [projectId, page, sortColumn, sortDir, onlyDuplicates, onlyFavorites, startDate, endDate, selectedPlatform])
 
     const handleFilter = () => {
         setPage(1)
@@ -92,92 +113,85 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
         })
     }
 
-    const portals = ['Mercado Libre', 'InfoCasas', 'CasasYMas', 'Gallito']
-
     return (
         <div className="space-y-4">
-            <h2 className={`text-xl font-bold ${textClass}`}>Propiedades</h2>
+            <div className="flex items-center justify-between gap-4">
+                <h2 className={`text-xl font-bold ${textClass}`}>Propiedades</h2>
+            </div>
+
+            {/* Platform Selector */}
+            <PlatformSelector
+                selected={selectedPlatform}
+                onChange={(p) => { onPlatformChange(p); setPage(1) }}
+                counts={platformCounts}
+            />
 
             <div className={`border rounded-xl overflow-hidden ${cardClass}`}>
                 {/* Filters */}
                 <div className={`p-6 border-b ${isLight ? 'border-gray-200' : 'border-zinc-800'} space-y-4`}>
-                    <div className="flex flex-wrap items-center justify-between gap-6">
-                        <div className="flex flex-wrap items-center gap-6">
-                            {/* Agency Filter */}
-                            <div className="flex items-center gap-2">
-                                <span className={`text-xs font-medium ${mutedClass}`}>Inmobiliaria:</span>
-                                <input
-                                    type="text"
-                                    placeholder="Buscar por nombre..."
-                                    value={agencyFilter}
-                                    onChange={(e) => setAgencyFilter(e.target.value)}
-                                    className={`w-48 px-3 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 ${inputClass}`}
-                                />
-                            </div>
-
-                            {/* Price Range */}
-                            <div className="flex items-center gap-2">
-                                <span className={`text-xs font-medium ${mutedClass}`}>Precio:</span>
-                                <input
-                                    type="number"
-                                    placeholder="Min"
-                                    value={minPrice}
-                                    onChange={(e) => setMinPrice(e.target.value)}
-                                    className={`w-24 px-3 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 ${inputClass}`}
-                                />
-                                <span className={mutedClass}>-</span>
-                                <input
-                                    type="number"
-                                    placeholder="Max"
-                                    value={maxPrice}
-                                    onChange={(e) => setMaxPrice(e.target.value)}
-                                    className={`w-24 px-3 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 ${inputClass}`}
-                                />
-                            </div>
-
-                            {/* Date Range */}
-                            <div className="flex items-center gap-2">
-                                <Calendar size={14} className={mutedClass} />
-                                <input
-                                    type="date"
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    className={`text-xs p-1.5 rounded border ${isLight ? 'bg-white border-gray-200' : 'bg-black border-zinc-800'} ${textClass} focus:outline-none focus:ring-1 focus:ring-violet-500`}
-                                    placeholder="Desde"
-                                />
-                                <span className={mutedClass}>-</span>
-                                <input
-                                    type="date"
-                                    value={endDate}
-                                    onChange={(e) => setEndDate(e.target.value)}
-                                    className={`text-xs p-1.5 rounded border ${isLight ? 'bg-white border-gray-200' : 'bg-black border-zinc-800'} ${textClass} focus:outline-none focus:ring-1 focus:ring-violet-500`}
-                                    placeholder="Hasta"
-                                />
-                                {(startDate || endDate) && (
-                                    <button
-                                        onClick={() => { setStartDate(''); setEndDate(''); }}
-                                        className="text-[10px] text-violet-500 hover:text-violet-400 font-medium"
-                                    >
-                                        Limpiar
-                                    </button>
-                                )}
-                            </div>
+                    <div className="flex flex-wrap items-center gap-6">
+                        {/* Agency Filter */}
+                        <div className="flex items-center gap-2">
+                            <span className={`text-xs font-medium ${mutedClass}`}>Inmobiliaria:</span>
+                            <input
+                                type="text"
+                                placeholder="Buscar por nombre..."
+                                value={agencyFilter}
+                                onChange={(e) => setAgencyFilter(e.target.value)}
+                                className={`w-48 px-3 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 ${inputClass}`}
+                            />
                         </div>
 
-                        {/* Portal Selection (Top Right) */}
-                        <select
-                            value={selectedPortal}
-                            onChange={(e) => setSelectedPortal(e.target.value)}
-                            className={`px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-violet-500 ${inputClass}`}
-                        >
-                            <option value="">Todos los portales</option>
-                            {portals.map(p => (
-                                <option key={p} value={p}>{p}</option>
-                            ))}
-                        </select>
+                        {/* Price Range */}
+                        <div className="flex items-center gap-2">
+                            <span className={`text-xs font-medium ${mutedClass}`}>Precio:</span>
+                            <input
+                                type="number"
+                                placeholder="Min"
+                                value={minPrice}
+                                onChange={(e) => setMinPrice(e.target.value)}
+                                className={`w-24 px-3 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 ${inputClass}`}
+                            />
+                            <span className={mutedClass}>-</span>
+                            <input
+                                type="number"
+                                placeholder="Max"
+                                value={maxPrice}
+                                onChange={(e) => setMaxPrice(e.target.value)}
+                                className={`w-24 px-3 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 ${inputClass}`}
+                            />
+                        </div>
+
+                        {/* Date Range */}
+                        <div className="flex items-center gap-2">
+                            <Calendar size={14} className={mutedClass} />
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className={`text-xs p-1.5 rounded border ${isLight ? 'bg-white border-gray-200' : 'bg-black border-zinc-800'} ${textClass} focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                placeholder="Desde"
+                            />
+                            <span className={mutedClass}>-</span>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className={`text-xs p-1.5 rounded border ${isLight ? 'bg-white border-gray-200' : 'bg-black border-zinc-800'} ${textClass} focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                placeholder="Hasta"
+                            />
+                            {(startDate || endDate) && (
+                                <button
+                                    onClick={() => { setStartDate(''); setEndDate(''); }}
+                                    className="text-[10px] text-violet-500 hover:text-violet-400 font-medium"
+                                >
+                                    Limpiar
+                                </button>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Bottom Row: Duplicates Toggle */}
+                    {/* Bottom Row: Toggles */}
                     <div className="flex items-center gap-4 pt-2">
                         <label className="flex items-center gap-2 cursor-pointer group">
                             <div className="relative inline-flex items-center">
@@ -219,7 +233,7 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
                             </span>
                         </label>
 
-                        {(onlyDuplicates || onlyFavorites) && (
+                        {(onlyDuplicates || onlyFavorites || selectedPlatform) && (
                             <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-bold uppercase tracking-wider animate-pulse">
                                 Filtro Activo
                             </span>
@@ -304,7 +318,7 @@ export default function PropertiesView({ projectId }: PropertiesViewProps) {
                                 <tbody>
                                     {!data?.properties?.length ? (
                                         <tr>
-                                            <td colSpan={10} className={`text-center py-12 ${mutedClass}`}>
+                                            <td colSpan={11} className={`text-center py-12 ${mutedClass}`}>
                                                 No se encontraron propiedades
                                             </td>
                                         </tr>
