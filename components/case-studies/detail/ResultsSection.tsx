@@ -10,34 +10,22 @@ interface ResultsSectionProps {
 
 export default function ResultsSection({ caseStudy }: ResultsSectionProps) {
   return (
-    <section className="border-t border-zinc-800 bg-[#0a0a0a] px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
+    <section className="bg-black px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="flex items-center gap-3"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/20 text-green-400">
-            <TrendingUp size={20} />
-          </div>
-          <h2 className="text-2xl font-semibold text-white">
-            El impacto real
-          </h2>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6"
         >
           {caseStudy.results.map((r, i) => (
             <div
               key={i}
-              className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5"
+              className="group relative rounded-2xl border border-white/5 bg-zinc-900/30 p-6 transition-all hover:bg-zinc-900/50 hover:border-purple-500/30"
             >
-              <p className="text-sm text-gray-500">{r.label}</p>
-              <p className="mt-2 text-lg font-semibold text-white">{r.value}</p>
+              <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-purple-500/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+              <p className="relative text-xs font-medium uppercase tracking-wider text-gray-500">{r.label}</p>
+              <p className="relative mt-2 text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">{r.value}</p>
             </div>
           ))}
         </motion.div>

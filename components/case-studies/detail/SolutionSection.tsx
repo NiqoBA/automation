@@ -10,21 +10,11 @@ interface SolutionSectionProps {
 
 export default function SolutionSection({ caseStudy }: SolutionSectionProps) {
   return (
-    <section className="border-t border-zinc-800 bg-[#0a0a0a] px-4 py-16 sm:px-6 lg:px-8">
+    <section className="bg-black px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex items-center gap-3"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600/20 text-purple-400">
-            <Lightbulb size={20} />
-          </div>
-          <h2 className="text-2xl font-semibold text-white">
-            Cómo lo resolvimos
-          </h2>
-        </motion.div>
+        <h2 className="text-xl font-bold tracking-tight text-white uppercase opacity-80">
+          Nuestra Solución
+        </h2>
         <div className="mt-8 space-y-5">
           {caseStudy.solution.map((para, i) => (
             <motion.p

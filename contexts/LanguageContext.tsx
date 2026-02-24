@@ -20,19 +20,19 @@ const translations = {
     'nav.consulting': 'Consulting',
     'nav.results': 'Results',
     'nav.book1on1': 'Contact',
-    'nav.bookDemo': 'Schedule Meeting',
-    
+    'nav.bookDemo': 'Agendar reunión',
+
     // Hero
     'hero.badge': 'AI + Automation Studio',
     'hero.badgeText': 'Automated Lead Generation',
     'hero.title': 'Intelligent Automation for Modern Businesses',
     'hero.subtitle': 'We automate repetitive processes and integrate AI into your current systems through the construction of highly customized software.',
-    'hero.cta.demo': 'Schedule Meeting',
+    'hero.cta.demo': 'Schedule Free Meeting',
     'hero.cta.work': 'View Work',
     'hero.microline.erp': 'ERP/CRM',
     'hero.microline.sheets': 'Sheets → DB',
     'hero.microline.automations': 'Production automations',
-    
+
     // Portfolio
     'portfolio.title': 'Selected Work',
     'portfolio.viewCase': 'View Case',
@@ -41,7 +41,7 @@ const translations = {
     'portfolio.outcome': 'Outcome',
     'portfolio.techStack': 'Tech Stack',
     'portfolio.result': 'Result',
-    
+
     // Consulting
     'consulting.eyebrow': '1:1 Consulting',
     'consulting.title': 'We build technical clarity and self-sufficient systems.',
@@ -80,7 +80,7 @@ const translations = {
     'consulting.step3Title': '3) Implementation',
     'consulting.step3Desc': 'Phased execution with monitoring',
     'consulting.formats': 'Formats: 60 min 1:1 · Team workshops · Monthly accompaniment',
-    
+
     // How It Works
     'howitworks.eyebrow': 'Process',
     'howitworks.title': 'How We Work',
@@ -91,7 +91,7 @@ const translations = {
     'howitworks.step2.description': 'We create a functional demo integrated with your stack and test it before releasing anything. We test load, errors, edge cases, and real usage. If it passes all protocols, only then is it deployed: stable, secure, and ready for production.',
     'howitworks.step3.title': 'Precision Deployment',
     'howitworks.step3.description': 'We deploy in your real environment without stopping operations. We monitor performance, adjust in real-time, and train your team. The goal: fast production deployment, adopted and generating value from day one.',
-    
+
     // Results
     'results.title': 'Results',
     'results.hoursSaved': 'Hours saved / month',
@@ -100,7 +100,7 @@ const translations = {
     'results.workflows': 'Workflows automated',
     'results.timeToShip': 'Time to ship',
     'results.credibility': 'Small team. Senior execution. Systems that keep running.',
-    
+
     // Contact
     'contact.title': 'Ready to scale?',
     'contact.subtitle': 'Tell us the challenge. We design the solution.',
@@ -127,7 +127,7 @@ const translations = {
     'contact.errors.emailInvalid': 'Please enter a valid email address',
     'contact.errors.company': 'Company is required',
     'contact.errors.service': 'Please select a service',
-    
+
     // Profile Modal
     'profile.title': 'Complete Your Profile',
     'profile.subtitle': 'Please provide your name and age to continue.',
@@ -139,13 +139,13 @@ const translations = {
     'profile.errors.nameRequired': 'Name is required',
     'profile.errors.ageRequired': 'Age is required',
     'profile.errors.ageInvalid': 'Please enter a valid age (1-150)',
-    
+
     // CTA
     'cta.title': 'Start today',
     'cta.description': 'Tell us the workflow. We\'ll map it, build it, and integrate it into your stack.',
     'cta.bookDemo': 'Start Now',
     'cta.book1on1': 'Book 1:1',
-    
+
     // Core Systems
     'core.servicesBadge': 'Our Services',
     'core.mainTitle': 'AI Solutions That Take\nYour Business to the Next Level',
@@ -176,7 +176,7 @@ const translations = {
     'core.leads.description1': 'Intelligent scraping system that uses AI to identify and qualify potential clients, automatically analyzing company profiles, growth indicators, and business needs.',
     'core.leads.description2': 'Scans multiple sources (LinkedIn, company websites, public data) to find high-quality leads, scores them based on fit and opportunity, and delivers qualified prospects ready for your sales team. Increases your sales pipeline without manual research.',
     'core.leads.useCases': 'Sales teams, B2B companies, agencies, and businesses looking to scale lead generation and increase conversion rates',
-    
+
     // Work / Portfolio
     'work.eyebrow': 'Experience',
     'work.title': 'Success Cases',
@@ -191,13 +191,13 @@ const translations = {
     'work.caseStudy.testUser': 'Test User:',
     'work.caseStudy.email': 'Email:',
     'work.caseStudy.password': 'Password:',
-    
+
     // Integrations
     'integrations.title': 'We work with your stack',
-    
+
     // Footer
     'footer.copyright': '© Inflexo AI',
-    
+
     // Project names and descriptions
     'project.reception.name': 'Reception + Scheduling Automation',
     'project.reception.description': 'AI-powered reception bot handles inquiries, books appointments, and sends confirmations automatically.',
@@ -220,18 +220,18 @@ const translations = {
     'nav.results': 'Resultados',
     'nav.book1on1': 'Contacto',
     'nav.bookDemo': 'Agendar reunión',
-    
+
     // Hero
     'hero.badge': 'Estudio de IA + Automatización',
     'hero.badgeText': 'Generación Automatizada de Leads',
     'hero.title': 'Transformación digital para Empresas',
     'hero.subtitle': 'Automatizamos procesos repetitivos e integramos IA en tus sistemas actuales mediante la construcción de software hiper personalizado.',
-    'hero.cta.demo': 'Agendar reunión',
+    'hero.cta.demo': 'Agendar reunión gratuita',
     'hero.cta.work': 'Ver Trabajo',
     'hero.microline.erp': 'ERP/CRM',
     'hero.microline.sheets': 'Hojas → BD',
     'hero.microline.automations': 'Automatizaciones en producción',
-    
+
     // Portfolio
     'portfolio.title': 'Trabajos Seleccionados',
     'portfolio.viewCase': 'Ver Caso',
@@ -240,7 +240,7 @@ const translations = {
     'portfolio.outcome': 'Resultado',
     'portfolio.techStack': 'Stack Tecnológico',
     'portfolio.result': 'Resultado',
-    
+
     // Consulting
     'consulting.eyebrow': 'Asesorías 1:1',
     'consulting.title': 'Construimos claridad técnica y sistemas autosuficientes.',
@@ -256,7 +256,7 @@ const translations = {
     'consulting.companiesDeliverable1': 'Un roadmap priorizado (impacto vs esfuerzo)',
     'consulting.companiesDeliverable2': 'Blueprint técnico (arquitectura + integraciones + datos)',
     'consulting.companiesDeliverable3': 'Plan de implementación por fases (piloto → producción)',
-    'consulting.bookCompanies': 'Agendar asesoría para empresas',
+    'consulting.bookCompanies': 'Agendar asesoría gratuita para empresas',
     'consulting.viewProjects': 'Ver proyectos →',
     'consulting.forDevelopersTitle': 'Para Developers',
     'consulting.forDevelopersOneLiner': 'De Scripts a Sistemas de Producción. Sesiones prácticas para aprender integración de APIs, automatización con n8n y construcción de agentes de IA listos para producción.',
@@ -269,7 +269,7 @@ const translations = {
     'consulting.devDeliverable1': 'Plantillas de workflows reutilizables',
     'consulting.devDeliverable2': 'Checklist de arquitectura para automatizaciones',
     'consulting.devDeliverable3': 'Plan de estudio/práctica según tu stack',
-    'consulting.bookDevs': 'Agendar 1:1 para devs',
+    'consulting.bookDevs': 'Agendar 1:1 gratuito para devs',
     'consulting.viewCurriculum': 'Ver temario →',
     'consulting.howItWorks': 'Cómo funciona',
     'consulting.step1Title': '1) Diagnóstico',
@@ -279,7 +279,7 @@ const translations = {
     'consulting.step3Title': '3) Implementación',
     'consulting.step3Desc': 'Ejecución por fases con seguimiento',
     'consulting.formats': 'Formatos: 60 min 1:1 · Workshops para equipos · Acompañamiento mensual',
-    
+
     // How It Works
     'howitworks.eyebrow': 'Proceso',
     'howitworks.title': 'Cómo Trabajamos',
@@ -290,7 +290,7 @@ const translations = {
     'howitworks.step2.description': 'Creamos una demo funcional integrada a tu stack y la ponemos a prueba antes de liberar nada. Testeamos carga, errores, casos límite y uso real. Si pasa todos los protocolos, recién ahí se despliega: estable, seguro y listo para producir.',
     'howitworks.step3.title': 'Despliegue de Precisión',
     'howitworks.step3.description': 'Hacemos el deploy en tu entorno real sin frenar la operación. Monitoreamos el rendimiento, ajustamos en vivo y entrenamos a tu equipo. El objetivo: puesta en producción rápida, adoptada y generando valor desde el primer día.',
-    
+
     // Contact
     'contact.title': '¿Listo para escalar?',
     'contact.subtitle': 'Cuéntanos el reto. Nosotros diseñamos la solución.',
@@ -317,7 +317,7 @@ const translations = {
     'contact.errors.emailInvalid': 'Por favor ingresa un email válido',
     'contact.errors.company': 'La empresa es requerida',
     'contact.errors.service': 'Por favor selecciona un servicio',
-    
+
     // Profile Modal
     'profile.title': 'Completa Tu Perfil',
     'profile.subtitle': 'Por favor proporciona tu nombre y edad para continuar.',
@@ -329,7 +329,7 @@ const translations = {
     'profile.errors.nameRequired': 'El nombre es requerido',
     'profile.errors.ageRequired': 'La edad es requerida',
     'profile.errors.ageInvalid': 'Por favor ingresa una edad válida (1-150)',
-    
+
     // Results
     'results.title': 'Resultados',
     'results.hoursSaved': 'Horas ahorradas / mes',
@@ -338,13 +338,13 @@ const translations = {
     'results.workflows': 'Flujos de trabajo automatizados',
     'results.timeToShip': 'Tiempo de entrega',
     'results.credibility': 'Equipo pequeño. Ejecución senior. Sistemas que siguen funcionando.',
-    
+
     // CTA
     'cta.title': 'Empieza hoy',
     'cta.description': 'Cuéntanos el flujo de trabajo. Lo mapearemos, lo construiremos y lo integraremos en tu stack.',
     'cta.bookDemo': 'Comienza Ya',
     'cta.book1on1': 'Reservar 1:1',
-    
+
     // Core Systems
     'core.servicesBadge': 'Nuestros servicios',
     'core.mainTitle': 'Soluciones con IA que llevan\ntu negocio al siguiente nivel',
@@ -375,7 +375,7 @@ const translations = {
     'core.leads.description1': 'Sistema de scraping inteligente que utiliza IA para identificar y calificar posibles clientes, analizando automáticamente perfiles de empresas, indicadores de crecimiento y necesidades de negocio.',
     'core.leads.description2': 'Escanea múltiples fuentes (LinkedIn, sitios web, datos públicos) para encontrar leads de alta calidad, los califica según fit y oportunidad, y entrega prospectos listos para tu equipo de ventas. Aumenta tu pipeline de ventas sin investigación manual.',
     'core.leads.useCases': 'Equipos de ventas, empresas B2B, agencias y negocios que buscan escalar la generación de leads y aumentar tasas de conversión',
-    
+
     // Work / Portfolio
     'work.eyebrow': 'Experience',
     'work.title': 'Casos de Éxito',
@@ -390,13 +390,13 @@ const translations = {
     'work.caseStudy.testUser': 'Usuario de prueba:',
     'work.caseStudy.email': 'Email:',
     'work.caseStudy.password': 'Password:',
-    
+
     // Integrations
     'integrations.title': 'Trabajamos con tu stack',
-    
+
     // Footer
     'footer.copyright': '© Inflexo AI',
-    
+
     // Project names and descriptions
     'project.reception.name': 'Automatización de Recepción + Programación',
     'project.reception.description': 'Bot de recepción con IA que maneja consultas, reserva citas y envía confirmaciones automáticamente.',

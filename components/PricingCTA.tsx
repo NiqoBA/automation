@@ -39,7 +39,7 @@ export default function PricingCTA() {
               whileTap={{ scale: 0.98 }}
               className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-purple-500"
             >
-              Agendar consultoría
+              Agendar consultoría gratuita
               <ArrowRight size={18} />
             </motion.button>
             <motion.button

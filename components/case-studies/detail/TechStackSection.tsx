@@ -10,21 +10,11 @@ interface TechStackSectionProps {
 
 export default function TechStackSection({ caseStudy }: TechStackSectionProps) {
   return (
-    <section className="border-t border-zinc-800 bg-[#000000] px-4 py-16 sm:px-6 lg:px-8">
+    <section className="bg-black px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex items-center gap-3"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600/20 text-purple-400">
-            <Cpu size={20} />
-          </div>
-          <h2 className="text-2xl font-semibold text-white">
-            Stack técnico
-          </h2>
-        </motion.div>
+        <h2 className="text-xl font-bold tracking-tight text-white uppercase opacity-80">
+          Tecnologías
+        </h2>
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}

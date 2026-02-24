@@ -108,11 +108,10 @@ function PlanCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
-      className={`relative flex flex-col rounded-2xl border transition-all duration-300 hover:border-white/20 ${
-        isPopular
+      className={`relative flex flex-col rounded-2xl border transition-all duration-300 hover:border-white/20 ${isPopular
           ? 'border-purple-500/50 bg-[#0d0d0d] shadow-[0_0_40px_rgba(139,92,246,0.12)] p-6 pt-10 sm:p-8 sm:pt-12'
           : 'border-white/10 bg-[#0a0a0a] hover:bg-[#0d0d0d] p-6 sm:p-8'
-      }`}
+        }`}
     >
       {plan.badge && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -151,11 +150,10 @@ function PlanCard({
         onClick={handleCta}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className={`w-full rounded-xl py-3.5 text-sm font-semibold transition-all duration-300 ${
-          isPopular
+        className={`w-full rounded-xl py-3.5 text-sm font-semibold transition-all duration-300 ${isPopular
             ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90'
             : 'border border-white/20 bg-white/5 text-white hover:border-white/30 hover:bg-white/10'
-        }`}
+          }`}
       >
         Contratar plan
       </motion.button>
@@ -252,18 +250,16 @@ export default function SupportMaintenance() {
                   <span className="text-sm font-medium text-white">{faq.q}</span>
                   <ChevronDown
                     size={18}
-                    className={`flex-shrink-0 text-gray-400 transition-transform duration-200 ${
-                      faqOpen === i ? 'rotate-180' : ''
-                    }`}
+                    className={`flex-shrink-0 text-gray-400 transition-transform duration-200 ${faqOpen === i ? 'rotate-180' : ''
+                      }`}
                   />
                 </button>
                 <div
                   id={`faq-answer-${i}`}
                   role="region"
                   aria-labelledby={`faq-question-${i}`}
-                  className={`grid overflow-hidden border-t border-white/10 transition-[grid-template-rows] duration-200 ${
-                    faqOpen === i ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-                  }`}
+                  className={`grid overflow-hidden border-t border-white/10 transition-[grid-template-rows] duration-200 ${faqOpen === i ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                    }`}
                 >
                   <div className="min-h-0">
                     <p className="px-5 py-4 text-sm leading-relaxed text-gray-400">
@@ -294,7 +290,7 @@ export default function SupportMaintenance() {
             whileTap={{ scale: 0.98 }}
             className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
-            Agendar llamada
+            Agendar llamada gratuita
             <ArrowRight size={18} />
           </motion.button>
         </motion.div>
