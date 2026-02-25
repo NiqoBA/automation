@@ -9,6 +9,9 @@ interface TechStackSectionProps {
 }
 
 export default function TechStackSection({ caseStudy }: TechStackSectionProps) {
+  const techStack = caseStudy.techStack ?? []
+  if (techStack.length === 0) return null
+
   return (
     <section className="bg-black px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
@@ -21,7 +24,7 @@ export default function TechStackSection({ caseStudy }: TechStackSectionProps) {
           viewport={{ once: true }}
           className="mt-8 grid gap-4 sm:grid-cols-2"
         >
-          {caseStudy.techStack.map((tech, i) => (
+          {techStack.map((tech, i) => (
             <div
               key={i}
               className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4"

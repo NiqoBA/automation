@@ -33,6 +33,8 @@ export interface CaseStudyDetail extends CaseStudyCard {
   architecture?: string
   /** Explicación opcional "Por qué RAG" u otra tecnología fue clave */
   ragExplanation?: string[]
+  /** Tecnologías usadas en el proyecto (opcional) */
+  techStack?: { name: string; description?: string }[]
 }
 
 export const CASE_FILTERS: CaseCategory[] = [
