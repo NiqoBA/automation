@@ -613,6 +613,7 @@ export async function getEnrichedAgencies(
         name: string
         count: number
         portals: Set<string>
+        firstSeenByPortal: Map<string, string>
         neighborhoods: Set<string>
         prices: number[]
         totalPrice: number
@@ -634,6 +635,10 @@ export async function getEnrichedAgencies(
         if (existing) {
             existing.count++
             if (portalName) existing.portals.add(portalName)
+            if (portalName) {
+                const prev = existing.firstSeenByPortal.get(portalName)
+                if (!prev || date < prev) existing.firstSeenByPortal.set(portalName, date)
+            }
             if (neighborhood) existing.neighborhoods.add(normAccent(neighborhood))
             if (price > 0) { existing.totalPrice += price; existing.priceCount++; existing.prices.push(price) }
             if (date < existing.firstSeen) existing.firstSeen = date
@@ -642,6 +647,8 @@ export async function getEnrichedAgencies(
         } else {
             const portals = new Set<string>()
             if (portalName) portals.add(portalName)
+            const firstSeenByPortal = new Map<string, string>()
+            if (portalName) firstSeenByPortal.set(portalName, date)
             const neighborhoods = new Set<string>()
             if (neighborhood) neighborhoods.add(normAccent(neighborhood))
             const phoneCounts = new Map<string, number>()
@@ -650,6 +657,7 @@ export async function getEnrichedAgencies(
                 name: raw,
                 count: 1,
                 portals,
+                firstSeenByPortal,
                 neighborhoods,
                 prices: price > 0 ? [price] : [],
                 totalPrice: price > 0 ? price : 0,
@@ -669,7 +677,12 @@ export async function getEnrichedAgencies(
             let topPhone = ''
             let maxPhoneCount = 0
             a.phoneCounts.forEach((c, p) => { if (c > maxPhoneCount) { maxPhoneCount = c; topPhone = p } })
-            const isNew = new Date(a.firstSeen) >= sinceDate
+            // IMPORTANT:
+            // - When filtering by a specific portal, firstSeen is already portal-scoped by the query.
+            // - When viewing "Todos los portales", consider an agency "new" if it's new in ANY portal.
+            const isNew = portal
+                ? new Date(a.firstSeen) >= sinceDate
+                : Array.from(a.firstSeenByPortal.values()).some(d => new Date(d) >= sinceDate)
 
             const sortedPrices = [...a.prices].sort((x, y) => x - y)
             const minPrice = sortedPrices.length > 0 ? sortedPrices[0] : 0

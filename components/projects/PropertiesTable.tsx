@@ -65,7 +65,7 @@ export default function PropertiesTable({
         onFilter({ neighborhood: searchTerm || undefined, portal: selectedPortal || undefined })
     }
 
-    const portals = ['Mercadolibre', 'Infocasas', 'Gallito']
+    const portals = ['Mercadolibre', 'Infocasas']
 
     return (
         <div className={`border rounded-xl overflow-hidden ${cardClass}`}>

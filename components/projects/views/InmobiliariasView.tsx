@@ -183,7 +183,7 @@ export default function InmobiliariasView({ projectId, selectedPlatform, onPlatf
         const p = portal.toLowerCase()
         if (p.includes('mercado')) return 'bg-yellow-500/20 text-yellow-500'
         if (p.includes('info')) return 'bg-orange-500/20 text-orange-500'
-        if (p.includes('casas') || p.includes('gallito')) return 'bg-blue-500/20 text-blue-500'
+        if (p.includes('casas')) return 'bg-blue-500/20 text-blue-500'
         return 'bg-zinc-500/20 text-zinc-500'
     }
 

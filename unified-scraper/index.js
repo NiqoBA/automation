@@ -240,6 +240,135 @@ async function scrapeCasasYMas(browser) {
     return allListings;
 }
 
+function parseVeoPrice(raw) {
+    if (!raw) return 0;
+    const n = raw.replace(/[^0-9]/g, '');
+    return parseInt(n, 10) || 0;
+}
+
+async function getVeoCasasDetail(browser, url) {
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    try {
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+        const data = await page.evaluate(() => {
+            const body = (document.body.innerText || '').replace(/\s+/g, ' ').trim();
+            const title = (document.querySelector('h1')?.textContent || '').trim();
+            const img = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || null;
+            const wa = document.querySelector('a[href*="wa.me/"]')?.getAttribute('href') || '';
+            return { body, title, img, wa };
+        });
+
+        // Typical line:
+        // "Detalles Parque Batlle Montevideo US$ 199.000 2 1 111m2"
+        const locationMatch = data.body.match(
+            /Detalles\s+(.+?)\s+(Montevideo|Canelones|Maldonado|Rocha|Colonia|San José|Paysandú|Salto|Florida|Lavalleja|Soriano|Durazno|Treinta y Tres|Rivera|Tacuarembó|Artigas)\s+U\$\s*([\d\.\,]+)/i
+        );
+        const metricMatch = data.body.match(/U\$\s*[\d\.\,]+\s+(\d+)\s+(\d+)\s+(\d+)\s*m2/i);
+        const phoneMatch = data.wa.match(/wa\.me\/(\d+)/i);
+
+        const neighborhood = locationMatch?.[1]?.trim() || '';
+        const department = locationMatch?.[2]?.trim() || '';
+        const price = parseVeoPrice(locationMatch?.[3] || (data.body.match(/U\$\s*([\d\.\,]+)/i)?.[1] || ''));
+        const rooms = metricMatch ? parseInt(metricMatch[1], 10) || 0 : 0;
+        const m2 = metricMatch ? parseInt(metricMatch[3], 10) || 0 : 0;
+        const phone = phoneMatch?.[1] || 'Consultar';
+
+        return {
+            title: data.title || 'Propiedad en VeoCasas',
+            price,
+            currency: 'U$S',
+            neighborhood,
+            department,
+            rooms,
+            m2,
+            phone,
+            image: data.img
+        };
+    } catch (e) {
+        console.error(`[VeoCasas] Error loading detail for ${url}: ${e.message}`);
+    } finally {
+        await page.close();
+    }
+    return null;
+}
+
+async function scrapeVeoCasas(browser) {
+    console.log('[VeoCasas] Iniciando scraper...');
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+
+    const baseUrl = 'https://veocasas.com/properties?publicationDate=1';
+    const maxPages = 59;
+    let allListings = [];
+    const seenLinks = new Set();
+
+    try {
+        for (let currentPage = 1; currentPage <= maxPages; currentPage++) {
+            const url = currentPage === 1 ? baseUrl : `${baseUrl}&page=${currentPage}`;
+            console.log(`[VeoCasas] Navegando a página ${currentPage}...`);
+            await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+
+            const links = await page.evaluate(() => {
+                return Array.from(document.querySelectorAll('a[href^="/properties/"]'))
+                    .map(a => a.getAttribute('href'))
+                    .filter(href => href && !href.includes('#contact-form'))
+                    .filter((href, idx, arr) => arr.indexOf(href) === idx)
+                    .map(href => `https://veocasas.com${href}`);
+            });
+
+            if (!links || links.length === 0) {
+                console.log('[VeoCasas] Fin de paginación o sin resultados.');
+                break;
+            }
+
+            const newLinks = links.filter(link => !seenLinks.has(link));
+            newLinks.forEach(link => seenLinks.add(link));
+
+            if (newLinks.length === 0) {
+                console.log('[VeoCasas] Sin links nuevos, finalizando.');
+                break;
+            }
+
+            console.log(`[VeoCasas] Obteniendo detalles de ${newLinks.length} propiedades...`);
+            for (let i = 0; i < newLinks.length; i += 3) {
+                const chunk = newLinks.slice(i, i + 3);
+                const results = await Promise.all(chunk.map(link => getVeoCasasDetail(browser, link)));
+
+                results.forEach((detail, idx) => {
+                    const link = chunk[idx];
+                    if (!detail) return;
+                    // Maintain same business rules as current scraper project
+                    if ((detail.department || '').toLowerCase() !== 'montevideo') return;
+                    if (detail.price < MIN_PRICE_FOR_DETAIL) return;
+
+                    allListings.push({
+                        portal: 'VeoCasas',
+                        id: link.split('/properties/')[1] || link,
+                        title: detail.title,
+                        price: detail.price,
+                        currency: detail.currency,
+                        neighborhood: detail.neighborhood,
+                        m2: detail.m2,
+                        rooms: detail.rooms,
+                        agency: 'Particular',
+                        phone: detail.phone,
+                        link,
+                        img_url: detail.image
+                    });
+                });
+
+                await new Promise(r => setTimeout(r, 800));
+            }
+        }
+    } catch (e) {
+        console.error('[VeoCasas] Error:', e.message);
+    } finally {
+        await page.close();
+    }
+    return allListings;
+}
+
 function normalizeString(str) {
     if (!str) return '';
     return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
@@ -337,12 +466,14 @@ async function sendToN8N(data, summary) {
     const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox'] });
 
     try {
-        const [infoCasasResults, casasYMasResults] = await Promise.all([
+        const [infoCasasResults, casasYMasResults, veoCasasResults] = await Promise.all([
             scrapeInfoCasas(browser),
-            scrapeCasasYMas(browser)
+            scrapeCasasYMas(browser),
+            scrapeVeoCasas(browser)
         ]);
 
-        const { combined, duplicates } = detectDuplicates(infoCasasResults, casasYMasResults);
+        const { combined: infoCasasCombined, duplicates } = detectDuplicates(infoCasasResults, casasYMasResults);
+        const combined = [...infoCasasCombined, ...veoCasasResults];
 
         // Filtrar opcionalmente solo >= 100k (aunque ya se filtró en scrapers)
         const finalResults = combined.filter(item => item.price >= MIN_PRICE_FOR_DETAIL);
@@ -367,6 +498,7 @@ async function sendToN8N(data, summary) {
             duplicates: duplicates.length,
             source_infocasas: infoCasasResults.length,
             source_casasymas: casasYMasResults.length,
+            source_veocasas: veoCasasResults.length,
             start_time: startTime,
             end_time: getUruguayTime()
         });

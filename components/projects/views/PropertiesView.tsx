@@ -420,7 +420,7 @@ export default function PropertiesView({ projectId, selectedPlatform, onPlatform
                                                                 <span key={idx} className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider
                                                                         ${p === 'Mercado Libre' ? 'bg-yellow-500/20 text-yellow-500' :
                                                                         (p === 'Infocasas' || p === 'InfoCasas') ? 'bg-orange-500/20 text-orange-500' :
-                                                                            (p === 'CasasYMas' || p === 'Gallito') ? 'bg-blue-500/20 text-blue-500' :
+                                                                            (p === 'CasasYMas') ? 'bg-blue-500/20 text-blue-500' :
                                                                                 'bg-zinc-500/20 text-zinc-500'}`}>
                                                                     {p}
                                                                 </span>

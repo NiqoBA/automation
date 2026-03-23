@@ -2,8 +2,8 @@ name: Daily Property Scraper
 
 on:
   schedule:
-    # Ejecutar todos los días a las 09:00 UTC (06:00 AM Uruguay)
-    - cron: '0 9 * * *'
+    # Ejecutar todos los días a las 21:00 UTC (18:00 Uruguay)
+    - cron: '0 21 * * *'
   workflow_dispatch: # Permite ejecutarlo manualmente desde la web de GitHub
 
 jobs:

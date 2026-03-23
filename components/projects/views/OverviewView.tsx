@@ -130,12 +130,6 @@ export default function OverviewView({
                 badge: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
                 accent: 'text-blue-600 dark:text-blue-400',
             }
-        if (p.includes('gallito'))
-            return {
-                bg: isLight ? 'bg-cyan-50 border-cyan-200' : 'bg-cyan-500/5 border-cyan-500/20',
-                badge: 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400',
-                accent: 'text-cyan-600 dark:text-cyan-400',
-            }
         return {
             bg: isLight ? 'bg-gray-50 border-gray-200' : 'bg-zinc-800/50 border-zinc-700',
             badge: 'bg-zinc-500/20 text-zinc-500',

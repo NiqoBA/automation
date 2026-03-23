@@ -67,29 +67,29 @@ export default function AdminProjectsTable({ projects }: AdminProjectsTableProps
 
   return (
     <div className={`w-full min-w-0 rounded-xl overflow-hidden border transition-colors ${bgClass}`}>
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      <div className="overflow-x-auto scrollbar-soft">
+        <table className="w-full table-fixed">
           <thead className={`border-b transition-colors ${headerBgClass}`}>
             <tr>
-              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
+              <th className={`w-[30%] px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Proyecto
               </th>
-              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
+              <th className={`w-[15%] px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Organización
               </th>
-              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
+              <th className={`w-[12%] px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Tipo
               </th>
-              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
+              <th className={`w-[10%] px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Estado
               </th>
-              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
+              <th className={`w-[13%] px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Creado por
               </th>
-              <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
+              <th className={`w-[10%] px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Fecha Creación
               </th>
-              <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
+              <th className={`w-[10%] px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${textSecondaryClass}`}>
                 Acciones
               </th>
             </tr>
@@ -108,31 +108,31 @@ export default function AdminProjectsTable({ projects }: AdminProjectsTableProps
                   key={project.id}
                   className={`transition-colors ${hoverBgClass}`}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm font-medium ${textPrimaryClass}`}>
+                  <td className="px-6 py-4 min-w-0">
+                    <div className={`text-sm font-medium truncate ${textPrimaryClass}`} title={project.name}>
                       {project.name}
                     </div>
                     {project.description && (
-                      <div className={`text-xs mt-1 truncate max-w-xs ${textSecondaryClass}`}>
+                      <div className={`text-xs mt-1 truncate ${textSecondaryClass}`} title={project.description}>
                         {project.description}
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm font-medium ${textPrimaryClass}`}>
+                  <td className="px-6 py-4 min-w-0">
+                    <div className={`text-sm font-medium truncate ${textPrimaryClass}`} title={project.organizations?.name || ''}>
                       {project.organizations?.name || '-'}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm ${textSecondaryClass}`}>
+                  <td className="px-6 py-4 min-w-0">
+                    <div className={`text-sm truncate ${textSecondaryClass}`} title={project.type || ''}>
                       {project.type || '-'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(project.status)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm ${textSecondaryClass}`}>
+                  <td className="px-6 py-4 min-w-0">
+                    <div className={`text-sm truncate ${textSecondaryClass}`} title={project.profiles?.full_name || ''}>
                       {project.profiles?.full_name || '-'}
                     </div>
                   </td>
