@@ -5,6 +5,7 @@ const fs = require('fs');
 // --- CONFIGURACIÓN ---
 const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK || 'https://n8n.srv908725.hstgr.cloud/webhook/scraper';
 const MIN_PRICE_FOR_DETAIL = 100000;
+const TEST_OUTPUT_JSON = process.env.TEST_OUTPUT_JSON || '';
 // ---------------------
 
 function getUruguayTime() {
@@ -262,14 +263,14 @@ async function getVeoCasasDetail(browser, url) {
         // Typical line:
         // "Detalles Parque Batlle Montevideo US$ 199.000 2 1 111m2"
         const locationMatch = data.body.match(
-            /Detalles\s+(.+?)\s+(Montevideo|Canelones|Maldonado|Rocha|Colonia|San José|Paysandú|Salto|Florida|Lavalleja|Soriano|Durazno|Treinta y Tres|Rivera|Tacuarembó|Artigas)\s+U\$\s*([\d\.\,]+)/i
+            /Detalles\s+(.+?)\s+(Montevideo|Canelones|Maldonado|Rocha|Colonia|San José|Paysandú|Salto|Florida|Lavalleja|Soriano|Durazno|Treinta y Tres|Rivera|Tacuarembó|Artigas)\s+U(?:S)?\$\s*([\d\.\,]+)/i
         );
-        const metricMatch = data.body.match(/U\$\s*[\d\.\,]+\s+(\d+)\s+(\d+)\s+(\d+)\s*m2/i);
+        const metricMatch = data.body.match(/U(?:S)?\$\s*[\d\.\,]+\s+(\d+)\s+(\d+)\s+(\d+)\s*m2/i);
         const phoneMatch = data.wa.match(/wa\.me\/(\d+)/i);
 
         const neighborhood = locationMatch?.[1]?.trim() || '';
         const department = locationMatch?.[2]?.trim() || '';
-        const price = parseVeoPrice(locationMatch?.[3] || (data.body.match(/U\$\s*([\d\.\,]+)/i)?.[1] || ''));
+        const price = parseVeoPrice(locationMatch?.[3] || (data.body.match(/U(?:S)?\$\s*([\d\.\,]+)/i)?.[1] || ''));
         const rooms = metricMatch ? parseInt(metricMatch[1], 10) || 0 : 0;
         const m2 = metricMatch ? parseInt(metricMatch[3], 10) || 0 : 0;
         const phone = phoneMatch?.[1] || 'Consultar';
@@ -298,14 +299,14 @@ async function scrapeVeoCasas(browser) {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
 
-    const baseUrl = 'https://veocasas.com/properties?publicationDate=1';
-    const maxPages = 59;
+    const baseUrl = 'https://veocasas.com/properties?location=1&recenter=1&currency=USD&minPrice=100000';
+    const maxPages = 5;
     let allListings = [];
     const seenLinks = new Set();
 
     try {
         for (let currentPage = 1; currentPage <= maxPages; currentPage++) {
-            const url = currentPage === 1 ? baseUrl : `${baseUrl}&page=${currentPage}`;
+            const url = `${baseUrl}&page=${currentPage}`;
             console.log(`[VeoCasas] Navegando a página ${currentPage}...`);
             await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
 
@@ -430,22 +431,32 @@ function detectDuplicates(list1, list2) {
 }
 
 async function sendToN8N(data, summary) {
+    const payload = {
+        timestamp: getUruguayTime(),
+        date: getUruguayTime().split('T')[0],
+        start_time: summary.start_time,
+        end_time: summary.end_time,
+        count: data.length,
+        project_id: process.env.PROJECT_ID || null, // Importante para asociar a la DB
+        summary: summary,
+        properties: data
+    };
+
+    if (TEST_OUTPUT_JSON) {
+        try {
+            fs.writeFileSync(TEST_OUTPUT_JSON, JSON.stringify(payload, null, 2), 'utf8');
+            console.log(`[JSON] Resultado guardado en ${TEST_OUTPUT_JSON}`);
+        } catch (e) {
+            console.error(`[JSON] Error al guardar ${TEST_OUTPUT_JSON}:`, e.message);
+        }
+    }
+
     if (!N8N_WEBHOOK_URL || N8N_WEBHOOK_URL.includes('AQUI')) {
         console.log('[Webhook] URL no configurada. Omitiendo envío.');
         return;
     }
     console.log('[Webhook] Enviando datos a n8n...');
     try {
-        const payload = {
-            timestamp: getUruguayTime(),
-            date: getUruguayTime().split('T')[0],
-            start_time: summary.start_time,
-            end_time: summary.end_time,
-            count: data.length,
-            project_id: process.env.PROJECT_ID || null, // Importante para asociar a la DB
-            summary: summary,
-            properties: data
-        };
         const response = await fetch(N8N_WEBHOOK_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
