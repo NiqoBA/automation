@@ -1,5 +1,6 @@
 'use server'
 
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireProfile, requireMasterAdmin } from '@/lib/auth/guards'
@@ -577,6 +578,49 @@ export async function consolidateAgencies(
     return { success: true, updatedCount: idsToUpdate.length }
 }
 
+const SCRAPER_PAGE_SIZE = 1000
+
+/**
+ * PostgREST limita por defecto ~1000 filas por request. Sin esto, "Todos los portales"
+ * devuelve un subconjunto arbitrario y firstSeenByPortal / isNew quedan mal vs. filtrar por portal.
+ */
+async function fetchAllPropertiesForAgencyStats(
+    supabase: SupabaseClient,
+    projectId: string,
+    portal?: string
+) {
+    const rows: {
+        agency: string | null
+        phone: string | null
+        portal: string | null
+        price: number | null
+        neighborhood: string | null
+        created_at: string
+    }[] = []
+    let offset = 0
+    for (;;) {
+        let q = supabase
+            .from('scraper_properties')
+            .select('agency, phone, portal, price, neighborhood, created_at')
+            .eq('project_id', projectId)
+            .order('id', { ascending: true })
+            .range(offset, offset + SCRAPER_PAGE_SIZE - 1)
+        if (portal) {
+            q = q.eq('portal', portal)
+        }
+        const { data: batch, error } = await q
+        if (error) {
+            console.error('Error fetching enriched agencies (paginated):', error)
+            return { error: error.message, data: null as null }
+        }
+        const chunk = batch || []
+        rows.push(...chunk)
+        if (chunk.length < SCRAPER_PAGE_SIZE) break
+        offset += SCRAPER_PAGE_SIZE
+    }
+    return { data: rows }
+}
+
 /**
  * Obtener inmobiliarias enriquecidas con métricas detalladas
  */
@@ -592,18 +636,12 @@ export async function getEnrichedAgencies(
     const supabase = createClient()
     const { portal, onlyNew = false, newSinceDays = 3 } = options
 
-    let query = supabase
-        .from('scraper_properties')
-        .select('agency, phone, portal, price, neighborhood, created_at')
-        .eq('project_id', projectId)
-
-    if (portal) {
-        query = query.eq('portal', portal)
-    }
-
-    const { data: allProps, error } = await query
-    if (error) {
-        console.error('Error fetching enriched agencies:', error)
+    const { data: allProps, error: fetchError } = await fetchAllPropertiesForAgencyStats(
+        supabase,
+        projectId,
+        portal
+    )
+    if (fetchError) {
         return { error: 'Error al obtener datos de inmobiliarias' }
     }
 
@@ -628,17 +666,17 @@ export async function getEnrichedAgencies(
         const raw = p.agency!.trim()
         const key = normAccent(raw)
         const phone = p.phone?.trim() || ''
-        const portalName = p.portal || ''
+        const portalKey = (p.portal || '').trim()
         const price = Number(p.price) || 0
         const neighborhood = (p.neighborhood || '').trim()
         const date = p.created_at
         const existing = agencyMap.get(key)
         if (existing) {
             existing.count++
-            if (portalName) existing.portals.add(portalName)
-            if (portalName) {
-                const prev = existing.firstSeenByPortal.get(portalName)
-                if (!prev || date < prev) existing.firstSeenByPortal.set(portalName, date)
+            if (portalKey) existing.portals.add(portalKey)
+            if (portalKey) {
+                const prev = existing.firstSeenByPortal.get(portalKey)
+                if (!prev || date < prev) existing.firstSeenByPortal.set(portalKey, date)
             }
             if (neighborhood) existing.neighborhoods.add(normAccent(neighborhood))
             if (price > 0) { existing.totalPrice += price; existing.priceCount++; existing.prices.push(price) }
@@ -647,9 +685,9 @@ export async function getEnrichedAgencies(
             if (phone) existing.phoneCounts.set(phone, (existing.phoneCounts.get(phone) || 0) + 1)
         } else {
             const portals = new Set<string>()
-            if (portalName) portals.add(portalName)
+            if (portalKey) portals.add(portalKey)
             const firstSeenByPortal = new Map<string, string>()
-            if (portalName) firstSeenByPortal.set(portalName, date)
+            if (portalKey) firstSeenByPortal.set(portalKey, date)
             const neighborhoods = new Set<string>()
             if (neighborhood) neighborhoods.add(normAccent(neighborhood))
             const phoneCounts = new Map<string, number>()
