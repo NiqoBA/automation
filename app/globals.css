@@ -55,34 +55,52 @@
     animation: gradient 8s ease infinite;
   }
 
-  /* Soft, compact, off-white scrollbar (no arrows) */
+  /*
+   * Minimal scrollbars (horizontal + vertical): thin, no arrows, neutral tones.
+   * Use on overflow-x-auto / overflow-y-auto wrappers.
+   */
   .scrollbar-soft {
     scrollbar-width: thin; /* Firefox */
-    scrollbar-color: rgba(255, 255, 255, 0.55) transparent; /* thumb track */
+    scrollbar-color: rgba(15, 23, 42, 0.14) transparent;
   }
   .scrollbar-soft::-webkit-scrollbar {
-    height: 8px;
+    width: 5px;
+    height: 5px;
   }
   .scrollbar-soft::-webkit-scrollbar-track {
     background: transparent;
-    border-radius: 9999px;
+    margin: 2px;
   }
   .scrollbar-soft::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.55);
+    background: rgba(15, 23, 42, 0.12);
     border-radius: 9999px;
-    border: 2px solid rgba(0, 0, 0, 0); /* creates inner padding */
+    border: 2px solid transparent;
     background-clip: padding-box;
+    transition: background-color 0.15s ease;
   }
   .scrollbar-soft::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.75);
-    border-radius: 9999px;
-    border: 2px solid rgba(0, 0, 0, 0);
+    background: rgba(15, 23, 42, 0.22);
+    border: 2px solid transparent;
     background-clip: padding-box;
   }
+  .scrollbar-soft::-webkit-scrollbar-corner {
+    background: transparent;
+  }
   .scrollbar-soft::-webkit-scrollbar-button {
-    display: none; /* remove arrows */
+    display: none;
     width: 0;
     height: 0;
+  }
+
+  /* Dark theme (html.dark from ThemeContext) */
+  .dark .scrollbar-soft {
+    scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+  }
+  .dark .scrollbar-soft::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .dark .scrollbar-soft::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.22);
   }
 
   @keyframes dotPulse {

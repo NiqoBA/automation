@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useTheme } from '@/contexts/ThemeContext'
 import { Search, MessageCircle, ChevronDown, ChevronRight, ChevronUp, ArrowUpDown, ExternalLink, Loader2, Merge } from 'lucide-react'
 import { getProjectProperties, consolidateAgencies, getEnrichedAgencies } from '@/app/actions/project-actions'
@@ -31,6 +31,8 @@ interface InmobiliariasViewProps {
 
 export default function InmobiliariasView({ projectId, selectedPlatform, onPlatformChange }: InmobiliariasViewProps) {
     const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
     const { theme } = useTheme()
     const isLight = theme === 'light'
     const [search, setSearch] = useState('')
@@ -85,10 +87,19 @@ export default function InmobiliariasView({ projectId, selectedPlatform, onPlatf
         setPropertiesCache({})
     }, [projectId, selectedPlatform])
 
-    const searchParams = useSearchParams()
+    // Sincronizar con ?soloNuevas=1 (p. ej. enlace desde Resumen) y permitir quitar el filtro al cambiar la URL
     useEffect(() => {
-        if (searchParams.get('soloNuevas') === '1') setOnlyNew(true)
+        setOnlyNew(searchParams.get('soloNuevas') === '1')
     }, [searchParams])
+
+    const setSoloNuevasFilter = (checked: boolean) => {
+        setOnlyNew(checked)
+        const p = new URLSearchParams(searchParams.toString())
+        if (checked) p.set('soloNuevas', '1')
+        else p.delete('soloNuevas')
+        const qs = p.toString()
+        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+    }
 
     const filtered = agencies
         .filter(a => !search.trim() || normAccent(a.name).includes(normAccent(search.trim())))
@@ -183,6 +194,7 @@ export default function InmobiliariasView({ projectId, selectedPlatform, onPlatf
         const p = portal.toLowerCase()
         if (p.includes('mercado')) return 'bg-yellow-500/20 text-yellow-500'
         if (p.includes('info')) return 'bg-orange-500/20 text-orange-500'
+        if (p.includes('veo')) return 'bg-emerald-500/20 text-emerald-500'
         if (p.includes('casas')) return 'bg-blue-500/20 text-blue-500'
         return 'bg-zinc-500/20 text-zinc-500'
     }
@@ -222,7 +234,7 @@ export default function InmobiliariasView({ projectId, selectedPlatform, onPlatf
                                     type="checkbox"
                                     className="sr-only peer"
                                     checked={onlyNew}
-                                    onChange={(e) => setOnlyNew(e.target.checked)}
+                                    onChange={(e) => setSoloNuevasFilter(e.target.checked)}
                                 />
                                 <div className={`w-9 h-5 rounded-full transition-colors peer-focus:ring-2 peer-focus:ring-amber-500/20 
                                     ${onlyNew ? 'bg-amber-500' : isLight ? 'bg-gray-200' : 'bg-zinc-700'}`}>
@@ -259,7 +271,7 @@ export default function InmobiliariasView({ projectId, selectedPlatform, onPlatf
                         <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto scrollbar-soft">
                         <table className="w-full">
                             <thead>
                                 <tr className={`${headerClass} border-b ${isLight ? 'border-gray-200' : 'border-zinc-800'}`}>
@@ -421,7 +433,7 @@ export default function InmobiliariasView({ projectId, selectedPlatform, onPlatf
                                                                         <span className={textSecondary}>Cargando...</span>
                                                                     </div>
                                                                 ) : cached?.data?.length ? (
-                                                                    <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+                                                                    <div className="overflow-x-auto max-h-[400px] overflow-y-auto scrollbar-soft">
                                                                         <table className="w-full text-sm">
                                                                             <thead>
                                                                                 <tr className={textSecondary}>

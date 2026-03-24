@@ -108,7 +108,7 @@ export default function MarketView({ projectId, selectedPlatform, onPlatformChan
                         <p className={textSecondary}>No hay datos de mercado disponibles</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto scrollbar-soft">
                         <table className="w-full">
                             <thead>
                                 <tr className={`${headerClass} border-b ${isLight ? 'border-gray-200' : 'border-zinc-800'}`}>

@@ -51,7 +51,7 @@ export default function ClientsTable({ clients }: ClientsTableProps) {
 
   return (
     <div className={`w-full min-w-0 rounded-xl overflow-hidden border transition-colors ${bgClass}`}>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto scrollbar-soft">
         <table className="w-full">
           <thead className={`border-b transition-colors ${headerBgClass}`}>
             <tr>

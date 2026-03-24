@@ -268,7 +268,7 @@ export default function PropertiesView({ projectId, selectedPlatform, onPlatform
                 ) : (
                     <>
                         {/* Table Section with extra top margin */}
-                        <div className="mt-6 overflow-x-auto">
+                        <div className="mt-6 overflow-x-auto scrollbar-soft">
                             <table className="w-full">
                                 <thead>
                                     <tr className={`${isLight ? 'bg-gray-50 border-b border-gray-200' : 'bg-zinc-800/50 border-b border-zinc-800'} transition-colors duration-200`}>
@@ -420,6 +420,7 @@ export default function PropertiesView({ projectId, selectedPlatform, onPlatform
                                                                 <span key={idx} className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider
                                                                         ${p === 'Mercado Libre' ? 'bg-yellow-500/20 text-yellow-500' :
                                                                         (p === 'Infocasas' || p === 'InfoCasas') ? 'bg-orange-500/20 text-orange-500' :
+                                                                            (p === 'VeoCasas') ? 'bg-emerald-500/20 text-emerald-500' :
                                                                             (p === 'CasasYMas') ? 'bg-blue-500/20 text-blue-500' :
                                                                                 'bg-zinc-500/20 text-zinc-500'}`}>
                                                                     {p}
@@ -476,6 +477,7 @@ export default function PropertiesView({ projectId, selectedPlatform, onPlatform
                                                                     className={`p-1 rounded-lg transition-colors
                                                                             ${linkObj.portal === 'Mercado Libre' ? 'text-yellow-500 hover:bg-yellow-500/10' :
                                                                             (linkObj.portal === 'Infocasas' || linkObj.portal === 'InfoCasas') ? 'text-orange-500 hover:bg-orange-500/10' :
+                                                                                linkObj.portal === 'VeoCasas' ? 'text-emerald-500 hover:bg-emerald-500/10' :
                                                                                 'text-blue-500 hover:bg-blue-500/10'}`}
                                                                     title={linkObj.portal}
                                                                 >

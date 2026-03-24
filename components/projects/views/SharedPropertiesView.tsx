@@ -48,6 +48,7 @@ export default function SharedPropertiesView({ projectId }: SharedPropertiesView
         const p = (portal || '').toLowerCase()
         if (p.includes('mercado')) return 'bg-yellow-500/20 text-yellow-500'
         if (p.includes('info')) return 'bg-orange-500/20 text-orange-500'
+        if (p.includes('veo')) return 'bg-emerald-500/20 text-emerald-500'
         if (p.includes('casas')) return 'bg-blue-500/20 text-blue-500'
         return 'bg-zinc-500/20 text-zinc-500'
     }
@@ -101,7 +102,7 @@ export default function SharedPropertiesView({ projectId }: SharedPropertiesView
                             </span>
                         </div>
 
-                        <div className="overflow-x-auto">
+                        <div className="overflow-x-auto scrollbar-soft">
                             <table className="w-full">
                                 <thead>
                                     <tr className={`${headerClass} border-b ${isLight ? 'border-gray-200' : 'border-zinc-800'}`}>

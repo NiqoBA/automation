@@ -7,6 +7,7 @@ const PLATFORMS = [
     { id: 'CasasYMas', label: 'CasasYMas', color: 'blue' },
     { id: 'InfoCasas', label: 'InfoCasas', color: 'orange' },
     { id: 'Mercado Libre', label: 'Mercado Libre', color: 'yellow' },
+    { id: 'VeoCasas', label: 'VeoCasas', color: 'emerald' },
 ]
 
 interface PlatformSelectorProps {
@@ -28,6 +29,7 @@ export default function PlatformSelector({ selected, onChange, counts }: Platfor
         blue: 'bg-blue-600 text-white shadow-lg shadow-blue-500/25',
         orange: 'bg-orange-600 text-white shadow-lg shadow-orange-500/25',
         yellow: 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/25',
+        emerald: 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25',
     }
 
     const inactiveStyle = isLight

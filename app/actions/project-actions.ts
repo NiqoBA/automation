@@ -156,9 +156,10 @@ export async function getProjectDashboard(projectId: string) {
         }
     })
     const threeDaysAgo = new Date()
+    threeDaysAgo.setHours(0, 0, 0, 0)
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
     const newAgencies = Array.from(agencyFirstSeenMap.values())
-        .filter(a => new Date(a.firstSeen) >= threeDaysAgo)
+        .filter(a => new Date(a.firstSeen).getTime() >= threeDaysAgo.getTime())
         .sort((a, b) => new Date(b.firstSeen).getTime() - new Date(a.firstSeen).getTime())
 
     // --- Monthly stats ---
@@ -669,7 +670,9 @@ export async function getEnrichedAgencies(
         }
     })
 
+    // Ventana "últimos N días": desde el inicio del día local (hoy - N) para evitar bordes raros por hora.
     const sinceDate = new Date()
+    sinceDate.setHours(0, 0, 0, 0)
     sinceDate.setDate(sinceDate.getDate() - newSinceDays)
 
     const agencies = Array.from(agencyMap.values())
@@ -678,11 +681,16 @@ export async function getEnrichedAgencies(
             let maxPhoneCount = 0
             a.phoneCounts.forEach((c, p) => { if (c > maxPhoneCount) { maxPhoneCount = c; topPhone = p } })
             // IMPORTANT:
-            // - When filtering by a specific portal, firstSeen is already portal-scoped by the query.
-            // - When viewing "Todos los portales", consider an agency "new" if it's new in ANY portal.
+            // - Con portal: firstSeen ya está acotado a ese portal (query filtrada).
+            // - Sin portal: "nueva" si apareció en la ventana en CUALQUIER portal (firstSeenByPortal),
+            //   O si solo hay filas sin portal / el mínimo global (firstSeen) cae en la ventana.
+            //   Si no hacemos OR con firstSeen, filas con portal vacío nunca entran en firstSeenByPortal y isNew queda mal.
+            const sinceMs = sinceDate.getTime()
+            const firstSeenMs = new Date(a.firstSeen).getTime()
             const isNew = portal
-                ? new Date(a.firstSeen) >= sinceDate
-                : Array.from(a.firstSeenByPortal.values()).some(d => new Date(d) >= sinceDate)
+                ? firstSeenMs >= sinceMs
+                : Array.from(a.firstSeenByPortal.values()).some(d => new Date(d).getTime() >= sinceMs) ||
+                  firstSeenMs >= sinceMs
 
             const sortedPrices = [...a.prices].sort((x, y) => x - y)
             const minPrice = sortedPrices.length > 0 ? sortedPrices[0] : 0

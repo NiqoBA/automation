@@ -65,7 +65,7 @@ export default function PropertiesTable({
         onFilter({ neighborhood: searchTerm || undefined, portal: selectedPortal || undefined })
     }
 
-    const portals = ['Mercadolibre', 'Infocasas']
+    const portals = ['Mercadolibre', 'Infocasas', 'VeoCasas']
 
     return (
         <div className={`border rounded-xl overflow-hidden ${cardClass}`}>
@@ -106,7 +106,7 @@ export default function PropertiesTable({
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto scrollbar-soft">
                 <table className="w-full">
                     <thead className={headerClass}>
                         <tr>
@@ -154,6 +154,7 @@ export default function PropertiesTable({
                                         <span className={`px-2 py-1 rounded text-xs font-medium
                       ${property.portal === 'Mercadolibre' ? 'bg-yellow-500/20 text-yellow-500' :
                                                 property.portal === 'Infocasas' ? 'bg-blue-500/20 text-blue-500' :
+                                                property.portal === 'VeoCasas' ? 'bg-emerald-500/20 text-emerald-500' :
                                                     'bg-green-500/20 text-green-500'}`}
                                         >
                                             {property.portal}

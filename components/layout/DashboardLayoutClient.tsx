@@ -390,7 +390,7 @@ export default function DashboardLayoutClient({
         </div>
 
         {/* Page content */}
-        <main className={`p-4 md:p-6 overflow-x-auto min-w-0 transition-colors duration-200 ${theme === 'light' ? 'bg-gray-50' : 'bg-black'
+        <main className={`p-4 md:p-6 overflow-x-auto scrollbar-soft min-w-0 transition-colors duration-200 ${theme === 'light' ? 'bg-gray-50' : 'bg-black'
           }`}>
           {children}
         </main>
