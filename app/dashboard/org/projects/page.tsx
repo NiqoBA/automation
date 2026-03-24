@@ -5,24 +5,25 @@ import ProjectsTable from '@/components/client/ProjectsTable'
 import CreateProjectButton from '@/components/client/CreateProjectButton'
 import ProjectFocusedView from '@/components/projects/ProjectFocusedView'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function ProjectsPage({
   searchParams,
 }: {
-  searchParams: { focusProject?: string }
+  searchParams: { focusProject?: string; tab?: string }
 }) {
   const { profile } = await requireProfile()
   const focusProjectId = searchParams.focusProject
+  const activeTab = searchParams.tab || 'overview'
 
-  // Si hay un proyecto enfocado, obtener su data
   let projectData = null
-  if (focusProjectId) {
+  if (focusProjectId && activeTab === 'overview') {
     const result = await getProjectDashboard(focusProjectId)
     projectData = result.data
   }
 
   const projects = await getProjects()
-
-  // Solo master admin o email específico puede crear proyectos
   const canCreateProjects = profile.role === 'master_admin' || profile.email === 'niqodt@gmail.com'
 
   return (
@@ -41,7 +42,7 @@ export default async function ProjectsPage({
         </div>
       )}
 
-      {focusProjectId && projectData ? (
+      {focusProjectId ? (
         <ProjectFocusedView
           projectId={focusProjectId}
           projectData={projectData}

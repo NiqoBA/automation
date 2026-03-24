@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useTheme } from '@/contexts/ThemeContext'
 import { Search, MessageCircle, ChevronDown, ChevronRight, ChevronUp, ArrowUpDown, ExternalLink, Loader2, Merge } from 'lucide-react'
-import { getProjectProperties, consolidateAgencies, getEnrichedAgencies } from '@/app/actions/project-actions'
+import { getProjectProperties, consolidateAgencies, getEnrichedAgencies, getPortalCounts } from '@/app/actions/project-actions'
 import PlatformSelector from '@/components/projects/PlatformSelector'
 
 interface EnrichedAgency {
@@ -64,21 +64,8 @@ export default function InmobiliariasView({ projectId, selectedPlatform, onPlatf
         setLoading(false)
     }
 
-    // Load platform counts for selector
     useEffect(() => {
-        const loadCounts = async () => {
-            const result = await getEnrichedAgencies(projectId)
-            if (result.data) {
-                const counts: Record<string, number> = {}
-                result.data.forEach((a: EnrichedAgency) => {
-                    a.portals.forEach(p => {
-                        counts[p] = (counts[p] || 0) + 1
-                    })
-                })
-                setPlatformCounts(counts)
-            }
-        }
-        loadCounts()
+        getPortalCounts(projectId).then(setPlatformCounts)
     }, [projectId])
 
     useEffect(() => {

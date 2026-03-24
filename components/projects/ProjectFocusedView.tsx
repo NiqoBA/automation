@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTheme } from '@/contexts/ThemeContext'
+import { getProjectDashboard } from '@/app/actions/project-actions'
+import { Loader2 } from 'lucide-react'
 import OverviewView from './views/OverviewView'
 import PropertiesView from './views/PropertiesView'
 import InmobiliariasView from './views/InmobiliariasView'
@@ -13,34 +15,57 @@ import MembersView from './views/MembersView'
 
 interface ProjectFocusedViewProps {
     projectId: string
-    projectData: any
+    projectData: any | null
     userRole: string
 }
 
 type TabType = 'overview' | 'properties' | 'inmobiliarias' | 'logs' | 'tickets' | 'updates' | 'members'
 
-export default function ProjectFocusedView({ projectId, projectData, userRole }: ProjectFocusedViewProps) {
+export default function ProjectFocusedView({ projectId, projectData: serverData, userRole }: ProjectFocusedViewProps) {
     const searchParams = useSearchParams()
     const activeTab = (searchParams.get('tab') as TabType) || 'overview'
     const { theme } = useTheme()
     const isLight = theme === 'light'
     const [selectedPlatform, setSelectedPlatform] = useState('')
+    const [dashboardData, setDashboardData] = useState<any | null>(serverData)
+    const [loadingDashboard, setLoadingDashboard] = useState(false)
+
+    useEffect(() => {
+        if (serverData) {
+            setDashboardData(serverData)
+            return
+        }
+        if (activeTab !== 'overview') return
+        if (dashboardData) return
+
+        setLoadingDashboard(true)
+        getProjectDashboard(projectId).then((result) => {
+            if (result.data) setDashboardData(result.data)
+            setLoadingDashboard(false)
+        })
+    }, [activeTab, projectId, serverData])
 
     return (
         <div className="w-full h-full animate-in fade-in slide-in-from-bottom-2 duration-300">
             {activeTab === 'overview' && (
-                <OverviewView
-                    projectId={projectId}
-                    stats={projectData.stats}
-                    topAgencies={projectData.topAgencies}
-                    platformStats={projectData.platformStats ?? []}
-                    newAgencies={projectData.newAgencies ?? []}
-                    monthlyStats={projectData.monthlyStats ?? []}
-                    project={projectData.project}
-                    userRole={userRole}
-                    selectedPlatform={selectedPlatform}
-                    onPlatformChange={setSelectedPlatform}
-                />
+                dashboardData ? (
+                    <OverviewView
+                        projectId={projectId}
+                        stats={dashboardData.stats}
+                        topAgencies={dashboardData.topAgencies}
+                        platformStats={dashboardData.platformStats ?? []}
+                        newAgencies={dashboardData.newAgencies ?? []}
+                        monthlyStats={dashboardData.monthlyStats ?? []}
+                        project={dashboardData.project}
+                        userRole={userRole}
+                        selectedPlatform={selectedPlatform}
+                        onPlatformChange={setSelectedPlatform}
+                    />
+                ) : (
+                    <div className="flex items-center justify-center py-20">
+                        <Loader2 className="w-6 h-6 animate-spin text-violet-500" />
+                    </div>
+                )
             )}
             {activeTab === 'properties' && (
                 <PropertiesView
@@ -63,7 +88,7 @@ export default function ProjectFocusedView({ projectId, projectData, userRole }:
                 <TicketsView projectId={projectId} />
             )}
             {activeTab === 'updates' && (
-                <UpdatesView projectId={projectId} />
+                <UpdatesView projectId={projectId} userRole={userRole} />
             )}
             {activeTab === 'members' && userRole === 'master_admin' && (
                 <MembersView projectId={projectId} />

@@ -403,9 +403,14 @@ export default function OverviewView({
             {/* Monthly Evolution */}
             {sortedMonths.length > 0 && (
                 <div className={`p-6 rounded-2xl border transition-all ${sectionBg}`}>
-                    <div className="flex items-center gap-2 mb-4">
-                        <Calendar className="w-5 h-5 text-blue-500" />
-                        <h3 className={`text-lg font-bold ${textPrimary}`}>Evolución Mensual</h3>
+                    <div className="mb-4">
+                        <div className="flex items-center gap-2">
+                            <Calendar className="w-5 h-5 text-blue-500" />
+                            <h3 className={`text-lg font-bold ${textPrimary}`}>Evolución Mensual</h3>
+                        </div>
+                        <p className={`text-xs mt-1 ${textSecondary}`}>
+                            Misma lógica que la pestaña Propiedades: avisos duplicados entre portales se cuentan una vez por portal; mes según fecha de carga en Uruguay (America/Montevideo).
+                        </p>
                     </div>
                     <div className="overflow-x-auto scrollbar-soft">
                         <table className="w-full">

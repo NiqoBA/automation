@@ -1,10 +1,27 @@
 'use server'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { consolidateProjectPropertiesData } from '@/lib/scraper/consolidate-project-properties'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireProfile, requireMasterAdmin } from '@/lib/auth/guards'
 import { revalidatePath } from 'next/cache'
+
+/** Columnas mínimas para consolidar (misma lógica que dashboard y pestaña Propiedades) */
+const SCRAPER_CONSOLIDATION_COLS =
+    'id, portal, agency, phone, price, neighborhood, m2, title, link, img_url, created_at, favourite'
+
+/** Obtener solo el nombre del proyecto (usado por sidebar, sin cargar stats) */
+export async function getProjectName(projectId: string): Promise<string | null> {
+    const { profile } = await requireProfile()
+    const supabase = createClient()
+    const { data } = await supabase
+        .from('projects')
+        .select('name')
+        .eq('id', projectId)
+        .single()
+    return data?.name ?? null
+}
 
 /**
  * Verificar acceso a un proyecto
@@ -50,6 +67,173 @@ async function verifyProjectAccess(projectId: string) {
     return { hasAccess: false, project: null, profile }
 }
 
+/** YYYY-MM del instante en zona Montevideo (alineado con negocio UY) */
+function monthKeyMontevideo(iso: string): string {
+    const d = new Date(iso)
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Montevideo',
+        year: 'numeric',
+        month: '2-digit',
+    }).formatToParts(d)
+    const y = parts.find((p) => p.type === 'year')?.value ?? '1970'
+    const m = parts.find((p) => p.type === 'month')?.value ?? '01'
+    return `${y}-${m}`
+}
+
+/** Inicio y fin del día actual en Uruguay (UTC-3 sin DST), como ISO para filtrar created_at */
+function getUruguayTodayBoundsIso(): { startIso: string; endIso: string } {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Montevideo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    }).formatToParts(new Date())
+    const y = parts.find((p) => p.type === 'year')?.value ?? '1970'
+    const m = parts.find((p) => p.type === 'month')?.value ?? '01'
+    const day = parts.find((p) => p.type === 'day')?.value ?? '01'
+    const dateStr = `${y}-${m}-${day}`
+    const start = new Date(`${dateStr}T00:00:00.000-03:00`)
+    const end = new Date(`${dateStr}T23:59:59.999-03:00`)
+    return { startIso: start.toISOString(), endIso: end.toISOString() }
+}
+
+/** Misma regla que getProjectDashboard (Desglose por plataforma): +1 por portal en cada aviso consolidado */
+function platformCountsFromConsolidated(consolidated: any[]): Record<string, number> {
+    const counts: Record<string, number> = {}
+    consolidated.forEach((g: any) => {
+        const portalsList: string[] = (g.portals?.length ? g.portals : [g.portal]).filter(Boolean)
+        const toCount = portalsList.length ? portalsList : ['Desconocido']
+        toCount.forEach((portalName) => {
+            const portal = portalName || 'Desconocido'
+            counts[portal] = (counts[portal] || 0) + 1
+        })
+    })
+    return counts
+}
+
+type ConsolidationDbFilters = {
+    neighborhood?: string
+    minPrice?: number
+    maxPrice?: number
+    portal?: string
+    agency?: string
+    onlyFavorites?: boolean
+    startDate?: string
+    endDate?: string
+    onlyToday?: boolean
+}
+
+async function fetchAllRowsForConsolidation(
+    supabase: SupabaseClient,
+    projectId: string,
+    filters: ConsolidationDbFilters
+): Promise<{ rows: any[]; error?: string }> {
+    const rows: any[] = []
+    let offset = 0
+    const pageSize = 1000
+    const buildQuery = (off: number) => {
+        let q = supabase
+            .from('scraper_properties')
+            .select(SCRAPER_CONSOLIDATION_COLS)
+            .eq('project_id', projectId)
+            .order('id', { ascending: true })
+            .range(off, off + pageSize - 1)
+        if (filters.neighborhood) q = q.ilike('neighborhood', `%${filters.neighborhood}%`)
+        if (filters.minPrice) q = q.gte('price', filters.minPrice)
+        if (filters.maxPrice) q = q.lte('price', filters.maxPrice)
+        if (filters.portal) q = q.eq('portal', filters.portal)
+        if (filters.agency?.trim()) q = q.ilike('agency', `%${filters.agency.trim()}%`)
+        if (filters.onlyToday) {
+            const { startIso, endIso } = getUruguayTodayBoundsIso()
+            q = q.gte('created_at', startIso).lte('created_at', endIso)
+        } else {
+            if (filters.startDate) q = q.gte('created_at', filters.startDate)
+            if (filters.endDate) {
+                const endStr = filters.endDate.includes('T') ? filters.endDate : `${filters.endDate}T23:59:59`
+                q = q.lte('created_at', endStr)
+            }
+        }
+        if (filters.onlyFavorites) q = q.eq('favourite', true)
+        return q
+    }
+    for (;;) {
+        const { data: batch, error } = await buildQuery(offset)
+        if (error) {
+            console.error('fetchAllRowsForConsolidation:', error)
+            return { rows: [], error: error.message }
+        }
+        const chunk = batch || []
+        rows.push(...chunk)
+        if (chunk.length < pageSize) break
+        offset += pageSize
+    }
+    return { rows }
+}
+
+/**
+ * Conteos por portal alineados con el dashboard (avisos consolidados, no filas crudas).
+ * Sin filtro de portal en BD: cuenta en todos los portales con los mismos filtros que la tabla.
+ */
+export async function getPortalCounts(
+    projectId: string,
+    filters?: {
+        agency?: string
+        minPrice?: number
+        maxPrice?: number
+        onlyFavorites?: boolean
+        onlyDuplicates?: boolean
+        startDate?: string
+        endDate?: string
+        onlyToday?: boolean
+    }
+): Promise<Record<string, number>> {
+    const access = await verifyProjectAccess(projectId)
+    if (!access.hasAccess) return {}
+    const supabase = createClient()
+    const f = filters || {}
+    const { rows, error } = await fetchAllRowsForConsolidation(supabase, projectId, {
+        agency: f.agency,
+        minPrice: f.minPrice,
+        maxPrice: f.maxPrice,
+        onlyFavorites: f.onlyFavorites,
+        startDate: f.startDate,
+        endDate: f.endDate,
+        onlyToday: f.onlyToday,
+    })
+    if (error) return {}
+    let consolidated = consolidateProjectPropertiesData(rows)
+    if (f.onlyDuplicates) {
+        consolidated = consolidated.filter((p) => p.is_cross_portal_duplicate)
+    }
+    if (f.onlyFavorites) {
+        consolidated = consolidated.filter((p) => p.is_favorite)
+    }
+    return platformCountsFromConsolidated(consolidated)
+}
+
+async function fetchPropertiesForDashboard(supabase: SupabaseClient, projectId: string) {
+    const rows: any[] = []
+    let offset = 0
+    const pageSize = 1000
+    for (;;) {
+        const { data: batch, error } = await supabase
+            .from('scraper_properties')
+            .select(SCRAPER_CONSOLIDATION_COLS)
+            .eq('project_id', projectId)
+            .order('id', { ascending: true })
+            .range(offset, offset + pageSize - 1)
+        if (error) {
+            console.error('fetchPropertiesForDashboard:', error)
+            return { error: error.message, data: null as null }
+        }
+        const chunk = batch || []
+        rows.push(...chunk)
+        if (chunk.length < pageSize) break
+        offset += pageSize
+    }
+    return { data: rows }
+}
+
 /**
  * Obtener dashboard del proyecto
  */
@@ -62,25 +246,31 @@ export async function getProjectDashboard(projectId: string) {
 
     const supabase = createClient()
 
-    // Obtener estadísticas
-    const [propertiesCount, logsCount, ticketsCount, updatesCount, agenciesData] = await Promise.all([
-        supabase.from('scraper_properties').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
+    // Filas completas + consolidación (misma lógica que la pestaña Propiedades) para que totales coincidan con los badges
+    const [logsCount, ticketsCount, updatesCount, rawFetch] = await Promise.all([
         supabase.from('scraper_logs').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
         supabase.from('tickets').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
         supabase.from('project_updates').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
-        supabase.from('scraper_properties').select('agency, phone, portal, price, created_at').eq('project_id', projectId),
+        fetchPropertiesForDashboard(supabase, projectId),
     ])
+
+    if (rawFetch.error) {
+        return { error: 'Error al obtener datos del proyecto' }
+    }
+    const allRawRows = rawFetch.data ?? []
+    const consolidated = consolidateProjectPropertiesData(allRawRows)
 
     const normAccent = (s: string) =>
         (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()
 
+    // --- Agencias (una fila consolidada = un aviso; cuenta por inmobiliaria como en la tabla) ---
     const agencyData = new Map<string, { name: string; count: number; phoneCounts: Map<string, number> }>()
-    ;(agenciesData.data || [])
+    consolidated
         .filter((p) => p.agency?.trim())
         .forEach((p) => {
-            const raw = p.agency!.trim()
+            const raw = String(p.agency).trim()
             const key = normAccent(raw)
-            const phone = p.phone?.trim() || ''
+            const phone = (p.phone || p.agency_phone || '').toString().trim()
             const existing = agencyData.get(key)
             if (existing) {
                 existing.count++
@@ -110,41 +300,47 @@ export async function getProjectDashboard(projectId: string) {
         .sort((a, b) => b.count - a.count)
     const topAgencies = allAgencies.slice(0, 5)
 
-    // --- Platform stats ---
-    const allProps = agenciesData.data || []
+    // --- Platform stats (cada portal en que aparece el aviso consolidado cuenta +1, igual que los badges) ---
     const platformMap = new Map<string, { total: number; agencies: Set<string>; totalPrice: number; priceCount: number }>()
-    allProps.forEach((p: any) => {
-        const portal = p.portal || 'Desconocido'
-        const agencyKey = normAccent(p.agency || '')
-        const price = Number(p.price) || 0
-        const existing = platformMap.get(portal)
-        if (existing) {
-            existing.total++
-            if (agencyKey) existing.agencies.add(agencyKey)
-            if (price > 0) { existing.totalPrice += price; existing.priceCount++ }
-        } else {
-            const agencies = new Set<string>()
-            if (agencyKey) agencies.add(agencyKey)
-            platformMap.set(portal, {
-                total: 1,
-                agencies,
-                totalPrice: price > 0 ? price : 0,
-                priceCount: price > 0 ? 1 : 0
-            })
-        }
+    consolidated.forEach((g: any) => {
+        const agencyKey = normAccent(g.agency || '')
+        const price = Number(g.price) || 0
+        const portalsList: string[] = (g.portals?.length ? g.portals : [g.portal]).filter(Boolean)
+        const toCount = portalsList.length ? portalsList : ['Desconocido']
+        toCount.forEach((portalName) => {
+            const portal = portalName || 'Desconocido'
+            const existing = platformMap.get(portal)
+            if (existing) {
+                existing.total++
+                if (agencyKey) existing.agencies.add(agencyKey)
+                if (price > 0) {
+                    existing.totalPrice += price
+                    existing.priceCount++
+                }
+            } else {
+                const agencies = new Set<string>()
+                if (agencyKey) agencies.add(agencyKey)
+                platformMap.set(portal, {
+                    total: 1,
+                    agencies,
+                    totalPrice: price > 0 ? price : 0,
+                    priceCount: price > 0 ? 1 : 0,
+                })
+            }
+        })
     })
     const platformStats = Array.from(platformMap.entries())
         .map(([portal, data]) => ({
             portal,
             total: data.total,
             agencies: data.agencies.size,
-            avgPrice: data.priceCount > 0 ? Math.round(data.totalPrice / data.priceCount) : 0
+            avgPrice: data.priceCount > 0 ? Math.round(data.totalPrice / data.priceCount) : 0,
         }))
         .sort((a, b) => b.total - a.total)
 
-    // --- New agencies (first seen in last 3 days) ---
+    // --- New agencies (first seen in last 3 days) — por fila en BD / portal ---
     const agencyFirstSeenMap = new Map<string, { name: string; portal: string; firstSeen: string; count: number }>()
-    allProps.filter((p: any) => p.agency?.trim()).forEach((p: any) => {
+    allRawRows.filter((p: any) => p.agency?.trim()).forEach((p: any) => {
         const raw = p.agency!.trim()
         const key = `${normAccent(raw)}::${p.portal || ''}`
         const existing = agencyFirstSeenMap.get(key)
@@ -163,24 +359,27 @@ export async function getProjectDashboard(projectId: string) {
         .filter(a => new Date(a.firstSeen).getTime() >= threeDaysAgo.getTime())
         .sort((a, b) => new Date(b.firstSeen).getTime() - new Date(a.firstSeen).getTime())
 
-    // --- Monthly stats ---
+    // --- Monthly stats (misma regla que badges: por aviso consolidado y por portal) ---
     const monthlyMap = new Map<string, Map<string, { total: number; agencies: Set<string> }>>()
-    allProps.forEach((p: any) => {
-        const date = new Date(p.created_at)
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        const portal = p.portal || 'Desconocido'
-        const agencyKey = normAccent(p.agency || '')
-        if (!monthlyMap.has(monthKey)) monthlyMap.set(monthKey, new Map())
-        const portalMap = monthlyMap.get(monthKey)!
-        const existing = portalMap.get(portal)
-        if (existing) {
-            existing.total++
-            if (agencyKey) existing.agencies.add(agencyKey)
-        } else {
-            const agencies = new Set<string>()
-            if (agencyKey) agencies.add(agencyKey)
-            portalMap.set(portal, { total: 1, agencies })
-        }
+    consolidated.forEach((g: any) => {
+        const monthKey = monthKeyMontevideo(g.created_at)
+        const agencyKey = normAccent(g.agency || '')
+        const portalsList: string[] = (g.portals?.length ? g.portals : [g.portal]).filter(Boolean)
+        const toCount = portalsList.length ? portalsList : ['Desconocido']
+        toCount.forEach((portalName) => {
+            const portal = portalName || 'Desconocido'
+            if (!monthlyMap.has(monthKey)) monthlyMap.set(monthKey, new Map())
+            const portalMap = monthlyMap.get(monthKey)!
+            const existing = portalMap.get(portal)
+            if (existing) {
+                existing.total++
+                if (agencyKey) existing.agencies.add(agencyKey)
+            } else {
+                const agencies = new Set<string>()
+                if (agencyKey) agencies.add(agencyKey)
+                portalMap.set(portal, { total: 1, agencies })
+            }
+        })
     })
     const monthlyStats: { month: string; portal: string; total: number; agencies: number }[] = []
     monthlyMap.forEach((portalMap, month) => {
@@ -195,7 +394,8 @@ export async function getProjectDashboard(projectId: string) {
         data: {
             project: access.project,
             stats: {
-                properties: propertiesCount.count || 0,
+                /** Filas únicas tras consolidar (coincide con total en pestaña Propiedades) */
+                properties: consolidated.length,
                 logs: logsCount.count || 0,
                 tickets: ticketsCount.count || 0,
                 updates: updatesCount.count || 0,
@@ -230,6 +430,8 @@ export async function getProjectProperties(
         onlyFavorites?: boolean
         startDate?: string
         endDate?: string
+        /** Solo propiedades con created_at en el día actual (America/Montevideo); prioridad sobre startDate/endDate */
+        onlyToday?: boolean
     } = {}
 ) {
     const access = await verifyProjectAccess(projectId)
@@ -251,148 +453,28 @@ export async function getProjectProperties(
         onlyDuplicates = false,
         onlyFavorites = false,
         startDate,
-        endDate
+        endDate,
+        onlyToday = false
     } = options
     const from = (page - 1) * perPage
     const to = from + perPage - 1
 
-    let query = supabase
-        .from('scraper_properties')
-        .select('*', { count: 'exact' })
-        .eq('project_id', projectId)
-
-    // Handle ordering
-    if (orderBy === 'm2') {
-        const orderPart = `CAST(NULLIF(regexp_replace(m2, '[^0-9.]', '', 'g'), '') AS NUMERIC)`
-        query = query.order(orderPart, { ascending: orderDir === 'asc', nullsFirst: false })
-    } else {
-        query = query.order(orderBy, { ascending: orderDir === 'asc' })
-    }
-
-    if (neighborhood) {
-        query = query.ilike('neighborhood', `%${neighborhood}%`)
-    }
-    if (minPrice) {
-        query = query.gte('price', minPrice)
-    }
-    if (maxPrice) {
-        query = query.lte('price', maxPrice)
-    }
-    if (portal) {
-        query = query.eq('portal', portal)
-    }
-    if (agency && agency.trim()) {
-        query = query.ilike('agency', `%${agency.trim()}%`)
-    }
-    // onlyDuplicates filter is applied in JS after grouping (cross-portal duplicates only)
-    if (startDate) {
-        query = query.gte('created_at', startDate)
-    }
-    if (endDate) {
-        // Add 23:59:59 to endDate if it's just a date string
-        const endStr = endDate.includes('T') ? endDate : `${endDate}T23:59:59`
-        query = query.lte('created_at', endStr)
-    }
-    if (onlyFavorites) {
-        query = query.eq('favourite', true)
-    }
-
-    const { data: rawData, count: totalRawCount, error } = await query
-
-    if (error) {
-        console.error('Error fetching properties:', error)
+    const { rows: allRows, error: fetchErr } = await fetchAllRowsForConsolidation(supabase, projectId, {
+        neighborhood,
+        minPrice,
+        maxPrice,
+        portal,
+        agency,
+        onlyFavorites,
+        startDate,
+        endDate,
+        onlyToday,
+    })
+    if (fetchErr) {
         return { error: 'Error al obtener propiedades' }
     }
 
-    // JS Consolidation Logic
-    // Duplicados: misma inmobiliaria + mismo precio + ubicación similar (LIKE, no exacta). El título NO influye.
-    // Al mergear ML + otro portal: priorizar datos del otro portal.
-    const ML = 'Mercado Libre'
-    const isML = (portal: string) => (portal || '').toLowerCase().includes('mercado') && (portal || '').toLowerCase().includes('libre')
-
-    const norm = (s: string) => (s || '').toLowerCase().trim()
-    const normAccent = (s: string) =>
-        (s || '')
-            .normalize('NFD')
-            .replace(/\p{Diacritic}/gu, '')
-            .toLowerCase()
-            .trim()
-    const neighborhoodsMatch = (a: string, b: string) => {
-        const na = norm(a)
-        const nb = norm(b)
-        if (!na || !nb) return na === nb
-        return na.includes(nb) || nb.includes(na)
-    }
-    const agenciesMatch = (a: string, b: string) => normAccent(a) === normAccent(b)
-    const priceMatch = (a: unknown, b: unknown) => Number(a) === Number(b) && Number(a) > 0
-
-    const agencyPhoneCounts = new Map<string, Map<string, number>>()
-    rawData?.forEach((p) => {
-        const key = normAccent(p.agency || '')
-        const phone = p.phone?.trim()
-        if (!key || !phone) return
-        if (!agencyPhoneCounts.has(key)) agencyPhoneCounts.set(key, new Map())
-        const m = agencyPhoneCounts.get(key)!
-        m.set(phone, (m.get(phone) || 0) + 1)
-    })
-    const agencyPhoneMap = new Map<string, string>()
-    agencyPhoneCounts.forEach((counts, key) => {
-        let top = ''
-        let max = 0
-        counts.forEach((c, ph) => { if (c > max) { max = c; top = ph } })
-        if (top) agencyPhoneMap.set(key, top)
-    })
-
-    const groups: any[] = []
-    rawData?.forEach((p) => {
-        const match = groups.find(
-            (g) =>
-                agenciesMatch(g.agency, p.agency) &&
-                priceMatch(g.price, p.price) &&
-                neighborhoodsMatch(g.neighborhood, p.neighborhood)
-        )
-        if (match) {
-            match.portal_count++
-            if (!match.portals.some((x: string) => norm(x) === norm(p.portal))) {
-                match.portals.push(p.portal)
-                match.all_links.push({ portal: p.portal, link: p.link })
-            }
-            // Priorizar datos de portales NO-ML sobre Mercado Libre
-            const pIsML = isML(p.portal)
-            const setIf = (dst: any, key: string, val: any) => {
-                const v = val != null ? String(val).trim() : ''
-                if (!v) return
-                if (pIsML) {
-                    if (!dst[key] || !String(dst[key]).trim()) dst[key] = val
-                } else {
-                    dst[key] = val
-                }
-            }
-            setIf(match, 'title', p.title)
-            setIf(match, 'neighborhood', p.neighborhood)
-            setIf(match, 'phone', p.phone)
-            setIf(match, 'img_url', p.img_url)
-            setIf(match, 'm2', p.m2)
-            if ((p as any).description) setIf(match, 'description', (p as any).description)
-            if (new Date(p.created_at) < new Date(match.created_at)) match.created_at = p.created_at
-            match.favourite = match.favourite || !!p.favourite
-        } else {
-            groups.push({
-                ...p,
-                portals: [p.portal],
-                all_links: [{ portal: p.portal, link: p.link }],
-                portal_count: 1
-            })
-        }
-    })
-
-    // "Duplicado" label + agency_phone + is_favorite (desde columna favourite)
-    let filteredGrouped = groups.map((p) => ({
-        ...p,
-        is_cross_portal_duplicate: (p.portals?.length ?? 0) > 1,
-        agency_phone: agencyPhoneMap.get(normAccent(p.agency || '')) || '',
-        is_favorite: !!p.favourite
-    }))
+    let filteredGrouped = consolidateProjectPropertiesData(allRows)
 
     if (onlyDuplicates) {
         filteredGrouped = filteredGrouped.filter(p => p.is_cross_portal_duplicate)
@@ -905,19 +987,25 @@ export async function getNeighborhoodStats(
     const supabase = createClient()
     const { portal } = options
 
-    let query = supabase
-        .from('scraper_properties')
-        .select('neighborhood, agency, price, portal')
-        .eq('project_id', projectId)
-
-    if (portal) {
-        query = query.eq('portal', portal)
-    }
-
-    const { data: allProps, error } = await query
-    if (error) {
-        console.error('Error fetching neighborhood stats:', error)
-        return { error: 'Error al obtener estadísticas por zona' }
+    const allProps: any[] = []
+    let offset = 0
+    for (;;) {
+        let q = supabase
+            .from('scraper_properties')
+            .select('neighborhood, agency, price, portal')
+            .eq('project_id', projectId)
+            .order('id', { ascending: true })
+            .range(offset, offset + 1000 - 1)
+        if (portal) q = q.eq('portal', portal)
+        const { data: batch, error } = await q
+        if (error) {
+            console.error('Error fetching neighborhood stats:', error)
+            return { error: 'Error al obtener estadísticas por zona' }
+        }
+        const chunk = batch || []
+        allProps.push(...chunk)
+        if (chunk.length < 1000) break
+        offset += 1000
     }
 
     const normAccent = (s: string) =>
@@ -1209,13 +1297,22 @@ export async function removeProjectMember(projectId: string, userId: string) {
     return { success: true }
 }
 
+type AlertRow = {
+    project_id: string
+    created_by: null
+    title: string
+    content: string
+    update_type: string
+    channel: 'technical' | 'functional'
+    severity: 'critical' | 'warning' | 'info' | null
+    tier: string | null
+    metadata: Record<string, any> | null
+}
+
 /**
- * Obtener lista de proyectos accesibles por el usuario
- */
-/**
- * Generar alertas automáticas basadas en el análisis de datos del scraper.
- * Inserta alertas como project_updates con update_type específico.
- * Tipos: alert_shared_property, alert_new_agency_zone, alert_high_activity.
+ * Generar alertas automáticas (técnicas + funcionales).
+ * Técnicas: salud del sistema (portales sin datos, logs viejos, scraping lento).
+ * Funcionales: propiedades compartidas, nuevas inmobiliarias en zonas, alta actividad.
  */
 export async function generateScraperAlerts(projectId: string) {
     const access = await verifyProjectAccess(projectId)
@@ -1224,9 +1321,110 @@ export async function generateScraperAlerts(projectId: string) {
     }
 
     const adminSupabase = createAdminClient()
-    const alerts: { title: string; content: string; update_type: string }[] = []
+    const alerts: AlertRow[] = []
+    const base = { project_id: projectId, created_by: null as null }
 
-    // 1. Shared property alerts
+    const normAccent = (s: string) =>
+        (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()
+
+    // ─── CANAL TÉCNICO ───────────────────────────────────────────────
+
+    // T1. Portal sin propiedades recientes (48h)
+    const KNOWN_PORTALS = ['CasasYMas', 'InfoCasas', 'VeoCasas', 'Mercado Libre']
+    const twoDaysAgo = new Date()
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
+
+    for (const portal of KNOWN_PORTALS) {
+        const { count } = await adminSupabase
+            .from('scraper_properties')
+            .select('id', { count: 'exact', head: true })
+            .eq('project_id', projectId)
+            .eq('portal', portal)
+            .gte('created_at', twoDaysAgo.toISOString())
+        if ((count ?? 0) === 0) {
+            alerts.push({
+                ...base,
+                title: `${portal}: sin datos nuevos en 48h`,
+                content: `No se han registrado propiedades de ${portal} en las últimas 48 horas. Verificar que el scraping esté funcionando correctamente.`,
+                update_type: 'alert_portal_stale',
+                channel: 'technical',
+                severity: 'warning',
+                tier: null,
+                metadata: { portal, hours_threshold: 48 },
+            })
+        }
+    }
+
+    // T2. Último log de scraping demasiado viejo (> 26h, ya que corre diario a las 18)
+    const { data: lastLog } = await adminSupabase
+        .from('scraper_logs')
+        .select('created_at, status, error_message')
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+    if (lastLog) {
+        const logAge = Date.now() - new Date(lastLog.created_at).getTime()
+        const hoursAgo = Math.round(logAge / (1000 * 60 * 60))
+        if (logAge > 26 * 60 * 60 * 1000) {
+            alerts.push({
+                ...base,
+                title: `Sin logs de scraping hace ${hoursAgo}h`,
+                content: `El último log de scraping tiene ${hoursAgo} horas de antigüedad. El scraper corre diariamente; esto puede indicar que n8n no procesó o que el workflow falló.`,
+                update_type: 'alert_stale_logs',
+                channel: 'technical',
+                severity: 'critical',
+                tier: null,
+                metadata: { last_log_at: lastLog.created_at, hours_ago: hoursAgo },
+            })
+        }
+        if (lastLog.status === 'error') {
+            alerts.push({
+                ...base,
+                title: 'Último scraping terminó con error',
+                content: `El último log registrado tiene status "error".\n\n${lastLog.error_message || 'Sin mensaje de error.'}`,
+                update_type: 'alert_scrape_error',
+                channel: 'technical',
+                severity: 'critical',
+                tier: null,
+                metadata: { last_log_at: lastLog.created_at, error: lastLog.error_message },
+            })
+        }
+    } else {
+        alerts.push({
+            ...base,
+            title: 'Sin logs de scraping',
+            content: 'No se encontró ningún log de scraping para este proyecto. El scraper podría no estar configurado.',
+            update_type: 'alert_no_logs',
+            channel: 'technical',
+            severity: 'critical',
+            tier: null,
+            metadata: null,
+        })
+    }
+
+    // T3. Ratio de duplicados cross-portal alto (> 40%)
+    const { rows: recentRows } = await fetchAllRowsForConsolidation(adminSupabase, projectId, {})
+    const consolidated = consolidateProjectPropertiesData(recentRows)
+    const crossPortalCount = consolidated.filter(p => p.is_cross_portal_duplicate).length
+    const dupRatio = consolidated.length > 0 ? crossPortalCount / consolidated.length : 0
+    if (dupRatio > 0.4) {
+        alerts.push({
+            ...base,
+            title: `Ratio de duplicados cross-portal alto: ${Math.round(dupRatio * 100)}%`,
+            content: `De ${consolidated.length} avisos consolidados, ${crossPortalCount} (${Math.round(dupRatio * 100)}%) aparecen en múltiples portales. Esto puede ser normal o indicar problemas de deduplicación.`,
+            update_type: 'alert_high_duplicates',
+            channel: 'technical',
+            severity: 'info',
+            tier: null,
+            metadata: { total: consolidated.length, cross_portal: crossPortalCount, ratio: Math.round(dupRatio * 100) },
+        })
+    }
+
+    // ─── CANAL FUNCIONAL ─────────────────────────────────────────────
+
+    // F1. Propiedades compartidas
     const sharedResult = await detectSharedProperties(projectId)
     if (sharedResult.success && sharedResult.count && sharedResult.count > 0) {
         const { data: sharedItems } = await adminSupabase
@@ -1234,34 +1432,31 @@ export async function generateScraperAlerts(projectId: string) {
             .select('agency_a, agency_b, neighborhood, price')
             .eq('project_id', projectId)
             .limit(5)
-
         const examples = (sharedItems || [])
             .map(s => `• ${s.neighborhood}: ${s.agency_a} vs ${s.agency_b} (U$S ${Number(s.price).toLocaleString()})`)
             .join('\n')
-
         alerts.push({
-            title: `Se detectaron ${sharedResult.count} propiedades compartidas`,
-            content: `Se encontraron propiedades publicadas por diferentes inmobiliarias en la misma zona y al mismo precio.\n\nEjemplos:\n${examples}`,
-            update_type: 'alert_shared_property'
+            ...base,
+            title: `${sharedResult.count} propiedades compartidas detectadas`,
+            content: `Propiedades publicadas por diferentes inmobiliarias en la misma zona y precio.\n\nEjemplos:\n${examples}`,
+            update_type: 'alert_shared_property',
+            channel: 'functional',
+            severity: null,
+            tier: 'full',
+            metadata: { count: sharedResult.count },
         })
     }
 
-    // 2. New agency in zone alerts
-    const normAccent = (s: string) =>
-        (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()
-
-    const { data: allProps } = await adminSupabase
-        .from('scraper_properties')
-        .select('agency, neighborhood, created_at')
-        .eq('project_id', projectId)
-
-    if (allProps && allProps.length > 0) {
-        // Detect agencies that appeared in a new neighborhood in the last 3 days
-        const agencyZones = new Map<string, { firstSeen: Map<string, string> }>()
-        allProps.filter(p => p.agency?.trim() && p.neighborhood?.trim()).forEach(p => {
+    // F2. Nuevas inmobiliarias en zonas (últimos 3 días)
+    const allProps = recentRows
+    if (allProps.length > 0) {
+        const agencyZones = new Map<string, { firstSeen: Map<string, string>; rawName: string }>()
+        const rawZoneMap = new Map<string, string>()
+        allProps.filter((p: any) => p.agency?.trim() && p.neighborhood?.trim()).forEach((p: any) => {
             const agKey = normAccent(p.agency!)
             const zoneKey = normAccent(p.neighborhood!)
-            if (!agencyZones.has(agKey)) agencyZones.set(agKey, { firstSeen: new Map() })
+            if (!rawZoneMap.has(zoneKey)) rawZoneMap.set(zoneKey, p.neighborhood!.trim())
+            if (!agencyZones.has(agKey)) agencyZones.set(agKey, { firstSeen: new Map(), rawName: p.agency!.trim() })
             const az = agencyZones.get(agKey)!
             const existing = az.firstSeen.get(zoneKey)
             if (!existing || p.created_at < existing) az.firstSeen.set(zoneKey, p.created_at)
@@ -1270,63 +1465,86 @@ export async function generateScraperAlerts(projectId: string) {
         const threeDaysAgo = new Date()
         threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
         const newEntries: string[] = []
-        agencyZones.forEach((data, agKey) => {
+        agencyZones.forEach((data, _agKey) => {
             data.firstSeen.forEach((date, zone) => {
                 if (new Date(date) >= threeDaysAgo) {
-                    // Find raw agency name
-                    const raw = allProps.find(p => normAccent(p.agency || '') === agKey)?.agency || agKey
-                    const rawZone = allProps.find(p => normAccent(p.neighborhood || '') === zone)?.neighborhood || zone
-                    newEntries.push(`• ${raw} comenzó a publicar en ${rawZone}`)
+                    newEntries.push(`• ${data.rawName} comenzó a publicar en ${rawZoneMap.get(zone) || zone}`)
                 }
             })
         })
 
         if (newEntries.length > 0) {
             alerts.push({
+                ...base,
                 title: `${newEntries.length} inmobiliarias en zonas nuevas`,
                 content: `En los últimos 3 días se detectaron inmobiliarias publicando en zonas donde no habían aparecido antes.\n\n${newEntries.slice(0, 10).join('\n')}${newEntries.length > 10 ? `\n... y ${newEntries.length - 10} más` : ''}`,
-                update_type: 'alert_new_agency_zone'
+                update_type: 'alert_new_agency_zone',
+                channel: 'functional',
+                severity: null,
+                tier: 'basic',
+                metadata: { count: newEntries.length },
             })
         }
 
-        // 3. High activity alert: zones with unusual activity (>= 5 props in last 24h)
+        // F3. Alta actividad por zona (>= 5 props en 24h)
         const oneDayAgo = new Date()
         oneDayAgo.setDate(oneDayAgo.getDate() - 1)
         const recentByZone = new Map<string, number>()
-        allProps.filter(p => p.neighborhood?.trim() && new Date(p.created_at) >= oneDayAgo).forEach(p => {
+        allProps.filter((p: any) => p.neighborhood?.trim() && new Date(p.created_at) >= oneDayAgo).forEach((p: any) => {
             const zone = normAccent(p.neighborhood!)
             recentByZone.set(zone, (recentByZone.get(zone) || 0) + 1)
         })
-
         const highActivityZones: string[] = []
         recentByZone.forEach((count, zone) => {
             if (count >= 5) {
-                const rawZone = allProps.find(p => normAccent(p.neighborhood || '') === zone)?.neighborhood || zone
-                highActivityZones.push(`• ${rawZone}: ${count} publicaciones`)
+                highActivityZones.push(`• ${rawZoneMap.get(zone) || zone}: ${count} publicaciones`)
             }
         })
-
         if (highActivityZones.length > 0) {
             alerts.push({
+                ...base,
                 title: `Alta actividad en ${highActivityZones.length} zona${highActivityZones.length !== 1 ? 's' : ''}`,
-                content: `Las siguientes zonas tuvieron actividad inusual en las últimas 24 horas:\n\n${highActivityZones.join('\n')}`,
-                update_type: 'alert_high_activity'
+                content: `Zonas con actividad notable en las últimas 24 horas:\n\n${highActivityZones.join('\n')}`,
+                update_type: 'alert_high_activity',
+                channel: 'functional',
+                severity: null,
+                tier: 'basic',
+                metadata: { zones: highActivityZones.length },
+            })
+        }
+
+        // F4. Resumen de nuevas propiedades del día
+        const { startIso, endIso } = getUruguayTodayBoundsIso()
+        const todayProps = allProps.filter((p: any) => p.created_at >= startIso && p.created_at <= endIso)
+        if (todayProps.length > 0) {
+            const byPortal = new Map<string, number>()
+            todayProps.forEach((p: any) => {
+                const portal = (p.portal || 'Desconocido').trim()
+                byPortal.set(portal, (byPortal.get(portal) || 0) + 1)
+            })
+            const breakdown = Array.from(byPortal.entries())
+                .sort((a, b) => b[1] - a[1])
+                .map(([p, c]) => `• ${p}: ${c}`)
+                .join('\n')
+            alerts.push({
+                ...base,
+                title: `${todayProps.length} propiedades nuevas hoy`,
+                content: `Desglose por portal:\n${breakdown}`,
+                update_type: 'alert_daily_properties',
+                channel: 'functional',
+                severity: null,
+                tier: 'basic',
+                metadata: { total: todayProps.length, by_portal: Object.fromEntries(byPortal) },
             })
         }
     }
 
-    // Insert alerts as project_updates
+    // ─── INSERT ──────────────────────────────────────────────────────
+
     if (alerts.length > 0) {
-        const rows = alerts.map(a => ({
-            project_id: projectId,
-            created_by: null,
-            title: a.title,
-            content: a.content,
-            update_type: a.update_type
-        }))
         const { error: insertError } = await adminSupabase
             .from('project_updates')
-            .insert(rows)
+            .insert(alerts)
         if (insertError) {
             console.error('Error inserting alerts:', insertError)
             return { error: 'Error al generar alertas' }
@@ -1334,7 +1552,73 @@ export async function generateScraperAlerts(projectId: string) {
     }
 
     revalidatePath(`/dashboard/projects/${projectId}`)
-    return { success: true, alertsGenerated: alerts.length }
+    const technical = alerts.filter(a => a.channel === 'technical').length
+    const functional = alerts.filter(a => a.channel === 'functional').length
+    return { success: true, alertsGenerated: alerts.length, technical, functional }
+}
+
+/**
+ * Health check rápido del sistema: verifica estado sin insertar alertas.
+ * Solo master_admin. Devuelve lista de issues encontrados.
+ */
+export async function checkSystemHealth(projectId: string) {
+    const { user } = await requireMasterAdmin()
+    const adminSupabase = createAdminClient()
+    const issues: { type: string; severity: string; message: string; metadata?: any }[] = []
+
+    // 1. Último log
+    const { data: lastLog } = await adminSupabase
+        .from('scraper_logs')
+        .select('created_at, status, error_message')
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+    if (!lastLog) {
+        issues.push({ type: 'no_logs', severity: 'critical', message: 'No hay logs de scraping' })
+    } else {
+        const hoursAgo = Math.round((Date.now() - new Date(lastLog.created_at).getTime()) / 3600000)
+        if (hoursAgo > 26) {
+            issues.push({ type: 'stale_logs', severity: 'critical', message: `Último log hace ${hoursAgo}h`, metadata: { hours_ago: hoursAgo } })
+        }
+        if (lastLog.status === 'error') {
+            issues.push({ type: 'last_error', severity: 'critical', message: `Último scraping con error: ${lastLog.error_message || 'sin detalle'}` })
+        }
+    }
+
+    // 2. Portales sin datos recientes (48h)
+    const PORTALS = ['CasasYMas', 'InfoCasas', 'VeoCasas', 'Mercado Libre']
+    const twoDaysAgo = new Date()
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
+    for (const portal of PORTALS) {
+        const { count } = await adminSupabase
+            .from('scraper_properties')
+            .select('id', { count: 'exact', head: true })
+            .eq('project_id', projectId)
+            .eq('portal', portal)
+            .gte('created_at', twoDaysAgo.toISOString())
+        if ((count ?? 0) === 0) {
+            issues.push({ type: 'portal_stale', severity: 'warning', message: `${portal}: sin datos en 48h`, metadata: { portal } })
+        }
+    }
+
+    // 3. Total de propiedades
+    const { count: totalProps } = await adminSupabase
+        .from('scraper_properties')
+        .select('id', { count: 'exact', head: true })
+        .eq('project_id', projectId)
+
+    return {
+        success: true,
+        data: {
+            status: issues.some(i => i.severity === 'critical') ? 'critical' : issues.length > 0 ? 'warning' : 'healthy',
+            issues,
+            totalProperties: totalProps ?? 0,
+            lastLogAt: lastLog?.created_at || null,
+            lastLogStatus: lastLog?.status || null,
+        }
+    }
 }
 
 export async function getAccessibleProjects() {

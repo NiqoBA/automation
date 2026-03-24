@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTheme } from '@/contexts/ThemeContext'
-import { Home, FileText, Building2, History, MessageSquare, Bell, Share2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
-import { getProjectDashboard } from '@/app/actions/project-actions'
+import { Home, FileText, Building2, History, MessageSquare, Bell, Share2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { getProjectName } from '@/app/actions/project-actions'
 
 interface ProjectSidebarProps {
     projectId: string
@@ -26,13 +26,9 @@ export default function ProjectSidebar({ projectId, userRole, leftOffset, collap
     const [projectName, setProjectName] = useState('Cargando...')
 
     useEffect(() => {
-        const loadProject = async () => {
-            const result = await getProjectDashboard(projectId)
-            if (result.data?.project?.name) {
-                setProjectName(result.data.project.name)
-            }
-        }
-        loadProject()
+        getProjectName(projectId).then(name => {
+            if (name) setProjectName(name)
+        })
     }, [projectId])
 
     const tabs = [

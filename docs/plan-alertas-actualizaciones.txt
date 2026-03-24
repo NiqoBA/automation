@@ -1,0 +1,128 @@
+ALERTAS Y ACTUALIZACIONES DE LA PLATAFORMA - PLAN FUNCIONAL
+============================================================
+
+Estado actual
+-------------
+Hoy project_updates es una tabla plana donde conviven:
+- Actualizaciones manuales del master admin (info, feature, fix, breaking)
+- Alertas automáticas generadas por generateScraperAlerts (alert_shared_property, alert_new_agency_zone, alert_high_activity)
+
+No hay distincion de audiencia. Todo lo que se genera aparece en la misma pestaña "Actualizaciones" para quien tenga acceso al proyecto, mezclando alertas operativas con información de negocio.
+
+
+Propuesta: dos canales de alertas con audiencias separadas
+-----------------------------------------------------------
+
+FUENTES DE EVENTOS:
+  - Scraper diario
+  - n8n ETL
+  - Sistema / CRON
+
+CLASIFICACION:
+  - Canal TECNICO → Master Admin / Inflexo
+  - Canal FUNCIONAL → Cliente / Org Users
+  (Tecnico opcionalmente visible para Org Users)
+
+
+Canal 1: TECNICO (para Inflexo)
+--------------------------------
+Objetivo: saber al instante si algo no anda bien en la plataforma.
+
+| Tipo de alerta           | Cuando se dispara                                              | Severidad |
+|--------------------------|----------------------------------------------------------------|-----------|
+| Scraping fallido         | Un portal devuelve 0 propiedades o el scraper crashea          | Critica   |
+| Scraping parcial         | Un portal trae < 50% de lo esperado (vs. promedio historico)   | Warning   |
+| Webhook caido            | sendToN8N recibe HTTP != 200 o timeout                         | Critica   |
+| n8n no proceso           | Pasan > 2h desde el scrape y no hay scraper_logs nuevo         | Critica   |
+| Portal sin datos nuevos  | Un portal lleva 48h sin propiedades nuevas (no es feriado)     | Warning   |
+| Duplicados excesivos     | Ratio de duplicados cross-portal supera un umbral (ej. >40%)  | Info      |
+| Tiempo de ejecucion      | El scraper tarda > X minutos (degradacion de performance)      | Warning   |
+
+Estas alertas SOLO las ve el master_admin. El cliente no necesita saber que InfoCasas devolvio un 503.
+
+
+Canal 2: FUNCIONAL (para el cliente y sus inmobiliarias)
+---------------------------------------------------------
+Objetivo: dar insumos comerciales accionables al cliente.
+
+| Tipo de alerta                | Descripcion                                                                       | Valor comercial                                           |
+|-------------------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------|
+| Nuevas propiedades del dia    | "Hoy se publicaron 45 propiedades nuevas en 3 portales"                           | Feature de plan Basic/Full                                |
+| Nueva inmobiliaria detectada  | "Inmobiliaria X aparecio por primera vez en VeoCasas publicando en Pocitos"       | Prospecto comercial para el cliente                       |
+| Inmobiliaria inactiva         | "Inmobiliaria Y no publica hace 7 dias (antes publicaba 3/semana)"               | Alerta de churn para el cliente                           |
+| Propiedad compartida          | "La propiedad en Pocitos a USD 250k esta publicada por 3 inmobiliarias distintas" | Feature Premium: competencia directa                      |
+| Precio fuera de rango         | "La propiedad X esta 25% por debajo del promedio de su zona"                      | Feature Premium/BigData: pricing intelligence             |
+| Zona en tendencia             | "Pocitos Nuevo tuvo un aumento del 30% en publicaciones esta semana vs anterior"  | Feature Premium: market trends                            |
+| Resumen semanal               | Digest automatico con metricas clave del periodo                                  | Feature para todos los planes                             |
+
+
+Mapeo a planes comerciales del cliente
+----------------------------------------
+Freemium:
+  - Resumen semanal basico
+  - Total propiedades por portal
+
+Basic:
+  - Nuevas propiedades del dia
+  - Nuevas inmobiliarias
+  - Inmobiliarias inactivas
+
+Full:
+  - Propiedades compartidas
+  - Alertas de zona en tendencia
+  - Todo lo de Basic
+
+Premium / BigData:
+  - Precio fuera de rango
+  - Score de actividad por inmobiliaria
+  - Benchmarking de publicaciones
+  - Todo lo de Full
+
+La idea es que cada tipo de alerta funcional tiene un "tier" asociado. El cliente configura que plan tiene cada una de sus inmobiliarias, y el sistema solo les muestra las alertas de su nivel.
+
+
+Donde se ve cada canal en la UI
+---------------------------------
+Pestaña "Actualizaciones" del proyecto:
+
+  [Tecnicas]  [Funcionales]  [Todas]     <-- selector tipo PlatformSelector
+
+- Tecnicas: solo visible si userRole === 'master_admin'. Fondo rojo/ambar segun severidad.
+- Funcionales: visible para todos. Icono y color segun tipo.
+- Todas: master_admin ve ambas; org_user solo ve funcionales.
+
+Opcional futuro: una vista tipo "Centro de notificaciones" en el sidebar principal (no dentro del proyecto) con un badge de no leidas.
+
+
+Modelo de datos (conceptual)
+------------------------------
+Columnas nuevas o modificadas en project_updates:
+
+| Campo       | Proposito                                                                    |
+|-------------|------------------------------------------------------------------------------|
+| channel     | 'technical' o 'functional'                                                   |
+| severity    | 'critical', 'warning', 'info' (para tecnicas)                               |
+| tier        | 'freemium', 'basic', 'full', 'premium' (para funcionales; null para tecnicas)|
+| update_type | Se mantiene pero se expanden los valores                                     |
+| metadata    | JSONB para datos estructurados (portal, zona, porcentaje, conteo, etc.)      |
+| read        | Boolean para marcar como leida (futuro)                                      |
+
+
+Cuando y como se generan
+--------------------------
+| Fuente                     | Momento                          | Alertas que produce                                                    |
+|----------------------------|----------------------------------|------------------------------------------------------------------------|
+| Scraper (index.js)         | Al terminar cada ejecucion       | Incluye en payload a n8n: errores parciales, conteos, tiempos          |
+| n8n                        | Al recibir el payload            | scraper_logs + alertas tecnicas si hay errores + funcionales historicas |
+| CRON diario (post-scrape)  | Despues de que n8n termina       | generateScraperAlerts ampliado                                         |
+| CRON semanal               | Lunes a las 9am UY               | Resumen semanal (digest)                                               |
+
+
+Resumen ejecutivo
+------------------
+1. Separar en dos canales (technical / functional) con visibilidad por rol.
+2. Tecnicas: errores de scraping, webhook, sync, performance. Solo master_admin. Severidad critica/warning/info.
+3. Funcionales: nuevas propiedades, inmobiliarias, compartidas, precios, tendencias, digest. Para el cliente. Con tier para mapear a planes comerciales.
+4. Expandir project_updates con channel, severity, tier y metadata JSONB.
+5. UI: selector de canal en la pestaña Actualizaciones; filtro por tier en el futuro.
+6. El scraper informa errores estructurados en el payload a n8n (hoy solo hace console.error).

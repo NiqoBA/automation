@@ -5,17 +5,20 @@ import AdminProjectsTable from '@/components/admin/AdminProjectsTable'
 import CreateProjectAdminButton from '@/components/admin/CreateProjectAdminButton'
 import ProjectFocusedView from '@/components/projects/ProjectFocusedView'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function AdminProjectsPage({
   searchParams,
 }: {
-  searchParams: { focusProject?: string }
+  searchParams: { focusProject?: string; tab?: string }
 }) {
   await requireMasterAdmin()
   const focusProjectId = searchParams.focusProject
+  const activeTab = searchParams.tab || 'overview'
 
-  // Si hay un proyecto enfocado, obtener su data
   let projectData = null
-  if (focusProjectId) {
+  if (focusProjectId && activeTab === 'overview') {
     const result = await getProjectDashboard(focusProjectId)
     projectData = result.data
   }
@@ -36,7 +39,7 @@ export default async function AdminProjectsPage({
         </div>
       )}
 
-      {focusProjectId && projectData ? (
+      {focusProjectId ? (
         <ProjectFocusedView
           projectId={focusProjectId}
           projectData={projectData}

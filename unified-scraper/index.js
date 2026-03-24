@@ -499,8 +499,9 @@ async function sendToN8N(data, summary) {
         start_time: summary.start_time,
         end_time: summary.end_time,
         count: data.length,
-        project_id: process.env.PROJECT_ID || null, // Importante para asociar a la DB
+        project_id: process.env.PROJECT_ID || null,
         summary: summary,
+        errors: summary.errors || [],
         properties: data
     };
 
@@ -515,22 +516,28 @@ async function sendToN8N(data, summary) {
 
     if (!N8N_WEBHOOK_URL || N8N_WEBHOOK_URL.includes('AQUI')) {
         console.log('[Webhook] URL no configurada. Omitiendo envío.');
-        return;
+        return { ok: false, error: 'URL no configurada' };
     }
     console.log('[Webhook] Enviando datos a n8n...');
     try {
         const response = await fetch(N8N_WEBHOOK_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            signal: AbortSignal.timeout(30000)
         });
         if (response.ok) {
             console.log('[Webhook] Datos enviados exitosamente!');
+            return { ok: true };
         } else {
-            console.error(`[Webhook] Error al enviar: ${response.status} ${response.statusText}`);
+            const msg = `HTTP ${response.status} ${response.statusText}`;
+            console.error(`[Webhook] Error al enviar: ${msg}`);
+            return { ok: false, error: msg };
         }
     } catch (error) {
-        console.error('[Webhook] Error de red:', error.message);
+        const msg = error.name === 'TimeoutError' ? 'Timeout (30s)' : error.message;
+        console.error('[Webhook] Error de red:', msg);
+        return { ok: false, error: msg };
     }
 }
 
@@ -553,16 +560,30 @@ async function sendToN8N(data, summary) {
             return;
         }
 
+        const portalErrors = [];
+
+        const scrapePortal = async (name, fn) => {
+            try {
+                const results = await fn(browser);
+                if (results.length === 0) {
+                    portalErrors.push({ portal: name, severity: 'critical', message: `${name} devolvió 0 propiedades` });
+                }
+                return results;
+            } catch (err) {
+                portalErrors.push({ portal: name, severity: 'critical', message: `${name} crasheó: ${err.message}` });
+                console.error(`[${name}] Error:`, err.message);
+                return [];
+            }
+        };
+
         const [infoCasasResults, casasYMasResults, veoCasasResults] = await Promise.all([
-            scrapeInfoCasas(browser),
-            scrapeCasasYMas(browser),
-            scrapeVeoCasas(browser)
+            scrapePortal('InfoCasas', scrapeInfoCasas),
+            scrapePortal('CasasYMas', scrapeCasasYMas),
+            scrapePortal('VeoCasas', scrapeVeoCasas)
         ]);
 
         const { combined: infoCasasCombined, duplicates } = detectDuplicates(infoCasasResults, casasYMasResults);
         const combined = [...infoCasasCombined, ...veoCasasResults];
-
-        // Filtrar opcionalmente solo >= 100k (aunque ya se filtró en scrapers)
         const finalResults = combined.filter(item => item.price >= MIN_PRICE_FOR_DETAIL);
 
         let output = `REPORTE UNIFICADO EXTRA (>= 100k) - ${new Date().toLocaleString()}\n`;
@@ -580,15 +601,31 @@ async function sendToN8N(data, summary) {
         fs.writeFileSync('reporte_final.txt', output);
         console.log('Archivos guardados: Salida2.0.txt y reporte_final.txt');
 
-        await sendToN8N(finalResults, {
+        const endTime = getUruguayTime();
+        const durationMs = new Date(endTime).getTime() - new Date(startTime).getTime();
+        if (durationMs > 10 * 60 * 1000) {
+            portalErrors.push({ portal: 'system', severity: 'warning', message: `Scraping tardó ${Math.round(durationMs / 60000)} min (umbral: 10 min)` });
+        }
+
+        const webhookResult = await sendToN8N(finalResults, {
             total: finalResults.length,
             duplicates: duplicates.length,
             source_infocasas: infoCasasResults.length,
             source_casasymas: casasYMasResults.length,
             source_veocasas: veoCasasResults.length,
             start_time: startTime,
-            end_time: getUruguayTime()
+            end_time: endTime,
+            duration_ms: durationMs,
+            errors: portalErrors,
         });
+
+        if (webhookResult && !webhookResult.ok) {
+            portalErrors.push({ portal: 'webhook', severity: 'critical', message: `Webhook falló: ${webhookResult.error}` });
+        }
+
+        if (portalErrors.length > 0) {
+            console.warn('[Alertas]', JSON.stringify(portalErrors, null, 2));
+        }
 
     } catch (error) {
         console.error('Error general:', error);
